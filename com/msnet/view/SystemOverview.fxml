@@ -28,6 +28,7 @@
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" styleClass="background">
                            <children>
                               <TreeView layoutX="6.0" prefHeight="563.0" prefWidth="314.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <Button layoutX="32.0" layoutY="54.0" mnemonicParsing="false" onAction="#handleInventoryStatus" text="Inventory status" />
                            </children>
                         </AnchorPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
@@ -54,7 +55,7 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <SplitPane dividerPositions="0.6364942528735632, 0.5" orientation="VERTICAL" prefHeight="698.0" prefWidth="663.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <SplitPane dividerPositions="0.6364942528735632" orientation="VERTICAL" prefHeight="698.0" prefWidth="663.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
                         <TabPane prefHeight="567.0" prefWidth="974.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
@@ -187,7 +188,6 @@
                               </SplitPane>
                            </children>
                         </AnchorPane>
-                        <Button mnemonicParsing="false" onAction="#handleInventoryStatus" text="Inventory status" />
                     </items>
                   </SplitPane>
                </children>

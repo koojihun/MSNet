@@ -69,7 +69,7 @@ public class LoginViewController implements Initializable {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
-					Desktop.getDesktop().browse(new URI("http://www.naver.com"));
+					Desktop.getDesktop().browse(new URI("http://166.104.126.42:8090/NewSystem/register.html"));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

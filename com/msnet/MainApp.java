@@ -68,7 +68,7 @@ public class MainApp extends Application {
 
 	public static void main(String[] args) throws Exception {
 		try {
-			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getRpcUser(), Settings.getRpcPassword());
+			bitcoinJSONRPClient = new BitcoinJSONRPCClient("a", "12");
 		} catch (MalformedURLException e) {
 			System.err.println("BitcoinJSONRPCClient Constructor Error!!");
 		}
