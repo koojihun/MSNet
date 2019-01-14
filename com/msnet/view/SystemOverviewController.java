@@ -36,7 +36,7 @@ public class SystemOverviewController implements Initializable {
 	private MainApp mainApp;
 
 	ObservableList<Product> inventoryList = FXCollections
-			.observableArrayList(new Product("20181123T1212", "20201123T1212", "¸Àµ¿»ê", 100));
+			.observableArrayList(new Product("20181123T1212", "20201123T1212", "¸Àµ¿»ê", "dfkj123-1234ewafdslk-123412m"));
 
 	public SystemOverviewController() {
 		// this.bitcoindTextArea.setEditable(false);
@@ -80,7 +80,7 @@ public class SystemOverviewController implements Initializable {
 		inventoryList = FXCollections.observableArrayList();
 		for (Map product : products) {
 			inventoryList.add(new Product(String.valueOf(product.get("production date")),
-					String.valueOf(product.get("expiration date")), String.valueOf(product.get("prodName")), 100));
+					String.valueOf(product.get("expiration date")), String.valueOf(product.get("prodName")), String.valueOf(product.get("PID"))));
 		}
 		inventoryStatusTableView.setItems(inventoryList);
 	}
@@ -94,7 +94,7 @@ public class SystemOverviewController implements Initializable {
 		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
 		expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
 		productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
-		quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+		//quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		inventoryStatusTableView.setItems(inventoryList);
 	}
 

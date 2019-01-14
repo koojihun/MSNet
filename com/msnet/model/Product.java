@@ -11,20 +11,20 @@ public class Product {
 	private StringProperty productionDate;
 	private StringProperty expirationDate;
 	private StringProperty productName;
-	private IntegerProperty quantity;
+	private StringProperty pid;
 	
 	public Product(Map product) {
 		this.productionDate = new SimpleStringProperty(String.valueOf(product.get("production date")));
 		this.expirationDate = new SimpleStringProperty(String.valueOf(product.get("expiration date")));
 		this.productName = new SimpleStringProperty(String.valueOf(product.get("productName")));
-		this.quantity = new SimpleIntegerProperty(Integer.valueOf((String) product.get("quantity")));
-	}
+		this.pid = new SimpleStringProperty(String.valueOf(product.get("PID")));
+	} 
 	
-	public Product(String productionDate, String expirationDate, String productName, int quantity) {
+	public Product(String productionDate, String expirationDate, String productName, String pid) {
 		this.productionDate = new SimpleStringProperty(productionDate);
 		this.expirationDate = new SimpleStringProperty(expirationDate);
 		this.productName = new SimpleStringProperty(productName);
-		this.quantity = new SimpleIntegerProperty(quantity);
+		this.pid = new SimpleStringProperty(pid);
 	}
 	
 	public String getProductId() {
@@ -76,15 +76,15 @@ public class Product {
 		return productName;
 	}
 	
-	public int getQuantity() {
-		return quantity.get();
+	public String getPID() {
+		return productName.get();
 	}
 	
-	public void setQuantity(int quantity) {
-		this.quantity.set(quantity);
-	}	
+	public void setPID(String pid) {
+		this.pid.set(pid);
+	}
 	
-	public IntegerProperty quantityProperty() {
-		return quantity;
+	public StringProperty pidProperty() {
+		return pid;
 	}
 }
