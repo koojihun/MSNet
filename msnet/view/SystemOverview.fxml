@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="900.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msnet.view.SystemOverviewController">
+   <children>
+      <SplitPane dividerPositions="0.24540901502504173" layoutX="208.0" layoutY="121.0" prefHeight="700.0" prefWidth="950.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="698.0" prefWidth="497.0">
+               <children>
+                  <SplitPane dividerPositions="0.632183908045977" orientation="VERTICAL" prefHeight="698.0" prefWidth="279.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" styleClass="background">
+                           <children>
+                              <TreeView layoutX="6.0" prefHeight="563.0" prefWidth="314.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <TableView layoutY="25.0" prefHeight="228.0" prefWidth="289.0" styleClass="table-row-cell" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+                                <columns>
+                                  <TableColumn maxWidth="500.0" prefWidth="300.0" text="Product name" />
+                                  <TableColumn maxWidth="300.0" prefWidth="150.0" text="Quantity" />
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                              <Label layoutX="14.0" layoutY="7.0" text="Total Quantity" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <SplitPane dividerPositions="0.6364942528735632, 0.5" orientation="VERTICAL" prefHeight="698.0" prefWidth="663.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                        <TabPane prefHeight="567.0" prefWidth="974.0" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                            <Tab text="Inventory">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TableView fx:id="inventoryStatusTableView" prefHeight="171.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columns>
+                                              <TableColumn fx:id="productionDateColumn" maxWidth="500.0" prefWidth="200.0" text="Production date" />
+                                              <TableColumn fx:id="productNameColumn" maxWidth="500.0" minWidth="0.0" prefWidth="185.0" text="Product name" />
+                                                <TableColumn fx:id="expirationDateColumn" maxWidth="500.0" minWidth="0.0" prefWidth="200.0" text="Expiration date" />
+                                                <TableColumn fx:id="quantityColumn" maxWidth="300.0" minWidth="0.0" prefWidth="153.0" text="Quantity" />
+                                            </columns>
+                                             <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TableView>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </Tab>
+                            <Tab text="Bitcoin Daemon">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TextArea fx:id="bitcoindTextArea" prefHeight="538.0" prefWidth="974.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <Button layoutX="411.0" layoutY="184.0" mnemonicParsing="false" onAction="#handleTest" text="test" />
+                                       </children></AnchorPane>
+                              </content>
+                            </Tab>
+                              <Tab text="Compare">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <AnchorPane layoutX="203.0" layoutY="55.0" prefHeight="538.0" prefWidth="974.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children></AnchorPane>
+                                 </content>
+                              </Tab>
+                          </tabs>
+                        </TabPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="206.0" prefWidth="661.0">
+                           <children>
+                              <SplitPane dividerPositions="0.6130500758725341" prefHeight="345.0" prefWidth="661.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                          <SplitPane layoutX="123.0" orientation="VERTICAL" prefHeight="248.0" prefWidth="432.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <items>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" styleClass="background">
+                                                   <children>
+                                                      <GridPane layoutX="11.0" layoutY="29.0" prefHeight="80.0" prefWidth="661.0" AnchorPane.bottomAnchor="210.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="29.0">
+                                                        <columnConstraints>
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="141.0" />
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="122.0" minWidth="10.0" prefWidth="68.0" />
+                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="235.0" minWidth="10.0" prefWidth="155.0" />
+                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="132.0" minWidth="10.0" prefWidth="66.0" />
+                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="207.0" minWidth="10.0" prefWidth="167.0" />
+                                                        </columnConstraints>
+                                                        <rowConstraints>
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        </rowConstraints>
+                                                         <children>
+                                                            <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="120.0" text="Address Book" />
+                                                            <Label prefHeight="15.0" prefWidth="69.0" text="Company:" GridPane.columnIndex="1" />
+                                                            <Label prefHeight="15.0" prefWidth="59.0" text="Address:" GridPane.columnIndex="3" />
+                                                            <TextField maxWidth="133.0" prefHeight="23.0" prefWidth="133.0" GridPane.columnIndex="2" />
+                                                            <TextField prefHeight="23.0" prefWidth="164.0" GridPane.columnIndex="4" />
+                                                         </children>
+                                                      </GridPane>
+                                                      <GridPane layoutX="31.0" layoutY="107.0" prefHeight="181.0" prefWidth="491.0" AnchorPane.bottomAnchor="31.0" AnchorPane.leftAnchor="31.0" AnchorPane.rightAnchor="161.0" AnchorPane.topAnchor="107.0">
+                                                        <columnConstraints>
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="167.0" minWidth="10.0" prefWidth="119.0" />
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="226.0" minWidth="10.0" prefWidth="226.0" />
+                                                        </columnConstraints>
+                                                        <rowConstraints>
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        </rowConstraints>
+                                                         <children>
+                                                            <Label prefHeight="15.0" prefWidth="150.0" text="Product name:" />
+                                                            <Label prefHeight="21.0" prefWidth="94.0" text="Quantity:" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                            <Label text="Production date:" GridPane.rowIndex="2" />
+                                                            <TextArea maxHeight="35.0" maxWidth="225.0" prefHeight="35.0" prefWidth="225.0" GridPane.columnIndex="1" />
+                                                            <TextArea maxHeight="16.0" prefHeight="16.0" prefWidth="226.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <DatePicker prefHeight="30.0" prefWidth="240.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                         </children>
+                                                      </GridPane>
+                                                      <Button layoutX="474.0" layoutY="186.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="59.0" text="Send" />
+                                                      <Label layoutX="-24.0" layoutY="-3.0" prefHeight="30.0" prefWidth="150.0" text="Product transfer" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="8.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </AnchorPane>
+                                            </items>
+                                          </SplitPane>
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                          <SplitPane layoutY="48.0" orientation="VERTICAL" prefHeight="248.0" prefWidth="272.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <items>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="215.0" prefWidth="209.0">
+                                                   <children>
+                                                      <TableView layoutX="21.0" layoutY="31.0" prefHeight="288.0" prefWidth="371.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="31.0">
+                                                        <columns>
+                                                          <TableColumn maxWidth="130.0" prefWidth="75.0" text="Name" />
+                                                          <TableColumn maxWidth="170.0" prefWidth="150.0" text="Employee number" />
+                                                            <TableColumn maxWidth="70.0" prefWidth="52.0" text="Login" />
+                                                        </columns>
+                                                         <columnResizePolicy>
+                                                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                         </columnResizePolicy>
+                                                      </TableView>
+                                                      <Label layoutX="14.0" layoutY="7.0" text="Worker Magement" AnchorPane.leftAnchor="8.0" AnchorPane.topAnchor="8.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </AnchorPane>
+                                            </items>
+                                          </SplitPane>
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
+                           </children>
+                        </AnchorPane>
+                        <Button mnemonicParsing="false" onAction="#handleInventoryStatus" text="Inventory status" />
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
+</AnchorPane>
