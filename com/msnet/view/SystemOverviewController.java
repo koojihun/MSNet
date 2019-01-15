@@ -1,48 +1,69 @@
 package com.msnet.view;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import com.msnet.MainApp;
 import com.msnet.model.Product;
+import com.msnet.model.NBox;
+import com.msnet.model.NDBox;
+import com.msnet.model.NDKey;
 
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.MouseEvent;
+import javafx.util.Pair;
 
 public class SystemOverviewController implements Initializable {
 	@FXML
 	private TextArea bitcoindTextArea;
 	@FXML
-	private TableView<Product> inventoryStatusTableView;
+	private TableView<NDBox> inventoryStatusTableView;
 	@FXML
-	private TableColumn<Product, String> productionDateColumn;
+	private TableColumn<NDBox, String> productionDateColumn;
 	@FXML
-	private TableColumn<Product, String> expirationDateColumn;
+	private TableColumn<NDBox, String> expirationDateColumn;
 	@FXML
-	private TableColumn<Product, String> productNameColumn;
+	private TableColumn<NDBox, String> productNameColumn;
 	@FXML
-	private TableColumn<Product, Integer> quantityColumn;
+	private TableColumn<NDBox, Integer> quantityColumn;
 	@FXML
 	private Button inventoryStatusButton;
 
+	@FXML
+	private TableView<NBox> total_inventoryStatusTableView;
+	@FXML
+	private TableColumn<NBox, String> total_productNameColumn;
+	@FXML
+	private TableColumn<NBox, Integer> total_quantityColumn;
+
 	private MainApp mainApp;
 
-	ObservableList<Product> inventoryList = FXCollections
-			.observableArrayList(new Product("20181123T1212", "20201123T1212", "맛동산", "dfkj123-1234ewafdslk-123412m"));
+	ObservableList<NBox> nList;
+	ObservableList<NDBox> ndList;
 
 	public SystemOverviewController() {
 		// this.bitcoindTextArea.setEditable(false);
 
 	}
-
+	
+	public void setMainApp(MainApp mainApp) {
+		this.mainApp = mainApp;
+	}
 	public TextArea getBitcoindTextArea() {
 		return bitcoindTextArea;
 	}
@@ -61,41 +82,139 @@ public class SystemOverviewController implements Initializable {
 	}
 
 	@FXML
-
-	private void showInventoryStatus() {
-		List<Map> products = MainApp.bitcoinJSONRPClient.get_current_products();
-
-		for (Map product : products) {
-
-		}
-	}
-
-	@FXML
 	public void handleInventoryStatus() {
+		List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
 
-		List<Map> products = MainApp.bitcoinJSONRPClient.get_current_products();
-		
-		
-		
-		inventoryList = FXCollections.observableArrayList();
-		for (Map product : products) {
-			inventoryList.add(new Product(String.valueOf(product.get("production date")),
-					String.valueOf(product.get("expiration date")), String.valueOf(product.get("prodName")), String.valueOf(product.get("PID"))));
+		//////////////////////////////////////////////////////////////
+		Map<NDKey, NDBox> result_NDBox = makeNDBox(productList);
+
+		ndList = FXCollections.observableArrayList();
+
+		for (NDKey key : result_NDBox.keySet()) {
+			ndList.add(result_NDBox.get(key));
 		}
-		inventoryStatusTableView.setItems(inventoryList);
+		inventoryStatusTableView.setItems(ndList);
+		//////////////////////////////////////////////////////////////
+		Map<String, NBox> result_NBox = makeNBox(result_NDBox);
+
+		nList = FXCollections.observableArrayList();
+
+		for (String key : result_NBox.keySet()) {
+			nList.add(result_NBox.get(key));
+		}
+		total_inventoryStatusTableView.setItems(nList);
+		//////////////////////////////////////////////////////////////
 	}
 
-	public void setMainApp(MainApp mainApp) {
-		this.mainApp = mainApp;
+	/**
+	 * get_current_products의 결과인 List<Map> 형태의 productList 인자로 받아서 제품명과 생성일, 유통기한을
+	 * 키로 가지고, NDBox를 값으로 가지는 Map<NDKey, NDBox> 형태의 값을 반환
+	 * 
+	 * @param productList
+	 * @return
+	 */
+	public Map<NDKey, NDBox> makeNDBox(List<Map> productList) {
+
+		Map<NDKey, NDBox> result = new HashMap<NDKey, NDBox>();
+
+		for (Map product : productList) {
+			// get_current_products를 통해서 반환 받은 productList를 for문을 돌면서 Map<String[],
+			// Products> 형식으로 변환
+			NDKey key = new NDKey(String.valueOf(product.get("prodName")),
+					String.valueOf(product.get("production date")), String.valueOf(product.get("expiration date")));
+
+			if (result.get(key) == null) {
+				// key에 대응하는 Products_Date가 없을 때
+				Product tmpProduct = new Product(product); // product를 Product 형식으로 변환
+				ArrayList<Product> tmpList = new ArrayList<Product>(); // Products의 ArrayList<Product>에 들어갈 임시 리스트를 하나
+																		// 생성
+				tmpList.add(tmpProduct); // 임시 리스트에 tmpProduct 추가
+				NDBox value = new NDBox(key.getProdName(), key.getProductionDate(), key.getExpirationDate(), tmpList,
+						1);
+				result.put(key, value);
+			} else {
+				// key에 대응하는 Products_Date가 있을 때
+				Product tmpProduct = new Product(product); // product를 Product 형식으로 변환
+				NDBox resultNDBox = result.get(key);
+				resultNDBox.addProduct(tmpProduct);
+				resultNDBox.setQuantity(resultNDBox.getQuantity() + 1);
+			}
+
+		}
+		return result;
 	}
+
+	/**
+	 * makeNDBox()의 결과인 Map<NDKey, NDBox>를 인수로 받아서 같은 prodName별로 묶어서 Map<String,
+	 * NBox>의 형태로 변환해줌.
+	 * 
+	 * @param ndboxMap
+	 * @return
+	 */
+	public Map<String, NBox> makeNBox(Map<NDKey, NDBox> ndboxMap) {
+		Map<String, NBox> result = new HashMap<String, NBox>();
+
+		for (NDKey key : ndboxMap.keySet()) {
+
+			String name = key.getProdName();
+
+			if (result.get(name) != null) {
+				// result에 name을 key로 갖는 값이 존재할 때
+				NDBox tmpNDBox = ndboxMap.get(key);
+				ArrayList<Product> tmpProductList = tmpNDBox.getProductList(); // 저장돼야 할 Product들의 리스트
+				NBox resultNBox = result.get(name); // 이미 저장되어 있는 result의 Products. resultProducts에다가 tmpProductsList의
+													// Product들을 저장해야 함.
+
+				Iterator itr = tmpProductList.iterator(); // 저장돼야 할 Product들의 리스트를 iterator로 만듦
+
+				while (itr.hasNext()) {
+					// itr를 이용해서 tmpProductsList의 모든 Product를 result의 Products에 저장.
+					resultNBox.getProductList().add((Product) itr.next());
+					resultNBox.setQuantity(resultNBox.getQuantity() + 1);
+				}
+
+			} else {
+				// result에 name을 key로 갖는 값이 존재하지 않을 때
+				NDBox tmpNDBox = ndboxMap.get(key);
+				NBox tmpProducts = new NBox(name, tmpNDBox.getProductList(), tmpNDBox.getQuantity());
+				result.put(name, tmpProducts);
+			}
+		}
+		return result;
+	}
+
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
 		expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
 		productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
-		//quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
-		inventoryStatusTableView.setItems(inventoryList);
+		quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+		inventoryStatusTableView.setItems(ndList);
+
+		total_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
+		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+		total_inventoryStatusTableView.setItems(nList);
+		
+		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if(event.getClickCount() >= 2) {
+					NDBox selectedNDBox =  inventoryStatusTableView.getSelectionModel().getSelectedItem();
+					ProductInfoDialogController.showProductInfoDialog(selectedNDBox);
+				}				
+			}			
+		});
+		
+		total_inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if(event.getClickCount() >= 2) {
+					NBox selectedNBox =  total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
+					ProductInfoDialogController.showProductInfoDialog(selectedNBox);
+				}				
+			}			
+		});
 	}
 
 }

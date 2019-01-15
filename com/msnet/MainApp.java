@@ -5,10 +5,12 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
+import com.msnet.model.NBox;
 import com.msnet.util.Bitcoind;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
 import com.msnet.view.LoginViewController;
+import com.msnet.view.ProductInfoDialogController;
 import com.msnet.view.SystemOverviewController;
 
 import javafx.animation.FadeTransition;
@@ -17,6 +19,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -26,6 +29,27 @@ public class MainApp extends Application {
 	static public Stage primaryStage;
 	static private BorderPane rootLayout;
 	static public BitcoinJSONRPCClient bitcoinJSONRPClient;
+
+
+
+	public static void main(String[] args) throws Exception {
+		try {
+			bitcoinJSONRPClient = new BitcoinJSONRPCClient("a", "12");
+		} catch (MalformedURLException e) {
+			System.err.println("BitcoinJSONRPCClient Constructor Error!!");
+		}
+		launch(args);
+	}
+
+	@Override
+	public void start(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+		this.primaryStage.setTitle("MSNet");
+		
+		// showLoginView();
+		initRootLayout();
+		showSystemOverview();
+	}
 
 	public static void initRootLayout() {
 		try {
@@ -55,9 +79,7 @@ public class MainApp extends Application {
 
 			// 메인 애플리케이션이 컨트롤러를 이용할 수 있게 한다.
 			SystemOverviewController controller = loader.getController();
-			//controller.setMainApp(this);
-
-	
+			
 			// Bitcoin daemon 출력
 			new Bitcoind(controller.getBitcoindTextArea()).start();
 
@@ -65,42 +87,6 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
-
-	public static void main(String[] args) throws Exception {
-		try {
-			bitcoinJSONRPClient = new BitcoinJSONRPCClient("a", "12");
-		} catch (MalformedURLException e) {
-			System.err.println("BitcoinJSONRPCClient Constructor Error!!");
-		}
-		launch(args);
-	}
-
-	@Override
-	public void start(Stage primaryStage) {
-		this.primaryStage = primaryStage;
-		this.primaryStage.setTitle("MSNet");
-		
-		showLoginView();
-	}
-
-	public Stage getPrimaryStage() {
-		return primaryStage;
-	}
-	
-	public static void changeScene(String path) {
-		try {
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource(path));
-			
-			Scene nextScene = new Scene(loader.load());
-			
-			primaryStage.setScene(nextScene);
-			primaryStage.show();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	public void showLoginView() {
 
 		try {
@@ -121,4 +107,6 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
+	
+
 }

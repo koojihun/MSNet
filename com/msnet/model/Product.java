@@ -1,13 +1,10 @@
 package com.msnet.model;
 
 import java.util.Map;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class Product {
-	private StringProperty productId;
 	private StringProperty productionDate;
 	private StringProperty expirationDate;
 	private StringProperty productName;
@@ -27,18 +24,7 @@ public class Product {
 		this.pid = new SimpleStringProperty(pid);
 	}
 	
-	public String getProductId() {
-		return productId.get();
-	}
-	
-	public void setProductId(String productId) {
-		this.productId.set(productId);
-	}
-	
-	public StringProperty productIdProperty() {
-		return productId;
-	}
-	
+
 	public String getProductionDate() {
 		return productionDate.get();
 	}
