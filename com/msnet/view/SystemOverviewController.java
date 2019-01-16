@@ -76,18 +76,9 @@ public class SystemOverviewController implements Initializable {
 		
 	}
 	
-
 	@FXML
-	public void handleTest() {
-		List<Map> maps = MainApp.bitcoinJSONRPClient.get_current_products();
-
-		for (Map map : maps) {
-			System.out.println(String.valueOf(map.get("prodName")));
-			System.out.println(String.valueOf(map.get("PID")));
-			System.out.println(String.valueOf(map.get("production date")));
-			System.out.println(String.valueOf(map.get("expiration date")));
-
-		}
+	public void handleAddressBook() {
+		
 	}
 
 	@FXML
