@@ -69,7 +69,7 @@ public class Settings {
         File license_txt = new File(
                 "C:\\Users\\"
                         + sysUsrName
-                        + "\\AppData\\Roaming\\Bitcoin\\License.txt");
+                        + "\\AppData\\Roaming\\Bitcoin\\license.txt");
         if (license_txt.exists())
             return true;
         else
@@ -85,7 +85,7 @@ public class Settings {
             OutputStream os = new FileOutputStream(
                     "C:\\Users\\"
                             + sysUsrName
-                            + "\\AppData\\Roaming\\Bitcoin\\License.txt");
+                            + "\\AppData\\Roaming\\Bitcoin\\license.txt");
             //2048 here is just my preference
             byte[] b = new byte[4096];
             int length;
