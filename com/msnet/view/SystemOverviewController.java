@@ -67,6 +67,16 @@ public class SystemOverviewController implements Initializable {
 	public TextArea getBitcoindTextArea() {
 		return bitcoindTextArea;
 	}
+	
+	public TableView<NDBox> getInventoryStatusTableView(){
+		return inventoryStatusTableView;
+	}
+	
+	public TableView<NBox> getTotal_InventoryStatusTableView(){
+		return total_inventoryStatusTableView;
+		
+	}
+	
 
 	@FXML
 	public void handleTest() {
@@ -193,26 +203,6 @@ public class SystemOverviewController implements Initializable {
 		total_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		total_inventoryStatusTableView.setItems(nList);
-		
-		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				if(event.getClickCount() >= 2) {
-					NDBox selectedNDBox =  inventoryStatusTableView.getSelectionModel().getSelectedItem();
-					ProductInfoDialogController.showProductInfoDialog(selectedNDBox);
-				}				
-			}			
-		});
-		
-		total_inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				if(event.getClickCount() >= 2) {
-					NBox selectedNBox =  total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-					ProductInfoDialogController.showProductInfoDialog(selectedNBox);
-				}				
-			}			
-		});
 	}
 
 }

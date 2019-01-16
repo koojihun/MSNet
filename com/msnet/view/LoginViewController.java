@@ -39,7 +39,9 @@ public class LoginViewController implements Initializable {
 	private TextField passwordTextField;
 	@FXML
 	private Button enterButton;
-
+	
+	private MainApp mainApp;
+	
 	public LoginViewController() {
 	}
 
@@ -123,8 +125,13 @@ public class LoginViewController implements Initializable {
 		}
 		
 		if(result) {
-			MainApp.initRootLayout();
-			MainApp.showSystemOverview();
+			mainApp.initRootLayout();
+			mainApp.showSystemOverview();
 		}
+	}
+
+	public void setMain(MainApp mainApp) {
+		this.mainApp = mainApp;
+		
 	}
 }
