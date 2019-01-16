@@ -49,8 +49,6 @@ public class MainApp extends Application {
 		this.primaryStage.setTitle("MSNet");
 
 		showLoginView();
-		// initRootLayout();
-		// showSystemOverview();
 	}
 
 	public void initRootLayout() {
@@ -207,7 +205,7 @@ public class MainApp extends Application {
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.initOwner(MainApp.primaryStage);
 			Scene scene = new Scene(addressBookPane);
-			
+			dialogStage.setScene(scene);
 			AddressBookDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
 			
