@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.model.NBox;
+import com.msnet.model.NDBox;
 import com.msnet.util.Bitcoind;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
@@ -15,8 +16,10 @@ import com.msnet.view.SystemOverviewController;
 
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
@@ -51,7 +54,7 @@ public class MainApp extends Application {
 		//showSystemOverview();
 	}
 
-	public static void initRootLayout() {
+	public void initRootLayout() {
 		try {
 			// fmxl 파일에서 상위 레이아웃을 가져온다.
 			FXMLLoader loader = new FXMLLoader();
@@ -67,7 +70,7 @@ public class MainApp extends Application {
 		}
 	}
 
-	public static void showSystemOverview() {
+	public void showSystemOverview() {
 		try {
 			// systemOverview를 fmxl 파일에서 가져온다.
 			FXMLLoader loader = new FXMLLoader();
@@ -79,6 +82,30 @@ public class MainApp extends Application {
 
 			// 메인 애플리케이션이 컨트롤러를 이용할 수 있게 한다.
 			SystemOverviewController controller = loader.getController();
+			
+			controller.setMainApp(this);
+			
+			// NDBox를 더블 클릭하면 Product 목록이 나옴
+			controller.getInventoryStatusTableView().setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					if(event.getClickCount() >= 2) {
+						NDBox selectedNDBox =  controller.getInventoryStatusTableView().getSelectionModel().getSelectedItem();
+						showProductInfoDialog(selectedNDBox);
+					}				
+				}			
+			});
+			
+			// NBox를 더블 클릭하면 Product 목록이 나옴
+			controller.getTotal_InventoryStatusTableView().setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					if(event.getClickCount() >= 2) {
+						NBox selectedNBox =  controller.getTotal_InventoryStatusTableView().getSelectionModel().getSelectedItem();
+						ProductInfoDialogController.showProductInfoDialog(selectedNBox);
+					}				
+				}			
+			});
 			
 			// Bitcoin daemon 출력
 			new Bitcoind(controller.getBitcoindTextArea()).start();
@@ -94,11 +121,15 @@ public class MainApp extends Application {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/LoginView.fxml"));
 			AnchorPane loginPane = (AnchorPane) loader.load();
+			
 			FadeTransition ft = new FadeTransition(Duration.millis(2500), loginPane);
 			ft.setFromValue(0);
 			ft.setToValue(1);
 			ft.play();
-			Scene loginScene = new Scene(loginPane);			
+			
+			Scene loginScene = new Scene(loginPane);
+			LoginViewController controller = loader.getController();
+			controller.setMain(this);
 			
 			primaryStage.setScene(loginScene);
 			//primaryStage.initStyle(StageStyle.TRANSPARENT);
@@ -109,5 +140,34 @@ public class MainApp extends Application {
 		}
 	}
 	
+	public void showProductInfoDialog(NDBox ndBox) {
+		
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
+			AnchorPane productInfoPane = (AnchorPane) loader.load();
+			
+			// 다이얼로그 스테이지를 만든다.
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Product Info");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(MainApp.primaryStage);
+			Scene scene = new Scene(productInfoPane);
+			dialogStage.setScene(scene);
+			
+			// product를 컨트롤러에 설정한다.
+			ProductInfoDialogController controller = loader.getController();
+			controller.setDialogStage(dialogStage);
+			controller.setProduct(ndBox);
+			
+			//다이얼로그를 보여주고 사용자가 닫을 때까지 기다린다.
+			dialogStage.showAndWait();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 
 }

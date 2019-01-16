@@ -66,6 +66,16 @@ public class SystemOverviewController implements Initializable {
 	public TextArea getBitcoindTextArea() {
 		return bitcoindTextArea;
 	}
+	
+	public TableView<NDBox> getInventoryStatusTableView(){
+		return inventoryStatusTableView;
+	}
+	
+	public TableView<NBox> getTotal_InventoryStatusTableView(){
+		return total_inventoryStatusTableView;
+		
+	}
+	
 
 	@FXML
 	public void handleTest() {
@@ -121,21 +131,19 @@ public class SystemOverviewController implements Initializable {
 			// Products> 형식으로 변환
 			NDKey key = new NDKey(String.valueOf(product.get("prodName")),
 					String.valueOf(product.get("production date")), String.valueOf(product.get("expiration date")));
-
 			if (result.get(key) == null) {
-				// key에 대응하는 Products_Date가 없을 때
+				// key에 대응하는 NDBox가 없을 때
 				Product tmpProduct = new Product(product); // product를 Product 형식으로 변환
-				ArrayList<Product> tmpList = new ArrayList<Product>(); // Products의 ArrayList<Product>에 들어갈 임시 리스트를 하나
-																		// 생성
+				ArrayList<Product> tmpList = new ArrayList<Product>(); // Products의 ArrayList<Product>에 들어갈 임시 리스트를 하나 생성
 				tmpList.add(tmpProduct); // 임시 리스트에 tmpProduct 추가
 				NDBox value = new NDBox(key.getProdName(), key.getProductionDate(), key.getExpirationDate(), tmpList,
 						1);
 				result.put(key, value);
 			} else {
-				// key에 대응하는 Products_Date가 있을 때
+				// key에 대응하는 NDBox가 있을 때
 				Product tmpProduct = new Product(product); // product를 Product 형식으로 변환
 				NDBox resultNDBox = result.get(key);
-				resultNDBox.addProduct(tmpProduct);
+				resultNDBox.addProduct(tmpProduct);				
 				resultNDBox.setQuantity(resultNDBox.getQuantity() + 1);
 			}
 		}
@@ -165,8 +173,9 @@ public class SystemOverviewController implements Initializable {
 				Iterator itr = tmpProductList.iterator(); // 저장돼야 할 Product들의 리스트를 iterator로 만듦
 
 				while (itr.hasNext()) {
-					// itr를 이용해서 tmpProductsList의 모든 Product를 result의 Products에 저장.
-					resultNBox.getProductList().add((Product) itr.next());
+					// itr를 이용해서 tmpProductsList의 모든 Product를 result의 NBox에 저장.
+					Product p = (Product)itr.next();
+					resultNBox.getProductList().add(p);
 					resultNBox.setQuantity(resultNBox.getQuantity() + 1);
 				}
 
@@ -192,26 +201,6 @@ public class SystemOverviewController implements Initializable {
 		total_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		total_inventoryStatusTableView.setItems(nList);
-		
-		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				if(event.getClickCount() >= 2) {
-					NDBox selectedNDBox =  inventoryStatusTableView.getSelectionModel().getSelectedItem();
-					ProductInfoDialogController.showProductInfoDialog(selectedNDBox);
-				}				
-			}			
-		});
-		
-		total_inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				if(event.getClickCount() >= 2) {
-					NBox selectedNBox =  total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-					ProductInfoDialogController.showProductInfoDialog(selectedNBox);
-				}				
-			}			
-		});
 	}
 
 }
