@@ -76,6 +76,11 @@ public class SystemOverviewController implements Initializable {
 		return total_inventoryStatusTableView;
 		
 	}
+	
+	@FXML
+	public void handleAddressBook() {
+		
+	}
 
 	@FXML
 	public void handleInventoryStatus() {

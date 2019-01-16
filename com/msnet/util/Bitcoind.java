@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 public class Bitcoind extends Thread {
+	
 	private static String fileName = "bincoind.exe";
 	private static Process process_bincoind;
 	private TextArea bincoind_screen;
@@ -62,10 +64,10 @@ public class Bitcoind extends Thread {
 		}
 
 		public void run() {
-			String s;
+			String input;
 			try {
-				while ((s = bufferedReader.readLine()) != null) {
-					bincoind_screen.appendText(s + "\n");
+				while ((input = bufferedReader.readLine()) != null) {
+					bincoind_screen.appendText(input + "\n");
 				}
 			} catch (IOException e) {
 				System.err.println("redirection error!!");

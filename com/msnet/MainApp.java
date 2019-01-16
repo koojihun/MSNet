@@ -33,8 +33,6 @@ public class MainApp extends Application {
 	static private BorderPane rootLayout;
 	static public BitcoinJSONRPCClient bitcoinJSONRPClient;
 
-
-
 	public static void main(String[] args) throws Exception {
 		try {
 			bitcoinJSONRPClient = new BitcoinJSONRPCClient("a", "12");
@@ -49,7 +47,7 @@ public class MainApp extends Application {
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("MSNet");
-		
+
 		showLoginView();
 	}
 
@@ -81,31 +79,32 @@ public class MainApp extends Application {
 
 			// 메인 애플리케이션이 컨트롤러를 이용할 수 있게 한다.
 			SystemOverviewController controller = loader.getController();
-			
+
 			controller.setMainApp(this);
-			
+
 			// NDBox를 더블 클릭하면 Product 목록이 나옴
 			controller.getInventoryStatusTableView().setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
-					if(event.getClickCount() >= 2) {
-						NDBox selectedNDBox =  controller.getInventoryStatusTableView().getSelectionModel().getSelectedItem();
+					if (event.getClickCount() >= 2) {
+						NDBox selectedNDBox = controller.getInventoryStatusTableView().getSelectionModel()
+								.getSelectedItem();
 						showProductInfoDialog(selectedNDBox);
-					}				
-				}			
+					}
+				}
 			});
-			
+
 			// NBox를 더블 클릭하면 Product 목록이 나옴
 			controller.getTotal_InventoryStatusTableView().setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
-					if(event.getClickCount() >= 2) {
-						NBox selectedNBox =  controller.getTotal_InventoryStatusTableView().getSelectionModel().getSelectedItem();
-						ProductInfoDialogController.showProductInfoDialog(selectedNBox);
-					}				
-				}			
+					if (event.getClickCount() >= 2) {
+						NBox selectedNBox = controller.getTotal_InventoryStatusTableView().getSelectionModel().getSelectedItem();
+						showProductInfoDialog(selectedNBox);
+					}
+				}
 			});
-			
+
 			// Bitcoin daemon 출력
 			new Bitcoind(controller.getBitcoindTextArea()).start();
 
@@ -113,39 +112,39 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void showLoginView() {
 
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/LoginView.fxml"));
 			AnchorPane loginPane = (AnchorPane) loader.load();
-			
+
 			FadeTransition ft = new FadeTransition(Duration.millis(2500), loginPane);
 			ft.setFromValue(0);
 			ft.setToValue(1);
 			ft.play();
-			
+
 			Scene loginScene = new Scene(loginPane);
 			LoginViewController controller = loader.getController();
 			controller.setMain(this);
-			
+
 			primaryStage.setScene(loginScene);
-			//primaryStage.initStyle(StageStyle.TRANSPARENT);
+			// primaryStage.initStyle(StageStyle.TRANSPARENT);
 			primaryStage.setResizable(false);
 			primaryStage.show();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void showProductInfoDialog(NDBox ndBox) {
-		
+
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
 			AnchorPane productInfoPane = (AnchorPane) loader.load();
-			
+
 			// 다이얼로그 스테이지를 만든다.
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Product Info");
@@ -153,7 +152,7 @@ public class MainApp extends Application {
 			dialogStage.initOwner(MainApp.primaryStage);
 			Scene scene = new Scene(productInfoPane);
 			dialogStage.setScene(scene);
-			
+
 			// product를 컨트롤러에 설정한다.
 			ProductInfoDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
@@ -161,7 +160,34 @@ public class MainApp extends Application {
 			
 			// 다이얼로그를 보여주고 사용자가 닫을 때까지 기다린다.
 			dialogStage.showAndWait();
-			
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void showProductInfoDialog(NBox nBox) {
+
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
+			AnchorPane productInfoPane = (AnchorPane) loader.load();
+
+			// 다이얼로그 스테이지를 만든다.
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Product Info");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(MainApp.primaryStage);
+			Scene scene = new Scene(productInfoPane);
+			dialogStage.setScene(scene);
+			// product를 컨트롤러에 설정한다.
+			ProductInfoDialogController controller = loader.getController();
+			controller.setDialogStage(dialogStage);
+			controller.setProduct(nBox);
+			// 다이얼로그를 보여주고 사용자가 닫을 때까지 기다린다.
+			dialogStage.showAndWait();
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

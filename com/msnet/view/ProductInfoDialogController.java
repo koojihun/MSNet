@@ -68,36 +68,6 @@ public class ProductInfoDialogController implements Initializable {
 		productInfoTableView.setItems(pList);		
 	}
 	
-	public static void showProductInfoDialog(NBox nBox) {
-		
-		try {
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
-			AnchorPane productInfoPane = (AnchorPane) loader.load();
-			
-			// 다이얼로그 스테이지를 만든다.
-			Stage dialogStage = new Stage();
-			dialogStage.setTitle("Product Info");
-			dialogStage.initModality(Modality.WINDOW_MODAL);
-			dialogStage.initOwner(MainApp.primaryStage);
-			Scene scene = new Scene(productInfoPane);
-			dialogStage.setScene(scene);
-			// product를 컨트롤러에 설정한다.
-			ProductInfoDialogController controller = loader.getController();
-			controller.setDialogStage(dialogStage);
-			controller.setProduct(nBox);
-			//다이얼로그를 보여주고 사용자가 닫을 때까지 기다린다.
-			dialogStage.showAndWait();
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
-
-	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		productInfoTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
