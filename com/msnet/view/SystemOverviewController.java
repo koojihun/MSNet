@@ -50,7 +50,10 @@ public class SystemOverviewController implements Initializable {
 	private TableColumn<NBox, String> total_productNameColumn;
 	@FXML
 	private TableColumn<NBox, Integer> total_quantityColumn;
-
+	
+	@FXML
+	private Button addressBookButton;
+	
 	private MainApp mainApp;
 
 	private ObservableList<NBox> nList;
@@ -78,7 +81,7 @@ public class SystemOverviewController implements Initializable {
 	
 	@FXML
 	public void handleAddressBook() {
-		
+		mainApp.showAddressBookDialog();
 	}
 
 	@FXML

@@ -6,8 +6,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane prefHeight="504.0" prefWidth="666.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1">
+<AnchorPane prefHeight="504.0" prefWidth="666.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msnet.view.AddressBookDialogController">
    <children>
       <TextField layoutX="18.0" layoutY="21.0" prefHeight="23.0" prefWidth="298.0" />
       <Button layoutX="329.0" layoutY="21.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="95.0" text="Search" />
