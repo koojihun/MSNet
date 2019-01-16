@@ -7,11 +7,14 @@ import java.io.*;
 
 public class Settings {
 
-	public static String id;
-	public static String password;
-	private static String sysUsrName;
-    public Settings() {
+	private String id;
+	private String password;
+	private String sysUsrName;
+
+	public Settings(String id, String password) {
         ////////////////////////////////////////////////////////////////
+    	this.id = id;
+    	this.password = password;
     	sysUsrName = System.getProperty("user.name");
         ////////////////////////////////////////////////////////////////
         // AppData\\Roaming\\Bitcoin 폴더에 bincoind.exe가 있다고 가정.
@@ -142,4 +145,16 @@ public class Settings {
             System.err.println("Error : Making bitcoin.conf file error.");
         }
     }
+    
+    public String getId() {
+		return id;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+	
+	public String getSysUsrName() {
+		return sysUsrName;
+	}
 }

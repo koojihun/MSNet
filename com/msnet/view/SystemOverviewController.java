@@ -66,6 +66,7 @@ public class SystemOverviewController implements Initializable {
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
 	}
+	
 	public TextArea getBitcoindTextArea() {
 		return bitcoindTextArea;
 	}
