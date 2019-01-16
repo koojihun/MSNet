@@ -140,7 +140,7 @@
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                         </rowConstraints>
                                                          <children>
-                                                            <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="120.0" text="Address Book" />
+                                                            <Button mnemonicParsing="false" onAction="#handleAddressBook" prefHeight="23.0" prefWidth="120.0" text="Address Book" />
                                                             <Label prefHeight="15.0" prefWidth="69.0" text="Company:" GridPane.columnIndex="1" />
                                                             <Label prefHeight="15.0" prefWidth="59.0" text="Address:" GridPane.columnIndex="3" />
                                                             <TextField maxWidth="133.0" prefHeight="23.0" prefWidth="133.0" GridPane.columnIndex="2" />
