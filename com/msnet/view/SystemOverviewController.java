@@ -1,8 +1,8 @@
 package com.msnet.view;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -11,22 +11,26 @@ import java.util.ResourceBundle;
 
 import com.msnet.MainApp;
 import com.msnet.model.Product;
+import com.msnet.util.Bitcoind;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 import com.msnet.model.NDKey;
 
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
-import javafx.util.Pair;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class SystemOverviewController implements Initializable {
 	@FXML
@@ -50,39 +54,58 @@ public class SystemOverviewController implements Initializable {
 	private TableColumn<NBox, String> total_productNameColumn;
 	@FXML
 	private TableColumn<NBox, Integer> total_quantityColumn;
-	
 	@FXML
 	private Button addressBookButton;
-	
-	private MainApp mainApp;
 
+	private MainApp mainApp;
 	private ObservableList<NBox> nList;
 	private ObservableList<NDBox> ndList;
 
-	public SystemOverviewController() {
-		// this.bitcoindTextArea.setEditable(false);
-	}
-	
-	public void setMainApp(MainApp mainApp) {
-		this.mainApp = mainApp;
-	}
-	
-	public TextArea getBitcoindTextArea() {
-		return bitcoindTextArea;
-	}
-	
-	public TableView<NDBox> getInventoryStatusTableView(){
-		return inventoryStatusTableView;
-	}
-	
-	public TableView<NBox> getTotal_InventoryStatusTableView(){
-		return total_inventoryStatusTableView;
+	public SystemOverviewController() {}
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
+		expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
+		productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
+		quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+		inventoryStatusTableView.setItems(ndList);
+
+		total_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
+		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+		total_inventoryStatusTableView.setItems(nList);
+
+		// NDBox를 더블 클릭하면 Product 목록이 나옴
+		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if (event.getClickCount() >= 2) {
+					NDBox selectedNDBox = inventoryStatusTableView.getSelectionModel()
+							.getSelectedItem();
+					showProductInfoDialog(selectedNDBox);
+				}
+			}
+		});
 		
+		// NBox를 더블 클릭하면 Product 목록이 나옴
+		total_inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if (event.getClickCount() >= 2) {
+					NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel()
+							.getSelectedItem();
+					showProductInfoDialog(selectedNBox);
+				}
+			}
+		});
+		
+		bitcoindTextArea.setEditable(false);
+		new Bitcoind(bitcoindTextArea).start();
 	}
-	
+
 	@FXML
 	public void handleAddressBook() {
-		mainApp.showAddressBookDialog();
+		showAddressBookDialog();
 	}
 
 	@FXML
@@ -129,7 +152,8 @@ public class SystemOverviewController implements Initializable {
 			if (result.get(key) == null) {
 				// key에 대응하는 NDBox가 없을 때
 				Product tmpProduct = new Product(product); // product를 Product 형식으로 변환
-				ArrayList<Product> tmpList = new ArrayList<Product>(); // Products의 ArrayList<Product>에 들어갈 임시 리스트를 하나 생성
+				ArrayList<Product> tmpList = new ArrayList<Product>(); // Products의 ArrayList<Product>에 들어갈 임시 리스트를 하나
+																		// 생성
 				tmpList.add(tmpProduct); // 임시 리스트에 tmpProduct 추가
 				NDBox value = new NDBox(key.getProdName(), key.getProductionDate(), key.getExpirationDate(), tmpList,
 						1);
@@ -138,7 +162,7 @@ public class SystemOverviewController implements Initializable {
 				// key에 대응하는 NDBox가 있을 때
 				Product tmpProduct = new Product(product); // product를 Product 형식으로 변환
 				NDBox resultNDBox = result.get(key);
-				resultNDBox.addProduct(tmpProduct);				
+				resultNDBox.addProduct(tmpProduct);
 				resultNDBox.setQuantity(resultNDBox.getQuantity() + 1);
 			}
 		}
@@ -169,7 +193,7 @@ public class SystemOverviewController implements Initializable {
 
 				while (itr.hasNext()) {
 					// itr를 이용해서 tmpProductsList의 모든 Product를 result의 NBox에 저장.
-					Product p = (Product)itr.next();
+					Product p = (Product) itr.next();
 					resultNBox.getProductList().add(p);
 					resultNBox.setQuantity(resultNBox.getQuantity() + 1);
 				}
@@ -183,19 +207,88 @@ public class SystemOverviewController implements Initializable {
 		}
 		return result;
 	}
+	
+	public void showProductInfoDialog(NDBox ndBox) {
 
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
+			AnchorPane productInfoPane = (AnchorPane) loader.load();
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
-		expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
-		productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
-		quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
-		inventoryStatusTableView.setItems(ndList);
+			// 다이얼로그 스테이지를 만든다.
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Product Info");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(mainApp.getPrimaryStage());
+			Scene scene = new Scene(productInfoPane);
+			dialogStage.setScene(scene);
 
-		total_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
-		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
-		total_inventoryStatusTableView.setItems(nList);
+			// product를 컨트롤러에 설정한다.
+			ProductInfoDialogController controller = loader.getController();
+			controller.setDialogStage(dialogStage);
+			controller.setProduct(ndBox);
+			
+			// 다이얼로그를 보여주고 사용자가 닫을 때까지 기다린다.
+			dialogStage.showAndWait();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void showProductInfoDialog(NBox nBox) {
+
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
+			AnchorPane productInfoPane = (AnchorPane) loader.load();
+
+			// 다이얼로그 스테이지를 만든다.
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Product Info");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(mainApp.getPrimaryStage());
+			Scene scene = new Scene(productInfoPane);
+			dialogStage.setScene(scene);
+			
+			// product를 컨트롤러에 설정한다.
+			ProductInfoDialogController controller = loader.getController();
+			controller.setDialogStage(dialogStage);
+			controller.setProduct(nBox);
+			// 다이얼로그를 보여주고 사용자가 닫을 때까지 기다린다.
+			dialogStage.showAndWait();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void showAddressBookDialog() {
+		
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/AddressBookDialog.fxml"));
+			AnchorPane addressBookPane = (AnchorPane) loader.load();
+			
+			// 다이얼로그 스테이지를 만든다.
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Address Book");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(mainApp.getPrimaryStage());
+			Scene scene = new Scene(addressBookPane);
+			dialogStage.setScene(scene);
+			
+			AddressBookDialogController controller = loader.getController();
+			controller.setDialogStage(dialogStage);
+			
+			dialogStage.showAndWait();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+
+	public void setMainApp(MainApp mainApp) {
+		this.mainApp = mainApp;
 	}
 
 }

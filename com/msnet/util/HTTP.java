@@ -38,13 +38,11 @@ public class HTTP {
 	public static JSONObject send(String strUrl, String method, ArrayList<String> keys, ArrayList<String> vals) throws Exception {
 		JSONObject ret = null;
 		if (method == "GET" || method == "get") {
-			URL url = new URL(strUrl + makeStrMap(keys, vals));
+			URL url = new URL(strUrl + "?" + makeStrMap(keys, vals));
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			
-			//int responseCode = con.getResponseCode();
-			
-			ret = getResponseBody(con.getInputStream());
+			int responseCode = con.getResponseCode();
 			con.disconnect();
 		} else if (method == "POST" || method == "post") {
 			URL obj = new URL(strUrl);
