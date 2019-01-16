@@ -21,8 +21,7 @@
       </TableView>
       <ButtonBar layoutX="706.0" layoutY="656.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0">
         <buttons>
-          <Button minWidth="71.0" mnemonicParsing="false" prefHeight="23.0" text="Send" />
-            <Button mnemonicParsing="false" text="OK" />
+            <Button mnemonicParsing="false" onAction="#handleOk" text="OK" />
         </buttons>
       </ButtonBar>
    </children>

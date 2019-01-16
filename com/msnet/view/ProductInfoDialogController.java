@@ -68,6 +68,11 @@ public class ProductInfoDialogController implements Initializable {
 		productInfoTableView.setItems(pList);		
 	}
 	
+	@FXML
+	public void handleOk() {
+		
+	}
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		productInfoTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);

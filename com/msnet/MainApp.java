@@ -2,14 +2,11 @@ package com.msnet;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 import com.msnet.util.Bitcoind;
-import com.msnet.util.HTTP;
-import com.msnet.util.Settings;
 import com.msnet.view.AddressBookDialogController;
 import com.msnet.view.LoginViewController;
 import com.msnet.view.ProductInfoDialogController;
@@ -19,13 +16,14 @@ import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class MainApp extends Application {
@@ -33,6 +31,8 @@ public class MainApp extends Application {
 	static public Stage primaryStage;
 	static private BorderPane rootLayout;
 	static public BitcoinJSONRPCClient bitcoinJSONRPClient;
+    public static final double WIDTH = 1300;
+    public static final double HEIGHT = 900;
 
 	public static void main(String[] args) throws Exception {
 		try {
@@ -48,10 +48,16 @@ public class MainApp extends Application {
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("MSNet");
-
 		showLoginView();
 	}
-
+	
+	// Stage의 위치를 중앙에 위치 시키기 위한 함수
+	public void centerStage(Stage stage, double width, double height) {
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        stage.setX((screenBounds.getWidth() - width) / 2);
+        stage.setY((screenBounds.getHeight() - height) / 2);
+    }
+	
 	public void initRootLayout() {
 		try {
 			// fmxl 파일에서 상위 레이아웃을 가져온다.

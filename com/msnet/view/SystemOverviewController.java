@@ -1,8 +1,8 @@
 package com.msnet.view;
 
+import javafx.scene.control.TextField;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,20 +15,30 @@ import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 import com.msnet.model.NDKey;
 
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
-import javafx.util.Pair;
 
 public class SystemOverviewController implements Initializable {
+	
+	//////////////////////////////////////////////////
+	// Accordion
+	@FXML
+	private Button inventoryStatusButton;
+	@FXML
+	private ComboBox<String> selectBox;
+	ObservableList<String> list;
+	//////////////////////////////////////////////////
+
+	
+	//////////////////////////////////////////////////
+	// Tab
 	@FXML
 	private TextArea bitcoindTextArea;
 	@FXML
@@ -41,19 +51,36 @@ public class SystemOverviewController implements Initializable {
 	private TableColumn<NDBox, String> productNameColumn;
 	@FXML
 	private TableColumn<NDBox, Integer> quantityColumn;
-	@FXML
-	private Button inventoryStatusButton;
+	//////////////////////////////////////////////////
 
+	//////////////////////////////////////////////////
+	// Total Quantity
 	@FXML
 	private TableView<NBox> total_inventoryStatusTableView;
 	@FXML
 	private TableColumn<NBox, String> total_productNameColumn;
 	@FXML
 	private TableColumn<NBox, Integer> total_quantityColumn;
-	
+	//////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////
+	// Product transfer
 	@FXML
 	private Button addressBookButton;
-	
+	@FXML
+	private TextField companyTextField;
+	@FXML
+	private TextField addressTextField;
+	@FXML
+	private TextField productNameTextField;
+	@FXML
+	private TextField quantityTextField;
+	@FXML
+	private TextField productionDateTextField;
+	@FXML
+	private TextField expirationDateTextField;
+	//////////////////////////////////////////////////
+
 	private MainApp mainApp;
 
 	private ObservableList<NBox> nList;
@@ -62,27 +89,58 @@ public class SystemOverviewController implements Initializable {
 	public SystemOverviewController() {
 		// this.bitcoindTextArea.setEditable(false);
 	}
-	
+
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
 	}
-	
+
 	public TextArea getBitcoindTextArea() {
 		return bitcoindTextArea;
 	}
-	
-	public TableView<NDBox> getInventoryStatusTableView(){
+
+	public TableView<NDBox> getInventoryStatusTableView() {
 		return inventoryStatusTableView;
 	}
-	
-	public TableView<NBox> getTotal_InventoryStatusTableView(){
+
+	public TableView<NBox> getTotal_InventoryStatusTableView() {
 		return total_inventoryStatusTableView;
-		
+
 	}
-	
+
 	@FXML
 	public void handleAddressBook() {
 		mainApp.showAddressBookDialog();
+	}
+
+	@FXML
+	public void handleSendToAddress() {
+		String address = addressTextField.getText();
+		String prodName = productNameTextField.getText();
+		int quantity = Integer.parseInt(quantityTextField.getText());
+		String productionDate = productionDateTextField.getText();
+		String expirationDate = expirationDateTextField.getText();
+
+		List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
+		Map<NDKey, NDBox> productMap = makeNDBox(productList);
+		NDKey key = new NDKey(prodName, productionDate, expirationDate);
+		NDBox ndBox = productMap.get(key);
+
+		MainApp.bitcoinJSONRPClient.send_many(address, quantity, ndBox.getPid());
+	}
+
+	@FXML
+	public void handleSelectProduct() {
+		NDBox selected_ND = inventoryStatusTableView.getSelectionModel().getSelectedItem();
+		NBox selected_N = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
+		if (selected_ND != null) {
+			productNameTextField.setText(selected_ND.getProductName());
+			productionDateTextField.setText(selected_ND.getProductionDate());
+			expirationDateTextField.setText(selected_ND.getExpirationDate());
+		} else if (selected_N != null) {
+			productNameTextField.setText(selected_N.getProductName());
+		} else {
+			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		}
 	}
 
 	@FXML
@@ -129,7 +187,8 @@ public class SystemOverviewController implements Initializable {
 			if (result.get(key) == null) {
 				// key에 대응하는 NDBox가 없을 때
 				Product tmpProduct = new Product(product); // product를 Product 형식으로 변환
-				ArrayList<Product> tmpList = new ArrayList<Product>(); // Products의 ArrayList<Product>에 들어갈 임시 리스트를 하나 생성
+				ArrayList<Product> tmpList = new ArrayList<Product>(); // Products의 ArrayList<Product>에 들어갈 임시 리스트를 하나
+																		// 생성
 				tmpList.add(tmpProduct); // 임시 리스트에 tmpProduct 추가
 				NDBox value = new NDBox(key.getProdName(), key.getProductionDate(), key.getExpirationDate(), tmpList,
 						1);
@@ -138,7 +197,7 @@ public class SystemOverviewController implements Initializable {
 				// key에 대응하는 NDBox가 있을 때
 				Product tmpProduct = new Product(product); // product를 Product 형식으로 변환
 				NDBox resultNDBox = result.get(key);
-				resultNDBox.addProduct(tmpProduct);				
+				resultNDBox.addProduct(tmpProduct);
 				resultNDBox.setQuantity(resultNDBox.getQuantity() + 1);
 			}
 		}
@@ -169,7 +228,7 @@ public class SystemOverviewController implements Initializable {
 
 				while (itr.hasNext()) {
 					// itr를 이용해서 tmpProductsList의 모든 Product를 result의 NBox에 저장.
-					Product p = (Product)itr.next();
+					Product p = (Product) itr.next();
 					resultNBox.getProductList().add(p);
 					resultNBox.setQuantity(resultNBox.getQuantity() + 1);
 				}
@@ -184,9 +243,11 @@ public class SystemOverviewController implements Initializable {
 		return result;
 	}
 
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		list = FXCollections.observableArrayList("Total", "Details");
+		selectBox.setItems(list);
+		
 		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
 		expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
 		productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
@@ -197,5 +258,4 @@ public class SystemOverviewController implements Initializable {
 		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		total_inventoryStatusTableView.setItems(nList);
 	}
-
 }

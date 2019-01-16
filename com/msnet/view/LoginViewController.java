@@ -128,6 +128,7 @@ public class LoginViewController implements Initializable {
 		
 		if(result) {
 			new Settings(id, password);
+			mainApp.centerStage(MainApp.primaryStage, MainApp.WIDTH, MainApp.HEIGHT);
 			mainApp.initRootLayout();
 			mainApp.showSystemOverview();
 		} else {

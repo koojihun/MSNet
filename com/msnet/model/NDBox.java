@@ -1,6 +1,7 @@
 package com.msnet.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -20,6 +21,14 @@ public class NDBox {
 		this.expirationDate = new SimpleStringProperty(expirationDate);
 		this.productList = productList;
 		this.quantity = new SimpleIntegerProperty(quantity);
+	}
+	
+	public List<String> getPid(){
+		List<String> pidList = new ArrayList<String>();
+		for(Product product : productList) {
+			pidList.add(product.getPID()); 
+		}
+		return pidList;
 	}
 	
 	public void addProduct(Product input) {

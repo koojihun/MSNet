@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
@@ -34,7 +35,11 @@
                                     <content>
                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                              <children>
-                                                <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleInventoryStatus" text="Inventory status" />
+                                                <Button fx:id="inventoryStatusButton" layoutX="138.0" layoutY="26.0" mnemonicParsing="false" onAction="#handleInventoryStatus" text="Get" />
+                                                <Label layoutX="28.0" layoutY="73.0" text="Selected Panel:" />
+                                                <Button layoutX="226.0" layoutY="105.0" mnemonicParsing="false" onAction="#handleSelectProduct" prefHeight="20.0" prefWidth="60.0" text="Select" />
+                                                <Label layoutX="28.0" layoutY="30.0" text="Inventory Status:" />
+                                                <ComboBox fx:id="selectBox" layoutX="126.0" layoutY="69.0" prefWidth="150.0" />
                                              </children>
                                           </AnchorPane>
                                     </content>
@@ -79,7 +84,7 @@
                <children>
                   <SplitPane dividerPositions="0.6364942528735632" orientation="VERTICAL" prefHeight="698.0" prefWidth="663.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
-                        <TabPane prefHeight="567.0" prefWidth="974.0" tabClosingPolicy="UNAVAILABLE">
+                        <TabPane prefHeight="549.0" prefWidth="920.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
                             <Tab text="Inventory">
                               <content>
@@ -128,11 +133,11 @@
                                             <items>
                                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" styleClass="background">
                                                    <children>
-                                                      <GridPane layoutX="11.0" layoutY="29.0" prefHeight="80.0" prefWidth="661.0" AnchorPane.bottomAnchor="210.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="29.0">
+                                                      <GridPane layoutX="11.0" layoutY="63.0" prefHeight="19.0" prefWidth="569.0" AnchorPane.bottomAnchor="237.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="63.0">
                                                         <columnConstraints>
                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="141.0" />
-                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="122.0" minWidth="10.0" prefWidth="68.0" />
-                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="235.0" minWidth="10.0" prefWidth="155.0" />
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="122.0" minWidth="10.0" prefWidth="70.0" />
+                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="235.0" minWidth="10.0" prefWidth="141.0" />
                                                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="132.0" minWidth="10.0" prefWidth="66.0" />
                                                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="207.0" minWidth="10.0" prefWidth="167.0" />
                                                         </columnConstraints>
@@ -140,11 +145,19 @@
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                         </rowConstraints>
                                                          <children>
-                                                            <Button mnemonicParsing="false" onAction="#handleAddressBook" prefHeight="23.0" prefWidth="120.0" text="Address Book" />
-                                                            <Label prefHeight="15.0" prefWidth="69.0" text="Company:" GridPane.columnIndex="1" />
-                                                            <Label prefHeight="15.0" prefWidth="59.0" text="Address:" GridPane.columnIndex="3" />
-                                                            <TextField maxWidth="133.0" prefHeight="23.0" prefWidth="133.0" GridPane.columnIndex="2" />
-                                                            <TextField prefHeight="23.0" prefWidth="164.0" GridPane.columnIndex="4" />
+                                                            <Button fx:id="addressBookButton" mnemonicParsing="false" onAction="#handleAddressBook" prefHeight="23.0" prefWidth="120.0" text="Address Book" />
+                                                            <Label prefHeight="15.0" prefWidth="78.0" text="Company:" GridPane.columnIndex="1">
+                                                               <GridPane.margin>
+                                                                  <Insets left="5.0" />
+                                                               </GridPane.margin>
+                                                            </Label>
+                                                            <Label prefHeight="15.0" prefWidth="59.0" text="Address:" GridPane.columnIndex="3">
+                                                               <GridPane.margin>
+                                                                  <Insets left="5.0" />
+                                                               </GridPane.margin>
+                                                            </Label>
+                                                            <TextField fx:id="companyTextField" GridPane.columnIndex="2" />
+                                                            <TextField fx:id="addressTextField" GridPane.columnIndex="4" />
                                                          </children>
                                                       </GridPane>
                                                       <GridPane layoutX="31.0" layoutY="107.0" prefHeight="181.0" prefWidth="491.0" AnchorPane.bottomAnchor="31.0" AnchorPane.leftAnchor="31.0" AnchorPane.rightAnchor="161.0" AnchorPane.topAnchor="107.0">
@@ -156,17 +169,20 @@
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                         </rowConstraints>
                                                          <children>
                                                             <Label prefHeight="15.0" prefWidth="150.0" text="Product name:" />
                                                             <Label prefHeight="21.0" prefWidth="94.0" text="Quantity:" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                                                             <Label text="Production date:" GridPane.rowIndex="2" />
-                                                            <TextArea maxHeight="35.0" maxWidth="225.0" prefHeight="35.0" prefWidth="225.0" GridPane.columnIndex="1" />
-                                                            <TextArea maxHeight="16.0" prefHeight="16.0" prefWidth="226.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                            <DatePicker prefHeight="30.0" prefWidth="240.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <Label text="Expirationtion date:" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="quantityTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="productNameTextField" GridPane.columnIndex="1" />
+                                                            <TextField fx:id="productionDateTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="expirationDateTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                          </children>
                                                       </GridPane>
-                                                      <Button layoutX="474.0" layoutY="186.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="59.0" text="Send" />
+                                                      <Button layoutX="474.0" layoutY="186.0" mnemonicParsing="false" onAction="#handleSendToAddress" prefHeight="20.0" prefWidth="60.0" text="Send" />
                                                       <Label layoutX="-24.0" layoutY="-3.0" prefHeight="30.0" prefWidth="150.0" text="Product transfer" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                                          <font>
                                                             <Font size="15.0" />
