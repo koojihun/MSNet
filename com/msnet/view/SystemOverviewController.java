@@ -157,7 +157,6 @@ public class SystemOverviewController implements Initializable {
 		for (NDKey key : ndboxMap.keySet()) {
 
 			String name = key.getProdName();
-
 			if (result.get(name) != null) {
 				// result에 name을 key로 갖는 값이 존재할 때
 				NDBox tmpNDBox = ndboxMap.get(key);
