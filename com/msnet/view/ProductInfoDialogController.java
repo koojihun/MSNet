@@ -34,7 +34,6 @@ public class ProductInfoDialogController implements Initializable {
 	@FXML
 	private TableColumn<Product, String> expirationDateColumn;
 	
-	
 	private Stage dialogStage;
 	private NBox nBox;
 	private NDBox ndBox;

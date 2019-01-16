@@ -19,6 +19,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -117,7 +119,6 @@ public class LoginViewController implements Initializable {
 		try {
 			JSONObject jsonResult = HTTP.send("http://166.104.126.42:8090/NewSystem/signin.do", "post", key, val);
 			result = (boolean)jsonResult.get("result");
-			System.out.println(result);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -125,6 +126,13 @@ public class LoginViewController implements Initializable {
 		if(result) {
 			MainApp.initRootLayout();
 			MainApp.showSystemOverview();
+		} else {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Login Error");
+			alert.setHeaderText("Login Error");
+			alert.setContentText("ID, PASSWORD CHECK AGAIN PLEASE.");
+
+			alert.showAndWait();
 		}
 	}
 }

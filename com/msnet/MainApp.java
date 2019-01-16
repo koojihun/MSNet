@@ -46,9 +46,9 @@ public class MainApp extends Application {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("MSNet");
 		
-		// showLoginView();
-		initRootLayout();
-		showSystemOverview();
+		showLoginView();
+		//initRootLayout();
+		//showSystemOverview();
 	}
 
 	public static void initRootLayout() {
@@ -87,6 +87,7 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
+	
 	public void showLoginView() {
 
 		try {
@@ -97,8 +98,8 @@ public class MainApp extends Application {
 			ft.setFromValue(0);
 			ft.setToValue(1);
 			ft.play();
-			Scene loginScene = new Scene(loginPane);
-
+			Scene loginScene = new Scene(loginPane);			
+			
 			primaryStage.setScene(loginScene);
 			//primaryStage.initStyle(StageStyle.TRANSPARENT);
 			primaryStage.setResizable(false);

@@ -53,12 +53,11 @@ public class SystemOverviewController implements Initializable {
 
 	private MainApp mainApp;
 
-	ObservableList<NBox> nList;
-	ObservableList<NDBox> ndList;
+	private ObservableList<NBox> nList;
+	private ObservableList<NDBox> ndList;
 
 	public SystemOverviewController() {
 		// this.bitcoindTextArea.setEditable(false);
-
 	}
 	
 	public void setMainApp(MainApp mainApp) {
@@ -139,7 +138,6 @@ public class SystemOverviewController implements Initializable {
 				resultNDBox.addProduct(tmpProduct);
 				resultNDBox.setQuantity(resultNDBox.getQuantity() + 1);
 			}
-
 		}
 		return result;
 	}

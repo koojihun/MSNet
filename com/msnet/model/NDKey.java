@@ -39,7 +39,6 @@ public class NDKey {
 
 		NDKey target = (NDKey) obj;
 
-		// todo:
 		if (prodName != null ? !prodName.equals(target.prodName) : target.prodName != null)
 			return false;
 		if (productionDate != null ? !productionDate.equals(target.productionDate) : target.productionDate != null)
