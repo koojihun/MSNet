@@ -52,6 +52,7 @@ public class ProductInfoDialogController implements Initializable {
 		pList = FXCollections.observableArrayList();
 		
 		for(Product product : nBox.getProductList()) {
+			
 			pList.add(product);
 		}
 		productInfoTableView.setItems(pList);
@@ -86,7 +87,6 @@ public class ProductInfoDialogController implements Initializable {
 			ProductInfoDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
 			controller.setProduct(nBox);
-			
 			//다이얼로그를 보여주고 사용자가 닫을 때까지 기다린다.
 			dialogStage.showAndWait();
 			
