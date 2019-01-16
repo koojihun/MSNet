@@ -12,6 +12,7 @@ import org.json.simple.JSONObject;
 
 import com.msnet.MainApp;
 import com.msnet.util.HTTP;
+import com.msnet.util.Settings;
 
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -126,6 +127,7 @@ public class LoginViewController implements Initializable {
 		}
 		
 		if(result) {
+			new Settings(id, password);
 			mainApp.initRootLayout();
 			mainApp.showSystemOverview();
 		} else {

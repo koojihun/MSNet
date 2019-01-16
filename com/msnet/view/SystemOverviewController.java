@@ -63,6 +63,7 @@ public class SystemOverviewController implements Initializable {
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
 	}
+	
 	public TextArea getBitcoindTextArea() {
 		return bitcoindTextArea;
 	}
@@ -74,20 +75,6 @@ public class SystemOverviewController implements Initializable {
 	public TableView<NBox> getTotal_InventoryStatusTableView(){
 		return total_inventoryStatusTableView;
 		
-	}
-	
-
-	@FXML
-	public void handleTest() {
-		List<Map> maps = MainApp.bitcoinJSONRPClient.get_current_products();
-
-		for (Map map : maps) {
-			System.out.println(String.valueOf(map.get("prodName")));
-			System.out.println(String.valueOf(map.get("PID")));
-			System.out.println(String.valueOf(map.get("production date")));
-			System.out.println(String.valueOf(map.get("expiration date")));
-
-		}
 	}
 
 	@FXML

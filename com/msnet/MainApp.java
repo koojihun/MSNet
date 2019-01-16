@@ -41,6 +41,7 @@ public class MainApp extends Application {
 		} catch (MalformedURLException e) {
 			System.err.println("BitcoinJSONRPCClient Constructor Error!!");
 		}
+		
 		launch(args);
 	}
 
@@ -50,8 +51,6 @@ public class MainApp extends Application {
 		this.primaryStage.setTitle("MSNet");
 		
 		showLoginView();
-		//initRootLayout();
-		//showSystemOverview();
 	}
 
 	public void initRootLayout() {
@@ -160,14 +159,13 @@ public class MainApp extends Application {
 			controller.setDialogStage(dialogStage);
 			controller.setProduct(ndBox);
 			
-			//다이얼로그를 보여주고 사용자가 닫을 때까지 기다린다.
+			// 다이얼로그를 보여주고 사용자가 닫을 때까지 기다린다.
 			dialogStage.showAndWait();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
-
+	
 }
