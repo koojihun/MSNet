@@ -167,7 +167,8 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 		this.sslSocketFactory = sslSocketFactory;
 	}
 
-	public static final Charset QUERY_CHARSET = Charset.forName("ISO8859-1");
+	public static final Charset QUERY_CHARSET = Charset.forName("EUC-KR");
+	//public static final Charset QUERY_CHARSET = Charset.forName("ISO8859-1");
 
 	public byte[] prepareRequest(final String method, final Object... params) {
 		return JSON.stringify(new LinkedHashMap() {
@@ -202,7 +203,7 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 			logger.log(Level.FINE, "Bitcoin JSON-RPC response:\n{0}", r);
 			try {
 				Map response = (Map) JSON.parse(r);
-
+				
 				if (!expectedID.equals(response.get("id")))
 					throw new BitcoinRPCException("Wrong response ID (expected: " + String.valueOf(expectedID)
 							+ ", response: " + response.get("id") + ")");
@@ -224,7 +225,7 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 		HttpURLConnection conn;
 		try {
 			conn = (HttpURLConnection) noAuthURL.openConnection();
-
+			
 			conn.setDoOutput(true);
 			conn.setDoInput(true);
 

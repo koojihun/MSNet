@@ -171,7 +171,6 @@ public class SystemOverviewController implements Initializable {
 	@FXML
 	public void handleInventoryStatus() {
 		List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
-
 		//////////////////////////////////////////////////////////////
 		Map<NDKey, NDBox> result_NDBox = makeNDBox(productList);
 
