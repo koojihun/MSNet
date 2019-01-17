@@ -249,9 +249,7 @@ public class SystemOverviewController implements Initializable {
 		} else {
 			int quantity = Integer.parseInt(str_quantity);
 			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
-			if(pid.get(0).isEmpty()) {
-				System.out.println("!!!!!!!!!!!!!!!!!!!!");
-			}
+			
 		}
 	}
 
