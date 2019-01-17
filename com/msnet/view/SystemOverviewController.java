@@ -5,7 +5,10 @@ import javafx.scene.control.Alert.AlertType;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,8 +56,12 @@ public class SystemOverviewController implements Initializable {
 	private TextField product_productionDateTextField;
 	@FXML
 	private TextField product_expirationDateTextField;
-
+	@FXML
+	private TextField termTextField;
+	@FXML
+	private ComboBox<String> dateBox;
 	ObservableList<String> list;
+	ObservableList<String> dateList;
 	//////////////////////////////////////////////////
 	// Tab
 	@FXML
@@ -105,7 +112,9 @@ public class SystemOverviewController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		list = FXCollections.observableArrayList("Total", "Details");
+		dateList = FXCollections.observableArrayList("Hour", "Day", "Month", "Year");
 		selectBox.setItems(list);
+		dateBox.setItems(dateList);
 
 		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
 		expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
@@ -238,17 +247,48 @@ public class SystemOverviewController implements Initializable {
 		String str_quantity = product_quantityTextField.getText();
 		String productionDate = product_productionDateTextField.getText();
 		String expirationDate = product_expirationDateTextField.getText();
-		
+
 		if (name.equals("") || str_quantity.equals("") || productionDate.equals("") || expirationDate.equals("")) {
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Caution");
 			alert.setHeaderText("Enter the information");
-			alert.setContentText("Please enter the required information(Name, Quantity, Production date, Expiration date)");
+			alert.setContentText(
+					"Please enter the required information(Name, Quantity, Production date, Expiration date)");
 			alert.showAndWait();
 		} else {
 			int quantity = Integer.parseInt(str_quantity);
-			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
-			
+			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate,
+					quantity);
+		}
+	}
+
+	@FXML
+	public void handleGetCurrentTime() {
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd:HHmmss");
+		Date current = new Date(System.currentTimeMillis());
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(current);
+		String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+		String str_term = termTextField.getText();
+		product_productionDateTextField.setText(prodTime);
+		if (!str_term.equals("")) {
+			int term = Integer.parseInt(termTextField.getText());
+			String unitOfTerm = dateBox.getSelectionModel().getSelectedItem();
+			String expTime = "";
+			if (unitOfTerm.equals("Hour")) {
+				cal.add(Calendar.HOUR, term);
+				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			} else if (unitOfTerm.equals("Day")) {
+				cal.add(Calendar.DATE, term);
+				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			} else if (unitOfTerm.equals("Month")) {
+				cal.add(Calendar.MONTH, term);
+				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			} else if (unitOfTerm.equals("Year")) {
+				cal.add(Calendar.YEAR, term);
+				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			}
+			product_expirationDateTextField.setText(expTime);
 		}
 	}
 
@@ -307,7 +347,7 @@ public class SystemOverviewController implements Initializable {
 			if (result.get(name) != null) {
 				// result�� name�� key�� ���� ���� ������ ��
 				NDBox tmpNDBox = ndboxMap.get(key);
-				
+
 				ArrayList<Product> tmpProductList = tmpNDBox.getProductList(); // ����ž� �� Product���� ����Ʈ
 				NBox resultNBox = result.get(name); // �̹� ����Ǿ� �ִ� result�� Products. resultProducts���ٰ�
 													// tmpProductsList��

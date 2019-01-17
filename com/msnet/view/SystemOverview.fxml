@@ -61,7 +61,11 @@
                                                 <TextField fx:id="product_quantityTextField" layoutX="132.0" layoutY="46.0" AnchorPane.rightAnchor="10.0" />
                                                 <TextField fx:id="product_productionDateTextField" layoutX="132.0" layoutY="76.0" AnchorPane.rightAnchor="10.0" />
                                                 <TextField fx:id="product_expirationDateTextField" layoutX="132.0" layoutY="106.0" AnchorPane.rightAnchor="10.0" />
-                                                <Button layoutX="215.0" layoutY="142.0" mnemonicParsing="false" onAction="#handleMakeProducts" text="Ok" AnchorPane.rightAnchor="10.0" />
+                                                <Button layoutX="243.0" layoutY="206.0" mnemonicParsing="false" onAction="#handleMakeProducts" text="OK" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="160.0" />
+                                                <Button layoutX="127.0" layoutY="183.0" mnemonicParsing="false" onAction="#handleGetCurrentTime" text="Current Time" AnchorPane.rightAnchor="60.0" AnchorPane.topAnchor="160.0" />
+                                                <ComboBox fx:id="dateBox" layoutX="216.0" layoutY="136.0" prefHeight="23.0" prefWidth="96.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="130.0" />
+                                                <TextField fx:id="termTextField" layoutX="68.0" layoutY="155.6" prefHeight="23.0" prefWidth="104.0" AnchorPane.leftAnchor="63.0" AnchorPane.topAnchor="130.0" />
+                                                <Label layoutX="23.0" layoutY="152.0" text="Term:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="131.0" />
                                              </children></AnchorPane>
                                     </content>
                                   </TitledPane>
