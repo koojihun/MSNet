@@ -312,7 +312,6 @@ public class SystemOverviewController implements Initializable {
 				NBox resultNBox = result.get(name); // �̹� ����Ǿ� �ִ� result�� Products. resultProducts���ٰ�
 													// tmpProductsList��
 													// Product���� �����ؾ� ��.
-
 				Iterator itr = tmpProductList.iterator(); // ����ž� �� Product���� ����Ʈ�� iterator�� ����
 
 				while (itr.hasNext()) {
