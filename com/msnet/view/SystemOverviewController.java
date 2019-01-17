@@ -175,7 +175,7 @@ public class SystemOverviewController implements Initializable {
 			alert.showAndWait();
 		} else {
 			// �ʼ� ����(Address, Product name, Quantity)�� �Է��� �ִ� ���
-			int quantity = Integer.getInteger(str_quantity);
+			int quantity = Integer.parseInt(str_quantity);
 			List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
 			Map<NDKey, NDBox> productND_Map = makeNDBox(productList);
 
@@ -207,6 +207,8 @@ public class SystemOverviewController implements Initializable {
 		if (selected.equals("Total")) {
 			NBox selectedBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
 			productNameTextField.setText(selectedBox.getProductName());
+			productionDateTextField.setText("");
+			expirationDateTextField.setText("");
 		} else if (selected.equals("Details")) {
 			NDBox selectedBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
 			productNameTextField.setText(selectedBox.getProductName());
