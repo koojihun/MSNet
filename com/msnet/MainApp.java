@@ -40,7 +40,6 @@ public class MainApp extends Application {
 	}
 
 	public void showLoginView() {
-
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/LoginView.fxml"));
@@ -82,7 +81,6 @@ public class MainApp extends Application {
 			
 			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
 			Settings.makeAndSendBitcoinAddress();
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

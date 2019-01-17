@@ -41,7 +41,6 @@ public class HTTP {
 			URL url = new URL(strUrl + "?" + makeStrMap(keys, vals));
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
-			
 			int responseCode = con.getResponseCode();
 			con.disconnect();
 		} else if (method == "POST" || method == "post") {
@@ -49,10 +48,8 @@ public class HTTP {
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("POST");
 			con.setDoOutput(true);
-			
 			String dataToSend = makeStrMap(keys, vals);
 			con.getOutputStream().write(dataToSend.getBytes());
-			
 			ret = getResponseBody(con.getInputStream());
 			con.disconnect();
 		}

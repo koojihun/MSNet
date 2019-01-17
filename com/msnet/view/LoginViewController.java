@@ -31,7 +31,7 @@ public class LoginViewController implements Initializable {
 
 	private double x = 0;
 	private double y = 0;
-	private String serverURL = "";
+	private final String serverURL = "http://166.104.126.42:8090/NewSystem/";
 
 	@FXML
 	private Button signUpButton;
@@ -115,7 +115,7 @@ public class LoginViewController implements Initializable {
 		val.add(id);   val.add(password);   val.add("p");
 		
 		try {
-			JSONObject jsonResult = HTTP.send("http://166.104.126.42:8090/NewSystem/signin.do", "post", key, val);
+			JSONObject jsonResult = HTTP.send(serverURL + "signin.do", "post", key, val);
 			result = (boolean)jsonResult.get("result");
 		} catch (Exception e) {
 			e.printStackTrace();

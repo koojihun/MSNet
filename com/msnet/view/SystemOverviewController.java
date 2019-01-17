@@ -248,7 +248,7 @@ public class SystemOverviewController implements Initializable {
 				ArrayList<Product> tmpProductList = tmpNDBox.getProductList(); // 저장돼야 할 Product들의 리스트
 				NBox resultNBox = result.get(name); // 이미 저장되어 있는 result의 Products. resultProducts에다가 tmpProductsList의
 													// Product들을 저장해야 함.
-
+ 
 				Iterator itr = tmpProductList.iterator(); // 저장돼야 할 Product들의 리스트를 iterator로 만듦
 
 				while (itr.hasNext()) {
