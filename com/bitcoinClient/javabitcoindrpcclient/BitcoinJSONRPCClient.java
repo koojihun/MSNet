@@ -58,7 +58,7 @@ import static com.bitcoinClient.javabitcoindrpcclient.MapWrapper.mapInt;
 import static com.bitcoinClient.javabitcoindrpcclient.MapWrapper.mapStr;
 
 /**
- * @author Mikhail Yevchenko m.?˜­Î±?— æ¢³ì‹†ï¿?.ï¿½ë³ƒë¨¤ë§™æ²¼ì§?®?ˆ¢ at azazar.com Small modifications
+ * @author Mikhail Yevchenko m.?ï¿½ï¿½Î±?ï¿½ï¿½æ¢³ì‹†ï¿½?.ï¿½ë³ƒë¨¤ë§™æ²¼ì§?ï¿½ï¿½?ï¿½ï¿½ at azazar.com Small modifications
  *         by Alessandro Polverini polverini at gmail.com
  */
 public class BitcoinJSONRPCClient implements BitcoindRpcClient {
@@ -2187,7 +2187,7 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 	 * query("gen_new_product", CrippledJavaScriptParser.parseJSExpr(str));
 	 * //System.out.println(ret);s //return ret; }
 	 */
-
+/*
 	@Override
 	public List<String> gen_new_product(String prodDate, String expDate, int count) {
 
@@ -2199,6 +2199,12 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 		// System.out.println(str);
 		List<String> ret = (List<String>) query("gen_new_product", CrippledJavaScriptParser.parseJSExpr(str));
 		// System.out.println(ret);
+		return ret;
+	}
+	*/
+	@Override
+	public List<String> gen_new_product(String prodName, String prodDate, String expDate, int count) {
+		List<String> ret = (List<String>) query("gen_new_product", prodName, prodDate, expDate, count);
 		return ret;
 	}
 

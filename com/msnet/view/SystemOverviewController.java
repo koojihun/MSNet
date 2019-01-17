@@ -1,6 +1,8 @@
 package com.msnet.view;
 
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
@@ -35,13 +38,22 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class SystemOverviewController implements Initializable {
-	
+
 	//////////////////////////////////////////////////
 	// Accordion
 	@FXML
 	private Button inventoryStatusButton;
 	@FXML
 	private ComboBox<String> selectBox;
+	@FXML
+	private TextField product_prodNameTextField;
+	@FXML
+	private TextField product_quantityTextField;
+	@FXML
+	private TextField product_productionDateTextField;
+	@FXML
+	private TextField product_expirationDateTextField;
+
 	ObservableList<String> list;
 	//////////////////////////////////////////////////
 	// Tab
@@ -86,14 +98,15 @@ public class SystemOverviewController implements Initializable {
 	private ObservableList<NBox> nList;
 	private ObservableList<NDBox> ndList;
 	//////////////////////////////////////////////////
-	
-	public SystemOverviewController() {}
+
+	public SystemOverviewController() {
+	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		list = FXCollections.observableArrayList("Total", "Details");
 		selectBox.setItems(list);
-		
+
 		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
 		expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
 		productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
@@ -104,30 +117,28 @@ public class SystemOverviewController implements Initializable {
 		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		total_inventoryStatusTableView.setItems(nList);
 
-		// NDBox¸¦ ´õºí Å¬¸¯ÇÏ¸é Product ¸ñ·ÏÀÌ ³ª¿È
+		// NDBoxï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ï¸ï¿½ Product ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
 				if (event.getClickCount() >= 2) {
-					NDBox selectedNDBox = inventoryStatusTableView.getSelectionModel()
-							.getSelectedItem();
+					NDBox selectedNDBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
 					showProductInfoDialog(selectedNDBox);
 				}
 			}
 		});
-		
-		// NBox¸¦ ´õºí Å¬¸¯ÇÏ¸é Product ¸ñ·ÏÀÌ ³ª¿È
+
+		// NBoxï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ï¸ï¿½ Product ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		total_inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
 				if (event.getClickCount() >= 2) {
-					NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel()
-							.getSelectedItem();
+					NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
 					showProductInfoDialog(selectedNBox);
 				}
 			}
 		});
-		
+
 		bitcoindTextArea.setEditable(false);
 		new Bitcoind(bitcoindTextArea).start();
 	}
@@ -139,32 +150,61 @@ public class SystemOverviewController implements Initializable {
 
 	@FXML
 	public void handleSendToAddress() {
+
 		String address = addressTextField.getText();
 		String prodName = productNameTextField.getText();
-		int quantity = Integer.parseInt(quantityTextField.getText());
+		String str_quantity = quantityTextField.getText();
 		String productionDate = productionDateTextField.getText();
 		String expirationDate = expirationDateTextField.getText();
 
-		List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
-		Map<NDKey, NDBox> productMap = makeNDBox(productList);
-		NDKey key = new NDKey(prodName, productionDate, expirationDate);
-		NDBox ndBox = productMap.get(key);
+		if (address.equals("") || prodName.equals("") || prodName.equals("")) {
+			// ï¿½Ê¼ï¿½ ï¿½ï¿½ï¿½ï¿½(Address, prodName, Quantity)ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Caution");
+			alert.setHeaderText("Enter the information");
+			alert.setContentText("Please enter the required information(Address, Product name, Quantity)");
+			alert.showAndWait();
+		} else {
+			// ï¿½Ê¼ï¿½ ï¿½ï¿½ï¿½ï¿½(Address, Product name, Quantity)ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½
+			int quantity = Integer.getInteger(str_quantity);
+			List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
+			Map<NDKey, NDBox> productND_Map = makeNDBox(productList);
 
-		MainApp.bitcoinJSONRPClient.send_many(address, quantity, ndBox.getPid());
+			if (productionDateTextField.getText().equals("") && expirationDateTextField.getText().equals("")) {
+				// productionDateï¿½ï¿½ expirationDateï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½
+				// (dateï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½) prodNameï¿½ï¿½ ï¿½ï¿½ï¿½ó¼­¸ï¿½ ï¿½ï¿½Ç°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+				Map<String, NBox> productN_Map = makeNBox(productND_Map);
+
+			} else if (!productionDateTextField.getText().equals("") && !expirationDateTextField.getText().equals("")) {
+				// productionDateï¿½ï¿½ expirationDateï¿½ï¿½ Ã¤ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½
+				// dateï¿½ï¿½ prodNameï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+				NDKey key = new NDKey(prodName, productionDate, expirationDate);
+				NDBox ndBox = productND_Map.get(key);
+				MainApp.bitcoinJSONRPClient.send_many(address, quantity, ndBox.getPid());
+			} else {
+				// productionDate, expirationDate ï¿½ï¿½ ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½Ô·ÂµÇ¾ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ì¿¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Caution");
+				alert.setHeaderText("Enter the date information");
+				alert.setContentText("Please enter the exact date information");
+				alert.showAndWait();
+			}
+		}
 	}
 
 	@FXML
 	public void handleSelectProduct() {
-		NDBox selected_ND = inventoryStatusTableView.getSelectionModel().getSelectedItem();
-		NBox selected_N = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-		if (selected_ND != null) {
-			productNameTextField.setText(selected_ND.getProductName());
-			productionDateTextField.setText(selected_ND.getProductionDate());
-			expirationDateTextField.setText(selected_ND.getExpirationDate());
-		} else if (selected_N != null) {
-			productNameTextField.setText(selected_N.getProductName());
+		String selected = selectBox.getSelectionModel().getSelectedItem();
+		if (selected.equals("Total")) {
+			NBox selectedBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
+			productNameTextField.setText(selectedBox.getProductName());
+		} else if (selected.equals("Details")) {
+			NDBox selectedBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
+			productNameTextField.setText(selectedBox.getProductName());
+			productionDateTextField.setText(selectedBox.getProductionDate());
+			expirationDateTextField.setText(selectedBox.getExpirationDate());
 		} else {
-			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			System.out.println("Select!!!!");
 		}
 	}
 
@@ -193,9 +233,32 @@ public class SystemOverviewController implements Initializable {
 		//////////////////////////////////////////////////////////////
 	}
 
+	@FXML
+	public void handleMakeProducts() {
+		String name = product_prodNameTextField.getText();
+		String str_quantity = product_quantityTextField.getText();
+		String productionDate = product_productionDateTextField.getText();
+		String expirationDate = product_expirationDateTextField.getText();
+		
+		if (name.equals("") || str_quantity.equals("") || productionDate.equals("") || expirationDate.equals("")) {
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Caution");
+			alert.setHeaderText("Enter the information");
+			alert.setContentText("Please enter the required information(Name, Quantity, Production date, Expiration date)");
+			alert.showAndWait();
+		} else {
+			int quantity = Integer.parseInt(str_quantity);
+			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
+			if(pid.get(0).isEmpty()) {
+				System.out.println("!!!!!!!!!!!!!!!!!!!!");
+			}
+		}
+	}
+
 	/**
-	 * get_current_productsÀÇ °á°úÀÎ List<Map> ÇüÅÂÀÇ productList ÀÎÀÚ·Î ¹Þ¾Æ¼­ Á¦Ç°¸í°ú »ý¼ºÀÏ, À¯Åë±âÇÑÀ»
-	 * Å°·Î °¡Áö°í, NDBox¸¦ °ªÀ¸·Î °¡Áö´Â Map<NDKey, NDBox> ÇüÅÂÀÇ °ªÀ» ¹ÝÈ¯
+	 * get_current_productsï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ List<Map> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ productList ï¿½ï¿½ï¿½Ú·ï¿½ ï¿½Þ¾Æ¼ï¿½ ï¿½ï¿½Ç°ï¿½ï¿½ï¿½
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, NDBoxï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Map<NDKey, NDBox> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
 	 * 
 	 * @param productList
 	 * @return
@@ -205,22 +268,24 @@ public class SystemOverviewController implements Initializable {
 		Map<NDKey, NDBox> result = new HashMap<NDKey, NDBox>();
 
 		for (Map product : productList) {
-			// get_current_products¸¦ ÅëÇØ¼­ ¹ÝÈ¯ ¹ÞÀº productList¸¦ for¹®À» µ¹¸é¼­ Map<String[],
-			// Products> Çü½ÄÀ¸·Î º¯È¯
+			// get_current_productsï¿½ï¿½ ï¿½ï¿½ï¿½Ø¼ï¿½ ï¿½ï¿½È¯ ï¿½ï¿½ï¿½ï¿½ productListï¿½ï¿½ forï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½é¼­
+			// Map<String[],
+			// Products> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
 			NDKey key = new NDKey(String.valueOf(product.get("prodName")),
 					String.valueOf(product.get("production date")), String.valueOf(product.get("expiration date")));
 			if (result.get(key) == null) {
-				// key¿¡ ´ëÀÀÇÏ´Â NDBox°¡ ¾øÀ» ¶§
-				Product tmpProduct = new Product(product); // product¸¦ Product Çü½ÄÀ¸·Î º¯È¯
-				ArrayList<Product> tmpList = new ArrayList<Product>(); // ProductsÀÇ ArrayList<Product>¿¡ µé¾î°¥ ÀÓ½Ã ¸®½ºÆ®¸¦ ÇÏ³ª
-																		// »ý¼º
-				tmpList.add(tmpProduct); // ÀÓ½Ã ¸®½ºÆ®¿¡ tmpProduct Ãß°¡
+				// keyï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ NDBoxï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+				Product tmpProduct = new Product(product); // productï¿½ï¿½ Product ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
+				ArrayList<Product> tmpList = new ArrayList<Product>(); // Productsï¿½ï¿½ ArrayList<Product>ï¿½ï¿½ ï¿½ï¿½î°¥ ï¿½Ó½ï¿½
+																		// ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ï³ï¿½
+																		// ï¿½ï¿½ï¿½ï¿½
+				tmpList.add(tmpProduct); // ï¿½Ó½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ tmpProduct ï¿½ß°ï¿½
 				NDBox value = new NDBox(key.getProdName(), key.getProductionDate(), key.getExpirationDate(), tmpList,
 						1);
 				result.put(key, value);
 			} else {
-				// key¿¡ ´ëÀÀÇÏ´Â NDBox°¡ ÀÖÀ» ¶§
-				Product tmpProduct = new Product(product); // product¸¦ Product Çü½ÄÀ¸·Î º¯È¯
+				// keyï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ NDBoxï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+				Product tmpProduct = new Product(product); // productï¿½ï¿½ Product ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
 				NDBox resultNDBox = result.get(key);
 				resultNDBox.addProduct(tmpProduct);
 				resultNDBox.setQuantity(resultNDBox.getQuantity() + 1);
@@ -230,8 +295,8 @@ public class SystemOverviewController implements Initializable {
 	}
 
 	/**
-	 * makeNDBox()ÀÇ °á°úÀÎ Map<NDKey, NDBox>¸¦ ÀÎ¼ö·Î ¹Þ¾Æ¼­ °°Àº prodNameº°·Î ¹­¾î¼­ Map<String,
-	 * NBox>ÀÇ ÇüÅÂ·Î º¯È¯ÇØÁÜ.
+	 * makeNDBox()ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ Map<NDKey, NDBox>ï¿½ï¿½ ï¿½Î¼ï¿½ï¿½ï¿½ ï¿½Þ¾Æ¼ï¿½ ï¿½ï¿½ï¿½ï¿½ prodNameï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½î¼­
+	 * Map<String, NBox>ï¿½ï¿½ ï¿½ï¿½ï¿½Â·ï¿½ ï¿½ï¿½È¯ï¿½ï¿½ï¿½ï¿½.
 	 * 
 	 * @param ndboxMap
 	 * @return
@@ -243,23 +308,24 @@ public class SystemOverviewController implements Initializable {
 
 			String name = key.getProdName();
 			if (result.get(name) != null) {
-				// result¿¡ nameÀ» key·Î °®´Â °ªÀÌ Á¸ÀçÇÒ ¶§
+				// resultï¿½ï¿½ nameï¿½ï¿½ keyï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 				NDBox tmpNDBox = ndboxMap.get(key);
-				ArrayList<Product> tmpProductList = tmpNDBox.getProductList(); // ÀúÀåµÅ¾ß ÇÒ ProductµéÀÇ ¸®½ºÆ®
-				NBox resultNBox = result.get(name); // ÀÌ¹Ì ÀúÀåµÇ¾î ÀÖ´Â resultÀÇ Products. resultProducts¿¡´Ù°¡ tmpProductsListÀÇ
-													// ProductµéÀ» ÀúÀåÇØ¾ß ÇÔ.
+				ArrayList<Product> tmpProductList = tmpNDBox.getProductList(); // ï¿½ï¿½ï¿½ï¿½Å¾ï¿½ ï¿½ï¿½ Productï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
+				NBox resultNBox = result.get(name); // ï¿½Ì¹ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ ï¿½Ö´ï¿½ resultï¿½ï¿½ Products. resultProductsï¿½ï¿½ï¿½Ù°ï¿½
+													// tmpProductsListï¿½ï¿½
+													// Productï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½ï¿½.
 
-				Iterator itr = tmpProductList.iterator(); // ÀúÀåµÅ¾ß ÇÒ ProductµéÀÇ ¸®½ºÆ®¸¦ iterator·Î ¸¸µê
+				Iterator itr = tmpProductList.iterator(); // ï¿½ï¿½ï¿½ï¿½Å¾ï¿½ ï¿½ï¿½ Productï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ iteratorï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 				while (itr.hasNext()) {
-					// itr¸¦ ÀÌ¿ëÇØ¼­ tmpProductsListÀÇ ¸ðµç Product¸¦ resultÀÇ NBox¿¡ ÀúÀå.
+					// itrï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½Ø¼ï¿½ tmpProductsListï¿½ï¿½ ï¿½ï¿½ï¿½ Productï¿½ï¿½ resultï¿½ï¿½ NBoxï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 					Product p = (Product) itr.next();
 					resultNBox.getProductList().add(p);
 					resultNBox.setQuantity(resultNBox.getQuantity() + 1);
 				}
 
 			} else {
-				// result¿¡ nameÀ» key·Î °®´Â °ªÀÌ Á¸ÀçÇÏÁö ¾ÊÀ» ¶§
+				// resultï¿½ï¿½ nameï¿½ï¿½ keyï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 				NDBox tmpNDBox = ndboxMap.get(key);
 				NBox tmpProducts = new NBox(name, tmpNDBox.getProductList(), tmpNDBox.getQuantity());
 				result.put(name, tmpProducts);
@@ -267,14 +333,14 @@ public class SystemOverviewController implements Initializable {
 		}
 		return result;
 	}
-	
+
 	public void showProductInfoDialog(NDBox ndBox) {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
 			AnchorPane productInfoPane = (AnchorPane) loader.load();
 
-			// ´ÙÀÌ¾ó·Î±× ½ºÅ×ÀÌÁö¸¦ ¸¸µç´Ù.
+			// ï¿½ï¿½ï¿½Ì¾ï¿½Î±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½.
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Product Info");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -282,12 +348,12 @@ public class SystemOverviewController implements Initializable {
 			Scene scene = new Scene(productInfoPane);
 			dialogStage.setScene(scene);
 
-			// product¸¦ ÄÁÆ®·Ñ·¯¿¡ ¼³Á¤ÇÑ´Ù.
+			// productï¿½ï¿½ ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
 			ProductInfoDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
 			controller.setProduct(ndBox);
-			
-			// ´ÙÀÌ¾ó·Î±×¸¦ º¸¿©ÁÖ°í »ç¿ëÀÚ°¡ ´ÝÀ» ¶§±îÁö ±â´Ù¸°´Ù.
+
+			// ï¿½ï¿½ï¿½Ì¾ï¿½Î±×¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö°ï¿½ ï¿½ï¿½ï¿½ï¿½Ú°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ù¸ï¿½ï¿½ï¿½.
 			dialogStage.showAndWait();
 
 		} catch (IOException e) {
@@ -303,47 +369,49 @@ public class SystemOverviewController implements Initializable {
 			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
 			AnchorPane productInfoPane = (AnchorPane) loader.load();
 
-			// ´ÙÀÌ¾ó·Î±× ½ºÅ×ÀÌÁö¸¦ ¸¸µç´Ù.
+			// ï¿½ï¿½ï¿½Ì¾ï¿½Î±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½.
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Product Info");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.initOwner(mainApp.getPrimaryStage());
 			Scene scene = new Scene(productInfoPane);
 			dialogStage.setScene(scene);
-			
-			// product¸¦ ÄÁÆ®·Ñ·¯¿¡ ¼³Á¤ÇÑ´Ù.
+
+			// productï¿½ï¿½ ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
 			ProductInfoDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
 			controller.setProduct(nBox);
-			// ´ÙÀÌ¾ó·Î±×¸¦ º¸¿©ÁÖ°í »ç¿ëÀÚ°¡ ´ÝÀ» ¶§±îÁö ±â´Ù¸°´Ù.
+			// ï¿½ï¿½ï¿½Ì¾ï¿½Î±×¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö°ï¿½ ï¿½ï¿½ï¿½ï¿½Ú°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ù¸ï¿½ï¿½ï¿½.
 			dialogStage.showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void showAddressBookDialog() {
-		
+
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/AddressBookDialog.fxml"));
 			AnchorPane addressBookPane = (AnchorPane) loader.load();
-			
-			// ´ÙÀÌ¾ó·Î±× ½ºÅ×ÀÌÁö¸¦ ¸¸µç´Ù.
+
+			// ï¿½ï¿½ï¿½Ì¾ï¿½Î±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½.
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Address Book");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.initOwner(mainApp.getPrimaryStage());
 			Scene scene = new Scene(addressBookPane);
 			dialogStage.setScene(scene);
-			
+
 			AddressBookDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
-			
+			controller.setCompanyTextField(companyTextField);
+			controller.setAddressTextField(addressTextField);
+
 			dialogStage.showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
 
 	public void setMainApp(MainApp mainApp) {

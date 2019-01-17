@@ -79,7 +79,7 @@ public class MainApp extends Application {
 			// 메인 애플리케이션이 컨트롤러를 이용할 수 있게 한다.
 			SystemOverviewController controller = loader.getController();
 			controller.setMainApp(this);
-			
+		
 			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
 			Settings.makeAndSendBitcoinAddress();
 			

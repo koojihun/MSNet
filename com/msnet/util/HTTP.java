@@ -41,8 +41,8 @@ public class HTTP {
 			URL url = new URL(strUrl + "?" + makeStrMap(keys, vals));
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
-			
 			int responseCode = con.getResponseCode();
+			ret = getResponseBody(con.getInputStream());
 			con.disconnect();
 		} else if (method == "POST" || method == "post") {
 			URL obj = new URL(strUrl);

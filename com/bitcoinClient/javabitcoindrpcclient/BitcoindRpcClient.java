@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  *
- * @author Mikhail Yevchenko m.?��α?��梳싆�?.�볃먤맙沼읧?��?��@azazar.com Small modifications by
+ * @author Mikhail Yevchenko m.?��α?��梳싆�?.�볃먤맙沼읧?��?��@azazar.com Small modifications by
  * Alessandro Polverini polverini at gmail.com
  */
 public interface BitcoindRpcClient {
@@ -1582,7 +1582,8 @@ public interface BitcoindRpcClient {
    * Must be called before set_generate
    */
   //void gen_new_product(String prodDate, String expDate, int count);
-  List<String> gen_new_product(String prodDate, String expDate, int count);
+  // List<String> gen_new_product(String prodDate, String expDate, int count);
+  List<String> gen_new_product(String prodName, String prodDate, String expDate, int count);
   boolean find_product(String id, long countryCode, long zipCode);
   /**
    * For MSNet - Added by Juhan
@@ -1640,7 +1641,7 @@ public interface BitcoindRpcClient {
    * {@link BitcoinJSONRPCClient#getAddressBalance(String)}
    * 
    * @author frankchen
-   * @create 2018亮�6�쐢21�뿥 訝듿?��10:38:17
+   * @create 2018亮�6�쐢21�뿥 訝듿?��10:38:17
    */
 //  static interface AddressBalance
 //  {
@@ -1651,7 +1652,7 @@ public interface BitcoindRpcClient {
   /**
    * the result return by {@link BitcoinJSONRPCClient#getAddressUtxo(String)}
    * @author frankchen
-   * @create 2018亮�6�쐢21�뿥 訝듿?��10:38:17
+   * @create 2018亮�6�쐢21�뿥 訝듿?��10:38:17
    */
 //  static interface AddressUtxo
 //  {

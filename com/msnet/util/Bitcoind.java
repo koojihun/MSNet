@@ -67,11 +67,12 @@ public class Bitcoind extends Thread {
 			BufferedReader br = new BufferedReader(new InputStreamReader(process_bincoind.getInputStream()));
 			try {
 				while ((input = br.readLine()) != null) {
+					/*
 					bucket += (input + "\n");
 					if (bucket.length() > 2048) {
 						bincoind_screen.appendText(bucket);
 						bucket = "";
-					}
+					}*/
 				}
 			} catch (IOException e) {
 				System.err.println("redirection error!!");

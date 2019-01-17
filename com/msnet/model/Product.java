@@ -63,7 +63,7 @@ public class Product {
 	}
 	
 	public String getPID() {
-		return productName.get();
+		return pid.get();
 	}
 	
 	public void setPID(String pid) {

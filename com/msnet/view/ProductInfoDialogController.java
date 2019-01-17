@@ -76,6 +76,4 @@ public class ProductInfoDialogController implements Initializable {
 		expirationDateColumn.setCellValueFactory(cellDate -> cellDate.getValue().expirationDateProperty());
 		productInfoTableView.setItems(pList);		
 	}
-	
-	
 }
