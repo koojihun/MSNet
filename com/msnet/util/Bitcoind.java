@@ -3,8 +3,6 @@ package com.msnet.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 public class Bitcoind extends Thread {
@@ -65,9 +63,15 @@ public class Bitcoind extends Thread {
 
 		public void run() {
 			String input;
+			String bucket = "";
+			BufferedReader br = new BufferedReader(new InputStreamReader(process_bincoind.getInputStream()));
 			try {
-				while ((input = bufferedReader.readLine()) != null) {
-					bincoind_screen.appendText(input + "\n");
+				while ((input = br.readLine()) != null) {
+					bucket += (input + "\n");
+					if (bucket.length() > 2048) {
+						bincoind_screen.appendText(bucket);
+						bucket = "";
+					}
 				}
 			} catch (IOException e) {
 				System.err.println("redirection error!!");

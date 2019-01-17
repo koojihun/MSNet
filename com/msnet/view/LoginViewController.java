@@ -26,7 +26,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 public class LoginViewController implements Initializable {
 
@@ -102,7 +101,7 @@ public class LoginViewController implements Initializable {
 	}
 
 	@FXML
-	private void handleEnter() {
+	private void handleEnter() throws Exception {
 
 		String id = idTextField.getText();
 		String password = passwordTextField.getText();
@@ -112,12 +111,8 @@ public class LoginViewController implements Initializable {
 		ArrayList<String> key = new ArrayList<String>();
 		ArrayList<String> val = new ArrayList<String>();
 
-		key.add("id");
-		val.add(id);
-		key.add("password");
-		val.add(password);
-		key.add("device");
-		val.add("m");
+		key.add("id"); key.add("password"); key.add("device");
+		val.add(id);   val.add(password);   val.add("p");
 		
 		try {
 			JSONObject jsonResult = HTTP.send("http://166.104.126.42:8090/NewSystem/signin.do", "post", key, val);
@@ -128,15 +123,12 @@ public class LoginViewController implements Initializable {
 		
 		if(result) {
 			new Settings(id, password);
-			mainApp.centerStage(MainApp.primaryStage, MainApp.WIDTH, MainApp.HEIGHT);
-			mainApp.initRootLayout();
 			mainApp.showSystemOverview();
 		} else {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Login Error");
 			alert.setHeaderText("Login Error");
 			alert.setContentText("ID, PASSWORD CHECK AGAIN PLEASE.");
-
 			alert.showAndWait();
 		}
 	}
