@@ -49,10 +49,8 @@ public class HTTP {
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("POST");
 			con.setDoOutput(true);
-			
 			String dataToSend = makeStrMap(keys, vals);
 			con.getOutputStream().write(dataToSend.getBytes());
-			
 			ret = getResponseBody(con.getInputStream());
 			con.disconnect();
 		}

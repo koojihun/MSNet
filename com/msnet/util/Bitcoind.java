@@ -32,8 +32,7 @@ public class Bitcoind extends Thread {
 			System.exit(1);
 		}
 		
-		BitcoindWriter writer = new BitcoindWriter(new BufferedReader(new InputStreamReader(process_bincoind.getInputStream())));
-		writer.start();
+		new BitcoindWriter().start();
 	}
 
 	public static boolean isBitcoindRunning() throws Exception {
@@ -55,11 +54,8 @@ public class Bitcoind extends Thread {
 	}
 
 	public class BitcoindWriter extends Thread {
-		private BufferedReader bufferedReader;
-
-		public BitcoindWriter(BufferedReader bufferedReader) {
-			this.bufferedReader = bufferedReader;
-		}
+		
+		public BitcoindWriter() {}
 
 		public void run() {
 			String input;
