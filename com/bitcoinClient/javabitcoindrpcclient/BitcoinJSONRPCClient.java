@@ -58,7 +58,7 @@ import static com.bitcoinClient.javabitcoindrpcclient.MapWrapper.mapInt;
 import static com.bitcoinClient.javabitcoindrpcclient.MapWrapper.mapStr;
 
 /**
- * @author Mikhail Yevchenko m.?��α?��梳싆�?.�볃먤맙沼읧?��?�� at azazar.com Small modifications
+ * @author Mikhail Yevchenko m.?占쏙옙慣?占쏙옙歟녹땰占�?.占쎈퀍癒ㅻ쭥亦쇱씑?占쏙옙?占쏙옙 at azazar.com Small modifications
  *         by Alessandro Polverini polverini at gmail.com
  */
 public class BitcoinJSONRPCClient implements BitcoindRpcClient {
@@ -168,7 +168,6 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 	}
 
 	public static final Charset QUERY_CHARSET = Charset.forName("EUC-KR");
-	//public static final Charset QUERY_CHARSET = Charset.forName("ISO8859-1");
 
 	public byte[] prepareRequest(final String method, final Object... params) {
 		return JSON.stringify(new LinkedHashMap() {
