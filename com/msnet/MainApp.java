@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.util.Bitcoind;
+import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
 import com.msnet.view.LoginViewController;
 import com.msnet.view.SystemOverviewController;
@@ -64,23 +65,21 @@ public class MainApp extends Application {
 	
 	public void showSystemOverview() throws Exception {
 		try {
-			// systemOverview를 fmxl 파일에서 가져온다.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/SystemOverview.fxml"));
 			AnchorPane systemOverview = (AnchorPane) loader.load();
 
-			// systemOverview를 상위 레이아웃의 가운데로 설정한다.
-			// 상위 레이아웃을 포함하는 scene을 보여준다.
 			Scene scene = new Scene(systemOverview);
 			primaryStage.setScene(scene);
 			primaryStage.show();;
 
-			// 메인 애플리케이션이 컨트롤러를 이용할 수 있게 한다.
 			SystemOverviewController controller = loader.getController();
 			controller.setMainApp(this);
 		
 			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
 			Settings.makeAndSendBitcoinAddress();
+			HTTP.startHttpServer();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

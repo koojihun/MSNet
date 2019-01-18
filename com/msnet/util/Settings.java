@@ -18,22 +18,18 @@ public class Settings {
 		this.password = password;
 		this.sysUsrName = System.getProperty("user.name");
 		////////////////////////////////////////////////////////////////
-		// AppData\\Roaming\\Bitcoin 폴더에 bincoind.exe가 있다고 가정.
-		if (!isThereBitcoind()) {
-			// bincoind.exe가 없을 경우 jar 파일로부터 복사해서옴.
+		if (!isThereBitcoind())
 			copyBitcoind();
-		}
 		////////////////////////////////////////////////////////////////
-		if (!isThereConfFile()) {
-			// AppData\\Roaming\\Bitcoin 폴더에 bincoin.conf 파일이 없을 경우}
+		if (!isThereConfFile())
 			makeConfFile();
-		}
 		////////////////////////////////////////////////////////////////
-		// License.txt 파일 복사.
 		if (!isThereLicense())
 			copyLicense();
 		////////////////////////////////////////////////////////////////
 		readBitcoinConfFile();
+		//////////////////////////////////////////////////////////////
+		AES.setKey("HANYANG HIT B102".trim());
 	}
 
 	private boolean isThereConfFile() {
@@ -45,7 +41,6 @@ public class Settings {
 
 	private boolean isThereBitcoind() {
 		///////////////////////////////////////////////////////////
-		// AppData/Roaming/ 에 BItcoin 폴더가 없을 때 폴더를 새로 생성.
 		File bitcoin_directory = new File("C:\\Users\\" + sysUsrName + "\\AppData\\Roaming\\Bitcoin");
 		if (!bitcoin_directory.exists()) {
 			bitcoin_directory.mkdir();
@@ -115,7 +110,7 @@ public class Settings {
 		String fileName = "C:\\Users\\" + sysUsrName + "\\AppData\\Roaming\\Bitcoin\\bitcoin.conf";
 		try {
 			BufferedWriter fw = new BufferedWriter(new FileWriter(fileName, false));
-			// 파일안에 문자열 쓰기
+
 			fw.write("rpcuser=" + id);
 			fw.newLine();
 			fw.write("rpcpassword=" + password);
@@ -126,8 +121,8 @@ public class Settings {
 			fw.newLine();
 			fw.write("printtoconsole=1");
 			fw.newLine();
+			
 			fw.flush();
-			// 객체 닫기
 			fw.close();
 		} catch (Exception e) {
 			System.err.println("Error : Making bitcoin.conf file error.");

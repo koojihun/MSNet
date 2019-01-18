@@ -1,17 +1,23 @@
 package com.msnet.util;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-
+import java.util.HashMap;
+import java.util.Map;
+import com.sun.net.httpserver.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 public class HTTP {
-	
+
 	public static String makeStrMap(ArrayList<String> keys, ArrayList<String> vals) {
 		String ret = "";
 		for (int cnt = 0; cnt < keys.size(); cnt++) {
@@ -21,21 +27,22 @@ public class HTTP {
 		}
 		return ret;
 	}
-	
+
 	public static JSONObject getResponseBody(InputStream is) throws Exception {
 		BufferedReader in = new BufferedReader(new InputStreamReader(is));
-		
+
 		String inputLine;
 		StringBuffer response = new StringBuffer();
 		while ((inputLine = in.readLine()) != null)
 			response.append(inputLine);
 		in.close();
-		
+
 		JSONParser jsonParser = new JSONParser();
-		return (JSONObject)jsonParser.parse(response.toString());
+		return (JSONObject) jsonParser.parse(response.toString());
 	}
-	
-	public static JSONObject send(String strUrl, String method, ArrayList<String> keys, ArrayList<String> vals) throws Exception {
+
+	public static JSONObject send(String strUrl, String method, ArrayList<String> keys, ArrayList<String> vals)
+			throws Exception {
 		JSONObject ret = null;
 		if (method == "GET" || method == "get") {
 			URL url = new URL(strUrl + "?" + makeStrMap(keys, vals));
@@ -55,5 +62,54 @@ public class HTTP {
 			con.disconnect();
 		}
 		return ret;
+	}
+
+	public static void startHttpServer() {
+		new bitcoinServer().start();
+	}
+
+	public static class bitcoinServer extends Thread {
+		public void run() {
+			try {
+				HttpServer httpServer = HttpServer.create(new InetSocketAddress(9999), 0);
+				httpServer.createContext("/", new Handler());
+				httpServer.setExecutor(null);
+				httpServer.start();
+			} catch (Exception e) {
+				System.err.println(e.toString());
+				System.exit(1);
+			}
+		}
+
+		public class Handler implements HttpHandler {
+			@Override
+			public void handle(HttpExchange httpExchange) throws IOException {
+				Map<String, String> query = queryToMap(httpExchange.getRequestURI().getQuery());
+				for (Map.Entry<String, String> ent : query.entrySet()) {
+					// TODO: get bitcoin address & pid --> decode pid --> bitcoin_clid(send_to_address) //
+				}
+				
+				// for return value.
+				String response = "Hi there!";
+				httpExchange.sendResponseHeaders(200, response.getBytes().length);
+				OutputStream os = httpExchange.getResponseBody();
+				os.write(response.getBytes());
+				os.close();
+				httpExchange.close();
+			}
+		}
+
+		// url 뒤 parameter들을 파싱 하기 위한 함수들. (ex. ip주소:port/?method=1&address=~~~&pid=~~)
+		public Map<String, String> queryToMap(String query) {
+			Map<String, String> result = new HashMap<String, String>();
+			for (String param : query.split("&")) {
+				String pair[] = param.split("=");
+				if (pair.length > 1)
+					result.put(pair[0], pair[1]);
+				else
+					result.put(pair[0], "");
+			}
+			return result;
+		}
 	}
 }
