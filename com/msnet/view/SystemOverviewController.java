@@ -17,6 +17,7 @@ import java.util.ResourceBundle;
 
 import com.msnet.MainApp;
 import com.msnet.model.Product;
+import com.msnet.model.Reservation;
 import com.msnet.util.Bitcoind;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
@@ -60,8 +61,6 @@ public class SystemOverviewController implements Initializable {
 	private TextField termTextField;
 	@FXML
 	private ComboBox<String> dateBox;
-	ObservableList<String> list;
-	ObservableList<String> dateList;
 	//////////////////////////////////////////////////
 	// Tab
 	@FXML
@@ -76,6 +75,23 @@ public class SystemOverviewController implements Initializable {
 	private TableColumn<NDBox, String> productNameColumn;
 	@FXML
 	private TableColumn<NDBox, Integer> quantityColumn;
+	
+	@FXML
+	private TableView<Reservation> reservationStatusTableView;
+	@FXML
+	private TableColumn<Reservation, String> r_timeColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_companyColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_productNameColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_productionDateColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_expirationDateColumn;
+	@FXML
+	private TableColumn<Reservation, Integer> r_quantityColumn;
+	@FXML
+	private TableColumn<Reservation, Integer> r_successColumn;
 	//////////////////////////////////////////////////
 	// Total Quantity
 	@FXML
@@ -104,6 +120,9 @@ public class SystemOverviewController implements Initializable {
 	private MainApp mainApp;
 	private ObservableList<NBox> nList;
 	private ObservableList<NDBox> ndList;
+	private ObservableList<Reservation> rList;
+	private ObservableList<String> list;
+	private ObservableList<String> dateList;
 	//////////////////////////////////////////////////
 
 	public SystemOverviewController() {
@@ -125,6 +144,16 @@ public class SystemOverviewController implements Initializable {
 		total_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		total_inventoryStatusTableView.setItems(nList);
+		
+		rList = FXCollections.observableArrayList();
+		r_timeColumn.setCellValueFactory(cellData -> cellData.getValue().timeProperty());
+		r_companyColumn.setCellValueFactory(cellData -> cellData.getValue().toCompanyProperty());
+		r_productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
+		r_expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
+		r_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
+		r_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+		r_successColumn.setCellValueFactory(cellData -> cellData.getValue().successProperty().asObject());
+		reservationStatusTableView.setItems(rList);
 
 		// NDBox�� ���� Ŭ���ϸ� Product ����� ����
 		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -159,39 +188,40 @@ public class SystemOverviewController implements Initializable {
 
 	@FXML
 	public void handleSendToAddress() {
-
+		
+		SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss");
+		Calendar cal = Calendar.getInstance();
+		String time = format.format(cal.getTime());
+		String company = companyTextField.getText();
 		String address = addressTextField.getText();
 		String prodName = productNameTextField.getText();
 		String str_quantity = quantityTextField.getText();
 		String productionDate = productionDateTextField.getText();
 		String expirationDate = expirationDateTextField.getText();
-
-		if (address.equals("") || prodName.equals("") || prodName.equals("")) {
-			// �ʼ� ����(Address, prodName, Quantity)�� �Է��� ���� ���
+		
+		Reservation r;
+		
+		if (address.equals("") || prodName.equals("") || str_quantity.equals("")) {
+			// 필수 정보(address, prodName, quantity)가 하나라도 없을 때
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Caution");
 			alert.setHeaderText("Enter the information");
 			alert.setContentText("Please enter the required information(Address, Product name, Quantity)");
 			alert.showAndWait();
 		} else {
-			// �ʼ� ����(Address, Product name, Quantity)�� �Է��� �ִ� ���
+			// 필수 정보(address, prodName, quantity)가 모두 있을 때
 			int quantity = Integer.parseInt(str_quantity);
-			List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
-			Map<NDKey, NDBox> productND_Map = makeNDBox(productList);
 
-			if (productionDateTextField.getText().equals("") && expirationDateTextField.getText().equals("")) {
-				// productionDate�� expirationDate�� ����ִ� ���
-				// (date�� ��� ����) prodName�� ���󼭸� ��ǰ�� ������.
-				Map<String, NBox> productN_Map = makeNBox(productND_Map);
-
-			} else if (!productionDateTextField.getText().equals("") && !expirationDateTextField.getText().equals("")) {
-				// productionDate�� expirationDate�� ä���� �ִ� ���
-				// date�� prodName�� ���� ��ǰ�� ������.
-				NDKey key = new NDKey(prodName, productionDate, expirationDate);
-				NDBox ndBox = productND_Map.get(key);
-				MainApp.bitcoinJSONRPClient.send_many(address, quantity, ndBox.getPid());
+			if (productionDate.equals("") && expirationDate.equals("")) {
+				// production date와  expiration date 둘다 없을 때 -> date와 관계 없이 상품 send
+				r = new Reservation(time, address, company, prodName, quantity, 0);
+				rList.add(r);
+			} else if (!productionDate.equals("") && !expirationDate.equals("")) {
+				// production date와  expiration date 둘다 있을 때 -> date에 따라 상품 send
+				r = new Reservation(time, address, company, prodName, productionDate, expirationDate, quantity, 0);
+				rList.add(r);
 			} else {
-				// productionDate, expirationDate �� �� �ϳ��� �ԷµǾ� �ִ� ��쿡�� ����Ѵ�.
+				// production date와  expiration date 둘 중에 하나만 있을 때 -> 경고!!
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Caution");
 				alert.setHeaderText("Enter the date information");
@@ -292,6 +322,10 @@ public class SystemOverviewController implements Initializable {
 			}
 			product_expirationDateTextField.setText(expTime);
 		}
+	}
+	
+	public void handleQRGenerate() {
+		
 	}
 
 	/**

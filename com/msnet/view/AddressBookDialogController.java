@@ -61,6 +61,7 @@ public class AddressBookDialogController implements Initializable {
 		Company comp = companyInfoTableView.getSelectionModel().getSelectedItem();
 		companyTextField.setText(comp.getName());
 		addressTextField.setText(comp.getBitcoinAddress());
+		this.dialogStage.close();
 	}
 
 	@Override
