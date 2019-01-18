@@ -38,8 +38,6 @@ public class QRMaker {
 			int backgroundColor = 0xFFFFFFFF;
 
 			QRCodeWriter qrCodeWriter = new QRCodeWriter();
-			QRCode qrCode = new QRCode();
-			qrCode.setVersion(Version.);
 			
 			// 3,4번째 parameter값 : width/height값 지정
 			BitMatrix bitMatrix = qrCodeWriter.encode(codeurl, BarcodeFormat.QR_CODE, width, height);

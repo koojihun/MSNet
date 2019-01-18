@@ -5,7 +5,10 @@ import javafx.scene.control.Alert.AlertType;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.ResourceBundle;
 
 import com.msnet.MainApp;
 import com.msnet.model.Product;
+import com.msnet.model.Reservation;
 import com.msnet.util.Bitcoind;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
@@ -53,8 +57,10 @@ public class SystemOverviewController implements Initializable {
 	private TextField product_productionDateTextField;
 	@FXML
 	private TextField product_expirationDateTextField;
-
-	ObservableList<String> list;
+	@FXML
+	private TextField termTextField;
+	@FXML
+	private ComboBox<String> dateBox;
 	//////////////////////////////////////////////////
 	// Tab
 	@FXML
@@ -69,6 +75,23 @@ public class SystemOverviewController implements Initializable {
 	private TableColumn<NDBox, String> productNameColumn;
 	@FXML
 	private TableColumn<NDBox, Integer> quantityColumn;
+	
+	@FXML
+	private TableView<Reservation> reservationStatusTableView;
+	@FXML
+	private TableColumn<Reservation, String> r_timeColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_companyColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_productNameColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_productionDateColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_expirationDateColumn;
+	@FXML
+	private TableColumn<Reservation, Integer> r_quantityColumn;
+	@FXML
+	private TableColumn<Reservation, Integer> r_successColumn;
 	//////////////////////////////////////////////////
 	// Total Quantity
 	@FXML
@@ -97,6 +120,9 @@ public class SystemOverviewController implements Initializable {
 	private MainApp mainApp;
 	private ObservableList<NBox> nList;
 	private ObservableList<NDBox> ndList;
+	private ObservableList<Reservation> rList;
+	private ObservableList<String> list;
+	private ObservableList<String> dateList;
 	//////////////////////////////////////////////////
 
 	public SystemOverviewController() {
@@ -105,7 +131,9 @@ public class SystemOverviewController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		list = FXCollections.observableArrayList("Total", "Details");
+		dateList = FXCollections.observableArrayList("Hour", "Day", "Month", "Year");
 		selectBox.setItems(list);
+		dateBox.setItems(dateList);
 
 		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
 		expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
@@ -116,6 +144,16 @@ public class SystemOverviewController implements Initializable {
 		total_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		total_inventoryStatusTableView.setItems(nList);
+		
+		rList = FXCollections.observableArrayList();
+		r_timeColumn.setCellValueFactory(cellData -> cellData.getValue().timeProperty());
+		r_companyColumn.setCellValueFactory(cellData -> cellData.getValue().toCompanyProperty());
+		r_productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
+		r_expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
+		r_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
+		r_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+		r_successColumn.setCellValueFactory(cellData -> cellData.getValue().successProperty().asObject());
+		reservationStatusTableView.setItems(rList);
 
 		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
@@ -148,32 +186,40 @@ public class SystemOverviewController implements Initializable {
 
 	@FXML
 	public void handleSendToAddress() {
-
+		
+		SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss");
+		Calendar cal = Calendar.getInstance();
+		String time = format.format(cal.getTime());
+		String company = companyTextField.getText();
 		String address = addressTextField.getText();
 		String prodName = productNameTextField.getText();
 		String str_quantity = quantityTextField.getText();
 		String productionDate = productionDateTextField.getText();
 		String expirationDate = expirationDateTextField.getText();
-
-		if (address.equals("") || prodName.equals("") || prodName.equals("")) {
+		
+		Reservation r;
+		
+		if (address.equals("") || prodName.equals("") || str_quantity.equals("")) {
+			// 필수 정보(address, prodName, quantity)가 하나라도 없을 때
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Caution");
 			alert.setHeaderText("Enter the information");
 			alert.setContentText("Please enter the required information(Address, Product name, Quantity)");
 			alert.showAndWait();
 		} else {
-			int quantity = Integer.getInteger(str_quantity);
-			List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
-			Map<NDKey, NDBox> productND_Map = makeNDBox(productList);
+			// 필수 정보(address, prodName, quantity)가 모두 있을 때
+			int quantity = Integer.parseInt(str_quantity);
 
-			if (productionDateTextField.getText().equals("") && expirationDateTextField.getText().equals("")) {
-				Map<String, NBox> productN_Map = makeNBox(productND_Map);
-
-			} else if (!productionDateTextField.getText().equals("") && !expirationDateTextField.getText().equals("")) {
-				NDKey key = new NDKey(prodName, productionDate, expirationDate);
-				NDBox ndBox = productND_Map.get(key);
-				MainApp.bitcoinJSONRPClient.send_many(address, quantity, ndBox.getPid());
+			if (productionDate.equals("") && expirationDate.equals("")) {
+				// production date와  expiration date 둘다 없을 때 -> date와 관계 없이 상품 send
+				r = new Reservation(time, address, company, prodName, quantity, 0);
+				rList.add(r);
+			} else if (!productionDate.equals("") && !expirationDate.equals("")) {
+				// production date와  expiration date 둘다 있을 때 -> date에 따라 상품 send
+				r = new Reservation(time, address, company, prodName, productionDate, expirationDate, quantity, 0);
+				rList.add(r);
 			} else {
+				// production date와  expiration date 둘 중에 하나만 있을 때 -> 경고!!
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Caution");
 				alert.setHeaderText("Enter the date information");
@@ -189,6 +235,8 @@ public class SystemOverviewController implements Initializable {
 		if (selected.equals("Total")) {
 			NBox selectedBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
 			productNameTextField.setText(selectedBox.getProductName());
+			productionDateTextField.setText("");
+			expirationDateTextField.setText("");
 		} else if (selected.equals("Details")) {
 			NDBox selectedBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
 			productNameTextField.setText(selectedBox.getProductName());
@@ -229,21 +277,52 @@ public class SystemOverviewController implements Initializable {
 		String str_quantity = product_quantityTextField.getText();
 		String productionDate = product_productionDateTextField.getText();
 		String expirationDate = product_expirationDateTextField.getText();
-		
+
 		if (name.equals("") || str_quantity.equals("") || productionDate.equals("") || expirationDate.equals("")) {
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Caution");
 			alert.setHeaderText("Enter the information");
-			alert.setContentText("Please enter the required information(Name, Quantity, Production date, Expiration date)");
+			alert.setContentText(
+					"Please enter the required information(Name, Quantity, Production date, Expiration date)");
 			alert.showAndWait();
 		} else {
 			int quantity = Integer.parseInt(str_quantity);
-			List<String> pids = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
-			if (pids == null)
-				System.out.println("실패");
-			else
-				System.out.println("성공");
+			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
 		}
+	}
+
+	@FXML
+	public void handleGetCurrentTime() {
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd:HHmmss");
+		Date current = new Date(System.currentTimeMillis());
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(current);
+		String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+		String str_term = termTextField.getText();
+		product_productionDateTextField.setText(prodTime);
+		if (!str_term.equals("")) {
+			int term = Integer.parseInt(termTextField.getText());
+			String unitOfTerm = dateBox.getSelectionModel().getSelectedItem();
+			String expTime = "";
+			if (unitOfTerm.equals("Hour")) {
+				cal.add(Calendar.HOUR, term);
+				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			} else if (unitOfTerm.equals("Day")) {
+				cal.add(Calendar.DATE, term);
+				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			} else if (unitOfTerm.equals("Month")) {
+				cal.add(Calendar.MONTH, term);
+				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			} else if (unitOfTerm.equals("Year")) {
+				cal.add(Calendar.YEAR, term);
+				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			}
+			product_expirationDateTextField.setText(expTime);
+		}
+	}
+	
+	public void handleQRGenerate() {
+		
 	}
 	
 	public Map<NDKey, NDBox> makeNDBox(List<Map> productList) {
@@ -278,9 +357,8 @@ public class SystemOverviewController implements Initializable {
 			String name = key.getProdName();
 			if (result.get(name) != null) {
 				NDBox tmpNDBox = ndboxMap.get(key);
-				
 				ArrayList<Product> tmpProductList = tmpNDBox.getProductList();
-				NBox resultNBox = result.get(name);
+				NBox resultNBox = result.get(name); 
 				Iterator itr = tmpProductList.iterator(); 
 
 				while (itr.hasNext()) {
@@ -288,7 +366,6 @@ public class SystemOverviewController implements Initializable {
 					resultNBox.getProductList().add(p);
 					resultNBox.setQuantity(resultNBox.getQuantity() + 1);
 				}
-
 			} else {
 				NDBox tmpNDBox = ndboxMap.get(key);
 				NBox tmpProducts = new NBox(name, tmpNDBox.getProductList(), tmpNDBox.getQuantity());
