@@ -28,7 +28,7 @@
                <children>
                   <SplitPane dividerPositions="0.632183908045977" orientation="VERTICAL" prefHeight="698.0" prefWidth="279.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" styleClass="background">
+                      <AnchorPane minHeight="0.0" minWidth="-Infinity" prefHeight="100.0" prefWidth="160.0" styleClass="background">
                            <children>
                               <Accordion prefHeight="563.0" prefWidth="314.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <panes>
@@ -37,10 +37,7 @@
                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                              <children>
                                                 <Button fx:id="inventoryStatusButton" layoutX="138.0" layoutY="26.0" mnemonicParsing="false" onAction="#handleInventoryStatus" text="Get" />
-                                                <Label layoutX="28.0" layoutY="73.0" text="Selected Panel:" />
-                                                <Button layoutX="226.0" layoutY="105.0" mnemonicParsing="false" onAction="#handleSelectProduct" prefHeight="20.0" prefWidth="60.0" text="Select" />
                                                 <Label layoutX="28.0" layoutY="30.0" text="Inventory Status:" />
-                                                <ComboBox fx:id="selectBox" layoutX="126.0" layoutY="69.0" prefWidth="150.0" />
                                              </children>
                                           </AnchorPane>
                                     </content>
@@ -83,6 +80,7 @@
                                 <columns>
                                   <TableColumn fx:id="total_productNameColumn" maxWidth="500.0" prefWidth="300.0" style="-fx-alignment: CENTER;" text="Product name" />
                                   <TableColumn fx:id="total_quantityColumn" maxWidth="300.0" prefWidth="150.0" style="-fx-alignment: CENTER;" text="Quantity" />
+                                    <TableColumn fx:id="total_availableColumn" maxWidth="300.0" prefWidth="150.0" style="-fx-alignment: CENTER;" text="Available" />
                                 </columns>
                                  <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -115,6 +113,7 @@
                                               <TableColumn fx:id="productionDateColumn" maxWidth="500.0" prefWidth="200.0" style="-fx-alignment: CENTER;" text="Production date" />
                                                 <TableColumn fx:id="expirationDateColumn" maxWidth="500.0" minWidth="0.0" prefWidth="200.0" style="-fx-alignment: CENTER;" text="Expiration date" />
                                                 <TableColumn fx:id="quantityColumn" maxWidth="300.0" minWidth="0.0" prefWidth="153.0" style="-fx-alignment: CENTER;" text="Quantity" />
+                                                <TableColumn fx:id="availableColumn" maxWidth="300.0" minWidth="0.0" prefWidth="153.0" style="-fx-alignment: CENTER;" text="Available" />
                                             </columns>
                                              <columnResizePolicy>
                                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -198,23 +197,26 @@
                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="226.0" minWidth="10.0" prefWidth="226.0" />
                                                         </columnConstraints>
                                                         <rowConstraints>
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                         </rowConstraints>
                                                          <children>
-                                                            <Label prefHeight="15.0" prefWidth="150.0" text="Product name:" />
-                                                            <Label prefHeight="21.0" prefWidth="94.0" text="Quantity:" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                                                            <Label text="Production date:" GridPane.rowIndex="2" />
-                                                            <Label text="Expirationtion date:" GridPane.rowIndex="3" />
-                                                            <TextField fx:id="quantityTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                            <TextField fx:id="productNameTextField" GridPane.columnIndex="1" />
-                                                            <TextField fx:id="productionDateTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                            <TextField fx:id="expirationDateTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <Label prefHeight="15.0" prefWidth="150.0" text="Product name:" GridPane.rowIndex="1" />
+                                                            <Label prefHeight="21.0" prefWidth="94.0" text="Quantity:" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                            <Label text="Production date:" GridPane.rowIndex="3" />
+                                                            <Label text="Expirationtion date:" GridPane.rowIndex="4" />
+                                                            <TextField fx:id="quantityTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="productNameTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="productionDateTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="expirationDateTextField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <Label text="Selected Panel:" />
+                                                            <ComboBox fx:id="selectBox" prefWidth="150.0" GridPane.columnIndex="1" />
                                                          </children>
                                                       </GridPane>
-                                                      <Button layoutX="474.0" layoutY="186.0" mnemonicParsing="false" onAction="#handleSendToAddress" prefHeight="20.0" prefWidth="60.0" text="Send" />
+                                                      <Button layoutX="474.0" layoutY="186.0" mnemonicParsing="false" onAction="#handleSendToAddress" prefHeight="20.0" prefWidth="60.0" text="Send" AnchorPane.rightAnchor="50.0" />
                                                       <Label layoutX="-24.0" layoutY="-3.0" prefHeight="30.0" prefWidth="150.0" text="Product transfer" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                                          <font>
                                                             <Font size="15.0" />

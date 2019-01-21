@@ -3,7 +3,11 @@ package com.msnet.view;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,10 +23,13 @@ import com.msnet.MainApp;
 import com.msnet.model.Product;
 import com.msnet.model.Reservation;
 import com.msnet.util.Bitcoind;
+import com.msnet.util.Settings;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 import com.msnet.model.NDKey;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -75,7 +82,9 @@ public class SystemOverviewController implements Initializable {
 	private TableColumn<NDBox, String> productNameColumn;
 	@FXML
 	private TableColumn<NDBox, Integer> quantityColumn;
-	
+	@FXML
+	private TableColumn<NDBox, Integer> availableColumn;
+
 	@FXML
 	private TableView<Reservation> reservationStatusTableView;
 	@FXML
@@ -100,6 +109,8 @@ public class SystemOverviewController implements Initializable {
 	private TableColumn<NBox, String> total_productNameColumn;
 	@FXML
 	private TableColumn<NBox, Integer> total_quantityColumn;
+	@FXML
+	private TableColumn<NBox, Integer> total_availableColumn;
 	//////////////////////////////////////////////////
 	// Product transfer
 	@FXML
@@ -133,18 +144,22 @@ public class SystemOverviewController implements Initializable {
 		list = FXCollections.observableArrayList("Total", "Details");
 		dateList = FXCollections.observableArrayList("Hour", "Day", "Month", "Year");
 		selectBox.setItems(list);
+		selectBox.setPromptText("Select panel");
 		dateBox.setItems(dateList);
+		dateBox.setPromptText("Select unit");
 
 		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
 		expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
 		productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+		availableColumn.setCellValueFactory(cellData -> cellData.getValue().availableProperty().asObject());
 		inventoryStatusTableView.setItems(ndList);
 
 		total_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+		total_availableColumn.setCellValueFactory(cellData -> cellData.getValue().availableProperty().asObject());
 		total_inventoryStatusTableView.setItems(nList);
-		
+
 		rList = FXCollections.observableArrayList();
 		r_timeColumn.setCellValueFactory(cellData -> cellData.getValue().timeProperty());
 		r_companyColumn.setCellValueFactory(cellData -> cellData.getValue().toCompanyProperty());
@@ -153,7 +168,37 @@ public class SystemOverviewController implements Initializable {
 		r_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		r_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		r_successColumn.setCellValueFactory(cellData -> cellData.getValue().successProperty().asObject());
+
 		reservationStatusTableView.setItems(rList);
+
+		selectBox.valueProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				String selected = newValue;
+				if (selected.equals("Total")) {
+					productionDateTextField.setText("");
+					expirationDateTextField.setText("");
+					productionDateTextField.setDisable(true);
+					expirationDateTextField.setDisable(true);
+
+					NBox selectedBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
+					productNameTextField.setText(selectedBox.getProductName());
+					total_inventoryStatusTableView.getSelectionModel().clearSelection();
+				} else {
+					// selected가 "Details" 일 때
+					productionDateTextField.setDisable(false);
+					expirationDateTextField.setDisable(false);
+
+					NDBox selectedBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
+					productNameTextField.setText(selectedBox.getProductName());
+					productionDateTextField.setText(selectedBox.getProductionDate());
+					expirationDateTextField.setText(selectedBox.getExpirationDate());
+					inventoryStatusTableView.getSelectionModel().clearSelection();
+				}
+				selectBox.getSelectionModel().clearSelection();
+			}
+		});
 
 		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
@@ -186,8 +231,8 @@ public class SystemOverviewController implements Initializable {
 
 	@FXML
 	public void handleSendToAddress() {
-		
-		SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss");
+
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		String time = format.format(cal.getTime());
 		String company = companyTextField.getText();
@@ -196,9 +241,9 @@ public class SystemOverviewController implements Initializable {
 		String str_quantity = quantityTextField.getText();
 		String productionDate = productionDateTextField.getText();
 		String expirationDate = expirationDateTextField.getText();
-		
+
 		Reservation r;
-		
+
 		if (address.equals("") || prodName.equals("") || str_quantity.equals("")) {
 			// 필수 정보(address, prodName, quantity)가 하나라도 없을 때
 			Alert alert = new Alert(AlertType.INFORMATION);
@@ -208,42 +253,89 @@ public class SystemOverviewController implements Initializable {
 			alert.showAndWait();
 		} else {
 			// 필수 정보(address, prodName, quantity)가 모두 있을 때
-			int quantity = Integer.parseInt(str_quantity);
-
-			if (productionDate.equals("") && expirationDate.equals("")) {
-				// production date와  expiration date 둘다 없을 때 -> date와 관계 없이 상품 send
-				r = new Reservation(time, address, company, prodName, quantity, 0);
-				rList.add(r);
-			} else if (!productionDate.equals("") && !expirationDate.equals("")) {
-				// production date와  expiration date 둘다 있을 때 -> date에 따라 상품 send
-				r = new Reservation(time, address, company, prodName, productionDate, expirationDate, quantity, 0);
-				rList.add(r);
-			} else {
-				// production date와  expiration date 둘 중에 하나만 있을 때 -> 경고!!
+			if (productionDate.equals("") && expirationDate.equals("") == false) {
+				// production date와 expiration date 둘 중에 하나만 있을 때 -> 경고!!
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Caution");
 				alert.setHeaderText("Enter the date information");
 				alert.setContentText("Please enter the exact date information");
 				alert.showAndWait();
+			} else {
+				int beSendedQauntity = Integer.parseInt(str_quantity);
+				List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
+				Map<NDKey, NDBox> result_NDBox = makeNDBox(productList);
+				ArrayList<Product> prodList = new ArrayList<Product>();
+				if (productionDate.equals("") && expirationDate.equals("")) {
+					// production date와 expiration date 둘다 없을 때 -> date와 관계 없이 상품 send
+					Map<String, NBox> result_NBox = makeNBox(result_NDBox);
+					NBox selectedNBox = result_NBox.get(prodName);
+					int available = selectedNBox.getAvailable();
+					if (available >= beSendedQauntity) {
+						selectedNBox.setAvailable(available - beSendedQauntity);
+						r = new Reservation(time, address, company, prodName, beSendedQauntity, 0, prodList);
+						rList.add(r);
+						nList.add(selectedNBox);
+						companyTextField.setText("");
+						addressTextField.setText("");
+						productNameTextField.setText("");
+						quantityTextField.setText("");
+						productionDateTextField.setText("");
+						expirationDateTextField.setText("");
+					} else {
+						// available의 양이 보내고자 하는 양(beSendedQuantity)보다 적을 때
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Caution");
+						if (available == 0) {
+							// available이 0일 때는 보낼 수 있는 물건이 없을 때.
+							alert.setHeaderText("Wrong Quantity");
+							alert.setContentText("There is nothing to send");
+						} else { 
+							alert.setHeaderText("Wrong Quantity");
+							alert.setContentText("Please enter the 'Quantity' less than " + available);
+						}
+						alert.showAndWait();
+					}
+				} else {
+					// production date와 expiration date 둘다 있을 때 -> date에 따라 상품 send
+					NDKey key = new NDKey(prodName, productionDate, expirationDate);
+					NDBox selectedNDBox = result_NDBox.get(key);
+					int available = selectedNDBox.getAvailable();
+					if (available >= beSendedQauntity) {
+						selectedNDBox.setAvailable(available - beSendedQauntity);
+						r = new Reservation(time, address, company, prodName, productionDate, expirationDate,
+								beSendedQauntity, 0, prodList);
+						/*
+						 * try { File file = new File("C:\\Users\\" + Settings.getSysUsrName() +
+						 * "\\AppData\\Roaming\\Bitcoin\\reservation.txt"); PrintWriter pw = new
+						 * PrintWriter(new BufferedWriter(new FileWriter(file)));
+						 * pw.println(r.toString()); pw.close(); } catch (IOException e) {
+						 * System.err.println("File writer error"); e.printStackTrace(); }
+						 */
+						rList.add(r);
+						// ndList.add(selectedNDBox);
+						handleInventoryStatus();
+						companyTextField.setText("");
+						addressTextField.setText("");
+						productNameTextField.setText("");
+						quantityTextField.setText("");
+						productionDateTextField.setText("");
+						expirationDateTextField.setText("");
+					} else {
+						// available의 양이 보내고자 하는 양(beSendedQuantity)보다 적을 때
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Caution");
+						if (available == 0) {
+							// available이 0일 때는 보낼 수 있는 물건이 없을 때.
+							alert.setHeaderText("Wrong Quantity");
+							alert.setContentText("There is nothing to send");
+						} else {
+							alert.setHeaderText("Wrong Quantity");
+							alert.setContentText("Please enter the 'Quantity' less than " + available);
+						}
+						alert.showAndWait();
+					}
+				}
 			}
-		}
-	}
-
-	@FXML
-	public void handleSelectProduct() {
-		String selected = selectBox.getSelectionModel().getSelectedItem();
-		if (selected.equals("Total")) {
-			NBox selectedBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-			productNameTextField.setText(selectedBox.getProductName());
-			productionDateTextField.setText("");
-			expirationDateTextField.setText("");
-		} else if (selected.equals("Details")) {
-			NDBox selectedBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
-			productNameTextField.setText(selectedBox.getProductName());
-			productionDateTextField.setText(selectedBox.getProductionDate());
-			expirationDateTextField.setText(selectedBox.getExpirationDate());
-		} else {
-			System.out.println("Select!!!!");
 		}
 	}
 
@@ -252,7 +344,6 @@ public class SystemOverviewController implements Initializable {
 		List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
 		//////////////////////////////////////////////////////////////
 		Map<NDKey, NDBox> result_NDBox = makeNDBox(productList);
-
 		ndList = FXCollections.observableArrayList();
 
 		for (NDKey key : result_NDBox.keySet()) {
@@ -261,7 +352,6 @@ public class SystemOverviewController implements Initializable {
 		inventoryStatusTableView.setItems(ndList);
 		//////////////////////////////////////////////////////////////
 		Map<String, NBox> result_NBox = makeNBox(result_NDBox);
-
 		nList = FXCollections.observableArrayList();
 
 		for (String key : result_NBox.keySet()) {
@@ -287,7 +377,8 @@ public class SystemOverviewController implements Initializable {
 			alert.showAndWait();
 		} else {
 			int quantity = Integer.parseInt(str_quantity);
-			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
+			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate,
+					quantity);
 		}
 	}
 
@@ -320,11 +411,11 @@ public class SystemOverviewController implements Initializable {
 			product_expirationDateTextField.setText(expTime);
 		}
 	}
-	
+
 	public void handleQRGenerate() {
-		
+
 	}
-	
+
 	public Map<NDKey, NDBox> makeNDBox(List<Map> productList) {
 
 		Map<NDKey, NDBox> result = new HashMap<NDKey, NDBox>();
@@ -335,8 +426,8 @@ public class SystemOverviewController implements Initializable {
 			if (result.get(key) == null) {
 				Product tmpProduct = new Product(product);
 				ArrayList<Product> tmpList = new ArrayList<Product>();
-				tmpList.add(tmpProduct); 
-				NDBox value = new NDBox(key.getProdName(), key.getProductionDate(), key.getExpirationDate(), tmpList,
+				tmpList.add(tmpProduct);
+				NDBox value = new NDBox(key.getProdName(), key.getProductionDate(), key.getExpirationDate(), tmpList, 1,
 						1);
 				result.put(key, value);
 			} else {
@@ -344,11 +435,27 @@ public class SystemOverviewController implements Initializable {
 				NDBox resultNDBox = result.get(key);
 				resultNDBox.addProduct(tmpProduct);
 				resultNDBox.setQuantity(resultNDBox.getQuantity() + 1);
+				resultNDBox.setAvailable(resultNDBox.getAvailable() + 1);
+			}
+		}
+
+		// Reservation List에서 NDBox map(result)의 key(prodName, prodDate, expDate)와 동일한 값을 갖는
+		// NDBox의 quantity를 구해서 result의 available에서 뺌.
+		Iterator<Reservation> reservationItr = rList.iterator();
+		while (reservationItr.hasNext()) {
+			Reservation thisReservation = reservationItr.next();
+			for (NDKey resultKey : result.keySet()) {
+				if (thisReservation.getProductName().equals(resultKey.getProdName())
+						&& thisReservation.getProductionDate().equals(resultKey.getProductionDate())
+						&& thisReservation.getExpirationDate().equals(resultKey.getExpirationDate())) {
+					NDBox thisNDBox = result.get(resultKey);
+					thisNDBox.setAvailable(thisNDBox.getAvailable() - thisReservation.getQuantity());
+				}
 			}
 		}
 		return result;
 	}
-	
+
 	public Map<String, NBox> makeNBox(Map<NDKey, NDBox> ndboxMap) {
 		Map<String, NBox> result = new HashMap<String, NBox>();
 
@@ -356,19 +463,23 @@ public class SystemOverviewController implements Initializable {
 
 			String name = key.getProdName();
 			if (result.get(name) != null) {
+				// result에 key 값을 갖는 NBox가 하나라도 있을 때 -> 원래 있던 NBox에 추가
 				NDBox tmpNDBox = ndboxMap.get(key);
 				ArrayList<Product> tmpProductList = tmpNDBox.getProductList();
-				NBox resultNBox = result.get(name); 
-				Iterator itr = tmpProductList.iterator(); 
+				NBox resultNBox = result.get(name);
+				Iterator itr = tmpProductList.iterator();
 
 				while (itr.hasNext()) {
 					Product p = (Product) itr.next();
 					resultNBox.getProductList().add(p);
 					resultNBox.setQuantity(resultNBox.getQuantity() + 1);
 				}
+				resultNBox.setAvailable(resultNBox.getAvailable() + tmpNDBox.getAvailable());
 			} else {
+				// result에 key 값을 갖는 NBox가 하나도 없을 때 -> 새로 만들어줌
 				NDBox tmpNDBox = ndboxMap.get(key);
-				NBox tmpProducts = new NBox(name, tmpNDBox.getProductList(), tmpNDBox.getQuantity());
+				NBox tmpProducts = new NBox(name, tmpNDBox.getProductList(), tmpNDBox.getQuantity(),
+						tmpNDBox.getAvailable());
 				result.put(name, tmpProducts);
 			}
 		}

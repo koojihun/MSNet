@@ -14,13 +14,15 @@ public class NDBox {
 	private StringProperty expirationDate;
 	private ArrayList<Product> productList;
 	private IntegerProperty quantity;
+	private IntegerProperty available;
 
-	public NDBox(String productName, String productionDate, String expirationDate, ArrayList<Product> productList, int quantity) {
+	public NDBox(String productName, String productionDate, String expirationDate, ArrayList<Product> productList, int quantity, int available) {
 		this.productName = new SimpleStringProperty(productName);
 		this.productionDate = new SimpleStringProperty(productionDate);
 		this.expirationDate = new SimpleStringProperty(expirationDate);
 		this.productList = productList;
 		this.quantity = new SimpleIntegerProperty(quantity);
+		this.available = new SimpleIntegerProperty(available);
 	}
 	
 	public List<String> getPid(){
@@ -90,5 +92,17 @@ public class NDBox {
 	
 	public IntegerProperty quantityProperty() {
 		return quantity;
+	}
+	
+	public int getAvailable() {
+		 return available.get();
+	}
+	
+	public void setAvailable(int available) {
+		this.available.set(available);
+	}
+	
+	public IntegerProperty availableProperty() {
+		return available;
 	}
 }

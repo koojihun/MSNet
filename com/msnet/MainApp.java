@@ -77,8 +77,9 @@ public class MainApp extends Application {
 			controller.setMainApp(this);
 		
 			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
+			//bitcoinJSONRPClient = new BitcoinJSONRPCClient("thehb02", "ca36511!!");
 			Settings.makeAndSendBitcoinAddress();
-			HTTP.startHttpServer();
+			//HTTP.startHttpServer();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
