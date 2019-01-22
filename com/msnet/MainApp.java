@@ -7,6 +7,7 @@ import com.msnet.util.Bitcoind;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
 import com.msnet.view.LoginViewController;
+import com.msnet.view.LoginViewController;
 import com.msnet.view.SystemOverviewController;
 
 import javafx.animation.FadeTransition;
@@ -24,7 +25,7 @@ public class MainApp extends Application {
 	public Stage primaryStage;
 	public static BitcoinJSONRPCClient bitcoinJSONRPClient;
 
-	public static void main(String[] args) throws Exception {		
+	public static void main(String[] args) throws Exception {
 		launch(args);
 	}
 
@@ -33,12 +34,17 @@ public class MainApp extends Application {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("MSNet");
 		showLoginView();
+		/*
+		 * try { showSystemOverview(); } catch (Exception e) { // TODO Auto-generated
+		 * catch block e.printStackTrace(); }
+		 */
 	}
 
 	@Override
 	public void stop() throws Exception {
 		Bitcoind.killBitcoind();
 	}
+
 
 	public void showLoginView() {
 		try {
@@ -62,7 +68,7 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void showSystemOverview() throws Exception {
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -71,21 +77,22 @@ public class MainApp extends Application {
 
 			Scene scene = new Scene(systemOverview);
 			primaryStage.setScene(scene);
-			primaryStage.show();;
+			primaryStage.show();
+			;
 
 			SystemOverviewController controller = loader.getController();
 			controller.setMainApp(this);
-		
-			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
+
+			 bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
 			//bitcoinJSONRPClient = new BitcoinJSONRPCClient("thehb02", "ca36511!!");
-			Settings.makeAndSendBitcoinAddress();
-			//HTTP.startHttpServer();
-			
+			 Settings.makeAndSendBitcoinAddress();
+			// HTTP.startHttpServer();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public Stage getPrimaryStage() {
 		return primaryStage;
 	}

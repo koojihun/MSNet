@@ -25,7 +25,7 @@ public class AddressBookDialogController implements Initializable {
 	@FXML
 	private TextField searchTextField;
 	@FXML
-	private TableView<Company> companyInfoTableView;	
+	private TableView<Company> companyInfoTableView;
 	@FXML
 	private TableColumn<Company, String> nameColumn;
 	@FXML
@@ -37,23 +37,31 @@ public class AddressBookDialogController implements Initializable {
 	private ObservableList<Company> companyList;
 	private TextField companyTextField;
 	private TextField addressTextField;
-	
+
 	public void setDialogStage(Stage dialogStage) {
 		this.dialogStage = dialogStage;
 		dialogStage.setResizable(false);
 	}
 
 	public void setCompanyTextField(TextField companyTextField) {
-		this.companyTextField = companyTextField;		
+		this.companyTextField = companyTextField;
 	}
-	
+
 	public void setAddressTextField(TextField addressTextField) {
 		this.addressTextField = addressTextField;
 	}
 
 	@FXML
 	public void handleSearch() {
-
+		String search_str = searchTextField.getText();
+		System.out.println(search_str);
+		companyInfoTableView
+				.getItems().stream().filter(item -> ((item.getName().equals(search_str))
+						| (item.getAddress().equals(search_str)) | (item.getBitcoinAddress().equals(search_str))))
+				.findAny().ifPresent(item -> {
+					companyInfoTableView.getSelectionModel().select(item);
+					companyInfoTableView.scrollTo(item);
+				});
 	}
 
 	@FXML
@@ -74,7 +82,7 @@ public class AddressBookDialogController implements Initializable {
 		key.add("password");
 		val.add(Settings.getId());
 		val.add(Settings.getPassword());
-	
+
 		try {
 			JSONObject response = HTTP.send("http://166.104.126.42:8090/NewSystem/listCompany.do", "post", key, val);
 			JSONArray arr = (JSONArray) response.get("result");
@@ -91,15 +99,12 @@ public class AddressBookDialogController implements Initializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
 		addressColumn.setCellValueFactory(cellData -> cellData.getValue().addressProperty());
 		bitcoinAddressColumn.setCellValueFactory(cellData -> cellData.getValue().bitcoinAddressProperty());
 		companyInfoTableView.setItems(companyList);
-		
+
 	}
-
-
-
 
 }

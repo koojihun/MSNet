@@ -32,16 +32,6 @@
                            <children>
                               <Accordion prefHeight="563.0" prefWidth="314.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <panes>
-                                  <TitledPane animated="false" text="Inventory">
-                                    <content>
-                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                             <children>
-                                                <Button fx:id="inventoryStatusButton" layoutX="138.0" layoutY="26.0" mnemonicParsing="false" onAction="#handleInventoryStatus" text="Get" />
-                                                <Label layoutX="28.0" layoutY="30.0" text="Inventory Status:" />
-                                             </children>
-                                          </AnchorPane>
-                                    </content>
-                                  </TitledPane>
                                   <TitledPane animated="false" text="Plotting">
                                     <content>
                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
@@ -67,6 +57,8 @@
                                                 <Label layoutX="23.0" layoutY="152.0" text="Term:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="131.0" />
                                                 <Button layoutX="90.0" layoutY="229.0" mnemonicParsing="false" onAction="#handleQRGenerate" text="Generate" AnchorPane.topAnchor="217.0" />
                                                 <Label layoutX="23.0" layoutY="233.0" text="QR code:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="220.0" />
+                                                <Label layoutX="23.0" layoutY="267.0" text="Mining:" AnchorPane.topAnchor="250.0" />
+                                                <Button layoutX="90.0" layoutY="256.0" mnemonicParsing="false" onAction="#handleMining" text="Start" />
                                              </children></AnchorPane>
                                     </content>
                                   </TitledPane>
@@ -197,23 +189,20 @@
                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="226.0" minWidth="10.0" prefWidth="226.0" />
                                                         </columnConstraints>
                                                         <rowConstraints>
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                         </rowConstraints>
                                                          <children>
-                                                            <Label prefHeight="15.0" prefWidth="150.0" text="Product name:" GridPane.rowIndex="1" />
-                                                            <Label prefHeight="21.0" prefWidth="94.0" text="Quantity:" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                            <Label text="Production date:" GridPane.rowIndex="3" />
-                                                            <Label text="Expirationtion date:" GridPane.rowIndex="4" />
-                                                            <TextField fx:id="quantityTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                            <TextField fx:id="productNameTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                            <TextField fx:id="productionDateTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                            <TextField fx:id="expirationDateTextField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                                            <Label text="Selected Panel:" />
-                                                            <ComboBox fx:id="selectBox" prefWidth="150.0" GridPane.columnIndex="1" />
+                                                            <Label prefHeight="15.0" prefWidth="150.0" text="Product name:" />
+                                                            <Label prefHeight="21.0" prefWidth="94.0" text="Quantity:" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                            <Label text="Production date:" GridPane.rowIndex="2" />
+                                                            <Label text="Expirationtion date:" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="quantityTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="productNameTextField" GridPane.columnIndex="1" />
+                                                            <TextField fx:id="productionDateTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="expirationDateTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                          </children>
                                                       </GridPane>
                                                       <Button layoutX="474.0" layoutY="186.0" mnemonicParsing="false" onAction="#handleSendToAddress" prefHeight="20.0" prefWidth="60.0" text="Send" AnchorPane.rightAnchor="50.0" />
@@ -222,6 +211,8 @@
                                                             <Font size="15.0" />
                                                          </font>
                                                       </Label>
+                                                      <Label layoutX="423.0" layoutY="14.0" text="Inventory Status:" AnchorPane.rightAnchor="60.0" AnchorPane.topAnchor="13.0" />
+                                                      <Button fx:id="inventoryStatusButton" layoutX="533.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleInventoryStatus" text="Get" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                                    </children>
                                                 </AnchorPane>
                                             </items>

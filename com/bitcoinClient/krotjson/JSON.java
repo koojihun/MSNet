@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  *
- * @author Mikhail Yevchenko m.ṥῥẚ�?.?�ѐḿởύḙ@azazar.com
+ * @author Mikhail Yevchenko m.ṥῥẚ�?.?�ѐḿởύḙ@azazar.com
  */
 public class JSON {
     
