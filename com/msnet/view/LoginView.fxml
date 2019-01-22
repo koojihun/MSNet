@@ -24,12 +24,12 @@
                   <Font name="Arial Bold" size="25.0" />
                </font>
             </Label>
-            <JFXTextField fx:id="idField" focusColor="WHITE" layoutX="19.0" layoutY="245.0" prefHeight="26.0" prefWidth="215.0" promptText="ID" unFocusColor="#343838">
+            <JFXTextField fx:id="idField" focusColor="WHITE" layoutX="19.0" layoutY="245.0" prefHeight="26.0" prefWidth="215.0" style="-fx-text-inner-color: white" promptText="ID" unFocusColor="#343838">
                <font>
                   <Font name="Arial" size="18.0" />
                </font>
             </JFXTextField>
-            <JFXPasswordField fx:id="passwordField" focusColor="WHITE" layoutX="19.0" layoutY="351.0" prefHeight="23.0" prefWidth="215.0" promptText="Password" unFocusColor="#343838">
+            <JFXPasswordField fx:id="passwordField" focusColor="WHITE" layoutX="19.0" layoutY="351.0" prefHeight="23.0" prefWidth="215.0" style="-fx-text-inner-color: white" promptText="Password" unFocusColor="#343838">
                <font>
                   <Font name="Arial" size="18.0" />
                </font>

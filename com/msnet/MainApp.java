@@ -13,8 +13,10 @@ import com.msnet.view.SystemOverviewController;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -52,10 +54,10 @@ public class MainApp extends Application {
 			loader.setLocation(MainApp.class.getResource("view/LoginView.fxml"));
 			AnchorPane loginPane = (AnchorPane) loader.load();
 
-			FadeTransition ft = new FadeTransition(Duration.millis(2500), loginPane);
-			ft.setFromValue(0);
-			ft.setToValue(1);
-			ft.play();
+			//FadeTransition ft = new FadeTransition(Duration.millis(2500), loginPane);
+			//ft.setFromValue(0);
+			//ft.setToValue(1);
+			//ft.play();
 
 			Scene loginScene = new Scene(loginPane);
 			LoginViewController controller = loader.getController();
@@ -77,8 +79,8 @@ public class MainApp extends Application {
 
 			Scene scene = new Scene(systemOverview);
 			primaryStage.setScene(scene);
+			centerStage(primaryStage, WIDTH, HEIGHT);
 			primaryStage.show();
-			;
 
 			SystemOverviewController controller = loader.getController();
 			controller.setMainApp(this);
@@ -96,4 +98,10 @@ public class MainApp extends Application {
 	public Stage getPrimaryStage() {
 		return primaryStage;
 	}
+	
+	private void centerStage(Stage stage, double width, double height) {
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        stage.setX((screenBounds.getWidth() - width) / 2);
+        stage.setY((screenBounds.getHeight() - height) / 2);
+    }
 }
