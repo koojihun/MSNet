@@ -10,106 +10,86 @@ import java.util.ResourceBundle;
 
 import org.json.simple.JSONObject;
 
+import com.jfoenix.controls.JFXAlert;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
 import com.msnet.MainApp;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
 
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class LoginViewController implements Initializable {
-
-	private double x = 0;
-	private double y = 0;
+public class LoginViewController implements Initializable{
 	private final String serverURL = "http://166.104.126.42:8090/NewSystem/";
-
 	@FXML
-	private Button signUpButton;
+	private JFXTextField idField;
 	@FXML
-	private TextField idTextField;
+	private JFXPasswordField passwordField;
 	@FXML
-	private TextField passwordTextField;
+	private JFXButton signUpButton;
 	@FXML
-	private Button enterButton;
+	private JFXButton enterButton;
 	
+	private AnchorPane loginPane;
 	private MainApp mainApp;
-	
-	public LoginViewController() {
-	}
 
 	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
-		String original = signUpButton.getStyle();
-		String pressed = original + "-fx-text-fill: gray;";
-		signUpButton.setOnMousePressed(new EventHandler<Event>() {
-
+	public void initialize(URL location, ResourceBundle resources) {
+		passwordField.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
-			public void handle(Event event) {
-				signUpButton.setStyle(pressed);
-			}
-		});
-
-		signUpButton.setOnMouseReleased(new EventHandler<Event>() {
-
-			@Override
-			public void handle(Event event) {
-				signUpButton.setStyle(original);
-			}
-		});
-
-		signUpButton.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent event) {
-				try {
-					Desktop.getDesktop().browse(new URI("http://166.104.126.42:8090/NewSystem/register.html"));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			public void handle(KeyEvent event) {
+				if(event.getCode() == KeyCode.ENTER) {
+					handleEnter();
 				}
 			}
+			
 		});
 	}
-
-	@FXML
-	void dragged(MouseEvent event) {
-		Node node = (Node) event.getSource();
-		Stage stage = (Stage) node.getScene().getWindow();
-
-		stage.setX(event.getScreenX() - x);
-		stage.setY(event.getScreenY() - y);
+	
+	public void setPane(Parent p) {
+		loginPane = (AnchorPane) p;
 	}
-
-	@FXML
-	void pressed(MouseEvent event) {
-		x = event.getSceneX();
-		y = event.getSceneY();
+	
+	public void setMain(MainApp mainApp) {
+		this.mainApp = mainApp;		
 	}
-
+	
 	@FXML
-	private void handleEnter() throws Exception {
+	public void handleSignUp() {
+		try {
+			Desktop.getDesktop().browse(new URI("http://166.104.126.42:8090/NewSystem/register.html"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+	@FXML
+	public void handleEnter() {
+		String id = idField.getText();
+		String password = passwordField.getText();
 
-		String id = idTextField.getText();
-		String password = passwordTextField.getText();
-		
 		boolean result = false;
 		
 		ArrayList<String> key = new ArrayList<String>();
 		ArrayList<String> val = new ArrayList<String>();
-
+		
 		key.add("id"); key.add("password"); key.add("device");
 		val.add(id);   val.add(password);   val.add("p");
 		
@@ -119,21 +99,33 @@ public class LoginViewController implements Initializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		if(result) {
 			new Settings(id, password);
-			mainApp.showSystemOverview();
+			try {
+				mainApp.showSystemOverview();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else {
+			JFXAlert alert = new JFXAlert((Stage) loginPane.getScene().getWindow());
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.setOverlayClose(true);
+            JFXDialogLayout layout = new JFXDialogLayout();
+            layout.setHeading(new Label("Login ERROR"));
+            layout.setBody(new Label("Check Your ID & Password again."));
+            JFXButton closeButton = new JFXButton("ACCEPT");
+            closeButton.getStyleClass().add("dialog-accept");
+            closeButton.setOnAction(event -> alert.hideWithAnimation());
+            layout.setActions(closeButton);
+            alert.setContent(layout);
+            alert.show();
+			/*
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Login Error");
 			alert.setHeaderText("Login Error");
 			alert.setContentText("ID, PASSWORD CHECK AGAIN PLEASE.");
 			alert.showAndWait();
+			*/
 		}
-	}
-
-	public void setMain(MainApp mainApp) {
-		this.mainApp = mainApp;
-		
 	}
 }

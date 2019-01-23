@@ -1,6 +1,7 @@
 package com.msnet.view;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import com.msnet.MainApp;
@@ -12,8 +13,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class ProductInfoDialogController implements Initializable {
@@ -27,46 +30,65 @@ public class ProductInfoDialogController implements Initializable {
 	private TableColumn<Product, String> productionDateColumn;
 	@FXML
 	private TableColumn<Product, String> expirationDateColumn;
-	
+	@FXML
+	private TextField searchTextField;
+	@FXML
+	private Button searchButton;
+
 	private Stage dialogStage;
 	private NBox nBox;
 	private NDBox ndBox;
-	private boolean okClicked = false;
+	private ArrayList<Product> prodList;
 	private MainApp mainApp;
-	
-	ObservableList<Product> pList;
-	
+
+	private ObservableList<Product> pList;
+
+	@FXML
+	public void handleSearch() {
+		String search_str = searchTextField.getText();
+		productInfoTableView.getItems().stream().filter(item -> item.getPID().equals(search_str)).findAny()
+				.ifPresent(item -> {
+					productInfoTableView.getSelectionModel().select(item);
+					productInfoTableView.scrollTo(item);
+				});
+	}
+
 	public void setDialogStage(Stage dialogStage) {
 		this.dialogStage = dialogStage;
 		dialogStage.setResizable(false);
 	}
-	
+
 	public void setProduct(NBox nBox) {
 		this.nBox = nBox;
 		pList = FXCollections.observableArrayList();
-		
-		for(Product product : nBox.getProductList()) {
-			
+
+		for (Product product : nBox.getProductList()) {
+
 			pList.add(product);
 		}
 		productInfoTableView.setItems(pList);
 	}
-	
+
 	public void setProduct(NDBox ndBox) {
 		this.ndBox = ndBox;
 		pList = FXCollections.observableArrayList();
-		
-		for(Product product : ndBox.getProductList()) {
+
+		for (Product product : ndBox.getProductList()) {
 			pList.add(product);
 		}
-		productInfoTableView.setItems(pList);		
+		productInfoTableView.setItems(pList);
 	}
-	
-	@FXML
-	public void handleOk() {
-		
+
+	public void setProduct(ArrayList<Product> prodList) {
+		this.prodList = prodList;
+		pList = FXCollections.observableArrayList();
+
+		for (Product product : prodList) {
+			pList.add(product);
+		}
+		productInfoTableView.setItems(pList);
 	}
-	
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		productInfoTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -74,6 +96,6 @@ public class ProductInfoDialogController implements Initializable {
 		idColumn.setCellValueFactory(cellData -> cellData.getValue().pidProperty());
 		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
 		expirationDateColumn.setCellValueFactory(cellDate -> cellDate.getValue().expirationDateProperty());
-		productInfoTableView.setItems(pList);		
+		productInfoTableView.setItems(pList);
 	}
 }
