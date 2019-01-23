@@ -18,20 +18,13 @@ public class AES {
     private static String encryptedString;
     
     public static void setKey(String myKey){
-        
-   
         MessageDigest sha = null;
         try {
             key = myKey.getBytes("UTF-8");
-            System.out.println(key.length);
             sha = MessageDigest.getInstance("SHA-1");
             key = sha.digest(key);
             key = Arrays.copyOf(key, 16); // use only first 128 bit
-            System.out.println(key.length);
-            System.out.println(new String(key,"UTF-8"));
             secretKey = new SecretKeySpec(key, "AES");
-            
-            
         } catch (NoSuchAlgorithmException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -39,9 +32,6 @@ public class AES {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-              
-    
     }
     
     public static String getDecryptedString() {
@@ -67,14 +57,13 @@ public class AES {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        
          
             setEncryptedString(Base64.encodeBase64String(cipher.doFinal(strToEncrypt.getBytes("UTF-8"))));
-        
+            
+            return encryptedString;
         }
         catch (Exception e)
         {
-           
             System.out.println("Error while encrypting: "+e.toString());
         }
         return null;
@@ -89,6 +78,7 @@ public class AES {
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             setDecryptedString(new String(cipher.doFinal(Base64.decodeBase64(strToDecrypt))));
             
+            return decryptedString;
         }
         catch (Exception e)
         {

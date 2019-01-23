@@ -24,7 +24,6 @@ public class Product {
 		this.pid = new SimpleStringProperty(pid);
 	}
 	
-
 	public String getProductionDate() {
 		return productionDate.get();
 	}

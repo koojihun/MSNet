@@ -3,7 +3,11 @@ package com.msnet.util;
 import java.io.*;
 import java.util.ArrayList;
 
+import org.json.simple.JSONObject;
+
 import com.msnet.MainApp;
+
+import netscape.javascript.JSObject;
 
 public class Settings {
 
@@ -18,17 +22,22 @@ public class Settings {
 		this.password = password;
 		this.sysUsrName = System.getProperty("user.name");
 		////////////////////////////////////////////////////////////////
+		// Bitcoin daemon.
 		if (!isThereBitcoind())
 			copyBitcoind();
 		////////////////////////////////////////////////////////////////
+		// Bitcoin conf file.
 		if (!isThereConfFile())
 			makeConfFile();
 		////////////////////////////////////////////////////////////////
+		// License.txt file.
 		if (!isThereLicense())
 			copyLicense();
 		////////////////////////////////////////////////////////////////
+		// Check bitcoin address.
 		readBitcoinConfFile();
-		//////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////
+		// Set key for encrypt.
 		AES.setKey("HANYANG HIT B102".trim());
 	}
 

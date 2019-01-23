@@ -49,7 +49,6 @@ public class LoginViewController implements Initializable {
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		// 참고사항 = 멤버 변수 객체들 생성 및 뷰와 연결후 initialize 함수 실행.
 		String original = signUpButton.getStyle();
 		String pressed = original + "-fx-text-fill: gray;";
 		signUpButton.setOnMousePressed(new EventHandler<Event>() {

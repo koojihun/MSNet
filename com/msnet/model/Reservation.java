@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class Reservation {
+	
 	private StringProperty time;
 	private StringProperty toAddress;
 	private StringProperty toCompany;
@@ -14,7 +15,6 @@ public class Reservation {
 	private StringProperty expirationDate;
 	private IntegerProperty quantity;
 	private IntegerProperty success;
-	
 	
 	public Reservation(String time, String toAddress, String toCompany, String productName, String productionDate, String expirationDate, int quantity, int success) {
 		this.time = new SimpleStringProperty(time);

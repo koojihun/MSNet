@@ -175,6 +175,8 @@ public class SystemOverviewController implements Initializable {
 			}
 		});
 
+		companyTextField.setEditable(false);
+		addressTextField.setEditable(false);
 		bitcoindTextArea.setEditable(false);
 		new Bitcoind(bitcoindTextArea).start();
 	}

@@ -21,9 +21,8 @@
 
 package com.bitcoinClient.javabitcoindrpcclient;
 
-import com.bitcoinClient.krotjson.Base64Coder;
-import com.bitcoinClient.krotjson.CrippledJavaScriptParser;
-import com.bitcoinClient.krotjson.JSON;
+import static com.bitcoinClient.javabitcoindrpcclient.MapWrapper.mapInt;
+import static com.bitcoinClient.javabitcoindrpcclient.MapWrapper.mapStr;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -54,13 +53,9 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
-import static com.bitcoinClient.javabitcoindrpcclient.MapWrapper.mapInt;
-import static com.bitcoinClient.javabitcoindrpcclient.MapWrapper.mapStr;
+import com.bitcoinClient.krotjson.Base64Coder;
+import com.bitcoinClient.krotjson.JSON;
 
-/**
- * @author Mikhail Yevchenko m.?占쏙옙慣?占쏙옙歟녹땰占�?.占쎈퀍癒ㅻ쭥亦쇱씑?占쏙옙?占쏙옙 at azazar.com Small modifications
- *         by Alessandro Polverini polverini at gmail.com
- */
 public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 
 	private static final Logger logger = Logger.getLogger(BitcoinJSONRPCClient.class.getCanonicalName());

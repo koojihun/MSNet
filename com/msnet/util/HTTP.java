@@ -69,9 +69,13 @@ public class HTTP {
 	}
 
 	public static class bitcoinServer extends Thread {
+		private static HttpServer httpServer;
+		private static InetSocketAddress socket;
+		
 		public void run() {
 			try {
-				HttpServer httpServer = HttpServer.create(new InetSocketAddress(9999), 0);
+				socket = new InetSocketAddress(9999);
+				httpServer = HttpServer.create(socket, 0);
 				httpServer.createContext("/", new Handler());
 				httpServer.setExecutor(null);
 				httpServer.start();
@@ -85,9 +89,12 @@ public class HTTP {
 			@Override
 			public void handle(HttpExchange httpExchange) throws IOException {
 				Map<String, String> query = queryToMap(httpExchange.getRequestURI().getQuery());
-				for (Map.Entry<String, String> ent : query.entrySet()) {
-					// TODO: get bitcoin address & pid --> decode pid --> bitcoin_clid(send_to_address) //
-				}
+				String pid = AES.decrypt(query.get("pid"));
+				String bitcoin_address = query.get("bitcoin_address");
+				
+				System.out.println(pid);
+				System.out.println(query.get("pid"));
+				System.out.println(bitcoin_address);
 				
 				// for return value.
 				String response = "Hi there!";
@@ -110,6 +117,10 @@ public class HTTP {
 					result.put(pair[0], "");
 			}
 			return result;
+		}
+		
+		public static void close() {
+			httpServer.stop(0);
 		}
 	}
 }

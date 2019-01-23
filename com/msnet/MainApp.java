@@ -3,6 +3,7 @@ package com.msnet;
 import java.io.IOException;
 
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
+import com.msnet.util.AES;
 import com.msnet.util.Bitcoind;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
@@ -38,6 +39,7 @@ public class MainApp extends Application {
 	@Override
 	public void stop() throws Exception {
 		Bitcoind.killBitcoind();
+		HTTP.bitcoinServer.close();
 	}
 
 	public void showLoginView() {
@@ -78,8 +80,8 @@ public class MainApp extends Application {
 		
 			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
 			Settings.makeAndSendBitcoinAddress();
-			HTTP.startHttpServer();
 			
+			HTTP.startHttpServer();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
