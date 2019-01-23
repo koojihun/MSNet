@@ -37,9 +37,13 @@ public class MainApp extends Application {
 		this.primaryStage.setTitle("MSNet");
 		showLoginView();
 		/*
-		 * try { showSystemOverview(); } catch (Exception e) { // TODO Auto-generated
-		 * catch block e.printStackTrace(); }
-		 */
+		try {
+			showSystemOverview();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+
 	}
 
 	@Override
@@ -47,17 +51,16 @@ public class MainApp extends Application {
 		Bitcoind.killBitcoind();
 	}
 
-
 	public void showLoginView() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/LoginView.fxml"));
 			AnchorPane loginPane = (AnchorPane) loader.load();
 
-			//FadeTransition ft = new FadeTransition(Duration.millis(2500), loginPane);
-			//ft.setFromValue(0);
-			//ft.setToValue(1);
-			//ft.play();
+			// FadeTransition ft = new FadeTransition(Duration.millis(2500), loginPane);
+			// ft.setFromValue(0);
+			// ft.setToValue(1);
+			// ft.play();
 
 			Scene loginScene = new Scene(loginPane);
 			LoginViewController controller = loader.getController();
@@ -85,9 +88,10 @@ public class MainApp extends Application {
 			SystemOverviewController controller = loader.getController();
 			controller.setMainApp(this);
 
-			 bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
+			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(),
+			Settings.getPassword());
 			//bitcoinJSONRPClient = new BitcoinJSONRPCClient("thehb02", "ca36511!!");
-			 Settings.makeAndSendBitcoinAddress();
+			Settings.makeAndSendBitcoinAddress();
 			// HTTP.startHttpServer();
 
 		} catch (IOException e) {
@@ -98,10 +102,10 @@ public class MainApp extends Application {
 	public Stage getPrimaryStage() {
 		return primaryStage;
 	}
-	
+
 	private void centerStage(Stage stage, double width, double height) {
-        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        stage.setX((screenBounds.getWidth() - width) / 2);
-        stage.setY((screenBounds.getHeight() - height) / 2);
-    }
+		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+		stage.setX((screenBounds.getWidth() - width) / 2);
+		stage.setY((screenBounds.getHeight() - height) / 2);
+	}
 }
