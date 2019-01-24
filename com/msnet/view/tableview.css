@@ -16,7 +16,7 @@
 }
 
 .table-view .column-header-background{
-    -fx-background-color: white;
+    -fx-background-color: #E8F1F7;
     -fx-border-width:0 0 1 0;
     -fx-border-style:solid;
     -fx-border-color:#B3B9BF;

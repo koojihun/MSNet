@@ -7,23 +7,29 @@ import java.util.ResourceBundle;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.jfoenix.controls.JFXTextField;
 import com.msnet.model.Company;
+import com.msnet.model.NDBox;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 public class AddressBookDialogController implements Initializable {
 
 	@FXML
-	private TextField searchTextField;
+	private JFXTextField searchTextField;
 	@FXML
 	private TableView<Company> companyInfoTableView;
 	@FXML
@@ -32,45 +38,10 @@ public class AddressBookDialogController implements Initializable {
 	private TableColumn<Company, String> addressColumn;
 	@FXML
 	private TableColumn<Company, String> bitcoinAddressColumn;
-
-	private Stage dialogStage;
-	private ObservableList<Company> companyList;
 	private TextField companyTextField;
 	private TextField addressTextField;
-
-	public void setDialogStage(Stage dialogStage) {
-		this.dialogStage = dialogStage;
-		dialogStage.setResizable(false);
-	}
-
-	public void setCompanyTextField(TextField companyTextField) {
-		this.companyTextField = companyTextField;
-	}
-
-	public void setAddressTextField(TextField addressTextField) {
-		this.addressTextField = addressTextField;
-	}
-
-	@FXML
-	public void handleSearch() {
-		String search_str = searchTextField.getText();
-		System.out.println(search_str);
-		companyInfoTableView
-				.getItems().stream().filter(item -> ((item.getName().equals(search_str))
-						| (item.getAddress().equals(search_str)) | (item.getBitcoinAddress().equals(search_str))))
-				.findAny().ifPresent(item -> {
-					companyInfoTableView.getSelectionModel().select(item);
-					companyInfoTableView.scrollTo(item);
-				});
-	}
-
-	@FXML
-	public void handleOk() {
-		Company comp = companyInfoTableView.getSelectionModel().getSelectedItem();
-		companyTextField.setText(comp.getName());
-		addressTextField.setText(comp.getBitcoinAddress());
-		this.dialogStage.close();
-	}
+	private Stage dialogStage;
+	private ObservableList<Company> companyList;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -104,7 +75,53 @@ public class AddressBookDialogController implements Initializable {
 		addressColumn.setCellValueFactory(cellData -> cellData.getValue().addressProperty());
 		bitcoinAddressColumn.setCellValueFactory(cellData -> cellData.getValue().bitcoinAddressProperty());
 		companyInfoTableView.setItems(companyList);
+		
+		searchTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				if(event.getCode() == KeyCode.ENTER) {
+					handleSearch();
+				}
+			}			
+		});
+		
+		companyInfoTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if (event.getClickCount() >= 2) {
+					Company comp = companyInfoTableView.getSelectionModel().getSelectedItem();
+					companyTextField.setText(comp.getName());
+					addressTextField.setText(comp.getBitcoinAddress());
+					dialogStage.close();
+				} 
+			}
+		});
 
 	}
 
+	public void setDialogStage(Stage dialogStage) {
+		this.dialogStage = dialogStage;
+		dialogStage.setResizable(false);
+	}
+
+	@FXML
+	public void handleSearch() {
+		String search_str = searchTextField.getText();
+		System.out.println(search_str);
+		companyInfoTableView
+				.getItems().stream().filter(item -> ((item.getName().equals(search_str))
+						| (item.getAddress().equals(search_str)) | (item.getBitcoinAddress().equals(search_str))))
+				.findAny().ifPresent(item -> {
+					companyInfoTableView.getSelectionModel().select(item);
+					companyInfoTableView.scrollTo(item);
+				});
+	}
+
+	public void setCompanyTextField(TextField companyTextField) {
+		this.companyTextField = companyTextField;
+	}
+
+	public void setAddressTextField(TextField addressTextField) {
+		this.addressTextField = addressTextField;
+	}
 }

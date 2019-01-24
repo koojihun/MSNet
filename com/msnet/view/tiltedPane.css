@@ -1,0 +1,22 @@
+.titled-pane>.title {
+	-fx-background-color: #287775;
+	-fx-background-insets: 0, 1, 2;
+	-fx-background-radius: 5 5 0 0, 4 4 0 0, 3 3 0 0;
+	-fx-padding: 0.166667em 0.833333em 0.25em 0.833333em;
+	-fx-focus-color: white; /* 2 10 3 10 */
+}
+
+.titled-pane>.title>.arrow-button .arrow {
+	-fx-background-color: white;
+	-fx-background-insets: 1 0 -1 0, 0;
+	-fx-padding: 0.25em 0.3125em 0.25em 0.3125em; /* 3 3.75 3 3.75 */
+	-fx-shape: "M 0 0 h 7 l -3.5 4 z";
+}
+
+.titled-pane:focused {
+	-fx-text-fill: white;
+}
+
+.titled-pane {
+	-fx-text-fill: white;
+}

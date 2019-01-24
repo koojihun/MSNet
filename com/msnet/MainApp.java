@@ -41,7 +41,6 @@ public class MainApp extends Application {
 		try {
 			showSystemOverview();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
 
@@ -89,6 +88,7 @@ public class MainApp extends Application {
 			primaryStage.show();
 
 			SystemOverviewController controller = loader.getController();
+			controller.setPane(systemOverview);
 			controller.setMainApp(this);
 
 			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());

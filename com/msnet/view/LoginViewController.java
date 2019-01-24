@@ -57,8 +57,7 @@ public class LoginViewController implements Initializable{
 				if(event.getCode() == KeyCode.ENTER) {
 					handleEnter();
 				}
-			}
-			
+			}			
 		});
 	}
 	
@@ -119,13 +118,6 @@ public class LoginViewController implements Initializable{
             layout.setActions(closeButton);
             alert.setContent(layout);
             alert.show();
-			/*
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Login Error");
-			alert.setHeaderText("Login Error");
-			alert.setContentText("ID, PASSWORD CHECK AGAIN PLEASE.");
-			alert.showAndWait();
-			*/
 		}
 	}
 }

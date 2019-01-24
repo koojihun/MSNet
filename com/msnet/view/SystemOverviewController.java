@@ -1,19 +1,11 @@
 package com.msnet.view;
 
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,17 +22,20 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.jfoenix.controls.JFXAlert;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXTextField;
 import com.msnet.MainApp;
 import com.msnet.model.Product;
 import com.msnet.model.Reservation;
+import com.msnet.model.Worker;
 import com.msnet.util.Bitcoind;
-import com.msnet.util.Settings;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 import com.msnet.model.NDKey;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -49,8 +44,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -64,21 +58,21 @@ public class SystemOverviewController implements Initializable {
 	//////////////////////////////////////////////////
 	// Accordion
 	@FXML
-	private Button inventoryStatusButton;
+	private JFXButton inventoryStatusButton;
 	@FXML
-	private TextField product_prodNameTextField;
+	private JFXTextField product_prodNameTextField;
 	@FXML
-	private TextField product_quantityTextField;
+	private JFXTextField product_quantityTextField;
 	@FXML
-	private TextField product_productionDateTextField;
+	private JFXTextField product_productionDateTextField;
 	@FXML
-	private TextField product_expirationDateTextField;
+	private JFXTextField product_expirationDateTextField;
 	@FXML
-	private TextField termTextField;
+	private JFXTextField termTextField;
 	@FXML
-	private ComboBox<String> dateBox;
+	private JFXComboBox<String> dateBox;
 	@FXML
-	private Button miningButton;
+	private JFXButton miningButton;
 	//////////////////////////////////////////////////
 	// Tab
 	@FXML
@@ -125,26 +119,38 @@ public class SystemOverviewController implements Initializable {
 	//////////////////////////////////////////////////
 	// Product transfer
 	@FXML
-	private Button addressBookButton;
+	private JFXButton addressBookButton;
 	@FXML
-	private TextField companyTextField;
+	private JFXTextField companyTextField;
 	@FXML
-	private TextField addressTextField;
+	private JFXTextField addressTextField;
 	@FXML
-	private TextField productNameTextField;
+	private JFXTextField productNameTextField;
 	@FXML
-	private TextField quantityTextField;
+	private JFXTextField quantityTextField;
 	@FXML
-	private TextField productionDateTextField;
+	private JFXTextField productionDateTextField;
 	@FXML
-	private TextField expirationDateTextField;
+	private JFXTextField expirationDateTextField;
 	//////////////////////////////////////////////////
+	// Worker management
+	@FXML
+	private TableView<Worker> workerTableView;
+	@FXML
+	private TableColumn<Worker, String> worker_idColumn;
+	@FXML
+	private TableColumn<Worker, String> worker_employeeNumberColumn;
+	@FXML
+	private TableColumn<Worker, Boolean> worker_isLoginColumn;
+	//////////////////////////////////////////////////
+
 	private MainApp mainApp;
 	private ObservableList<NBox> nList;
 	private ObservableList<NDBox> ndList;
 	private ObservableList<Reservation> rList;
-	private ObservableList<String> list;
+	private ObservableList<Worker> workerList;
 	private ObservableList<String> dateList;
+	private AnchorPane systemOverview;
 	//////////////////////////////////////////////////
 
 	public SystemOverviewController() {
@@ -154,7 +160,7 @@ public class SystemOverviewController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		dateList = FXCollections.observableArrayList("Hour", "Day", "Month", "Year");
 		dateBox.setItems(dateList);
-		dateBox.setPromptText("Select unit");
+		dateBox.setPromptText("Select date unit");
 
 		productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
 		expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
@@ -211,6 +217,11 @@ public class SystemOverviewController implements Initializable {
 
 		reservationStatusTableView.setItems(rList);
 
+		worker_idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty());
+		worker_employeeNumberColumn.setCellValueFactory(cellData -> cellData.getValue().employeeNumberProperty());
+		worker_isLoginColumn.setCellValueFactory(cellData -> cellData.getValue().isLoginProperty());
+		workerTableView.setItems(workerList);
+		
 		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -277,25 +288,38 @@ public class SystemOverviewController implements Initializable {
 		String expirationDate = expirationDateTextField.getText();
 
 		Reservation r;
-
+		
+		JFXAlert alert = new JFXAlert((Stage) systemOverview.getScene().getWindow());
+		
 		if (address.equals("") || prodName.equals("") || str_quantity.equals("") || productionDate.equals("")
 				|| expirationDate.equals("")) {
 			// 필수 정보(address, prodName, quantity)가 하나라도 없을 때
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Caution");
-			alert.setHeaderText("Enter the information");
-			alert.setContentText(
-					"Please enter the required information(Address, Product name, Quantity, Production date, Expiration date)");
-			alert.showAndWait();
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.setOverlayClose(true);
+            JFXDialogLayout layout = new JFXDialogLayout();
+            layout.setHeading(new Label("Enter the information"));
+            layout.setBody(new Label("Please enter the required information(Address, Product name, Quantity, Production date, Expiration date)"));
+            JFXButton closeButton = new JFXButton("ACCEPT");
+            closeButton.getStyleClass().add("dialog-accept");
+            closeButton.setOnAction(event -> alert.hideWithAnimation());
+            layout.setActions(closeButton);
+            alert.setContent(layout);
+            alert.show();
 		} else {
 			// 필수 정보(address, prodName, quantity, productionDate, expirationDate)가 모두 있을 때
 			if (productionDate.equals("") && expirationDate.equals("") == false) {
 				// production date와 expiration date 둘 중에 하나만 있을 때 -> 경고!!
-				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("Caution");
-				alert.setHeaderText("Enter the date information");
-				alert.setContentText("Please enter the exact date information");
-				alert.showAndWait();
+	            alert.initModality(Modality.APPLICATION_MODAL);
+	            alert.setOverlayClose(true);
+	            JFXDialogLayout layout = new JFXDialogLayout();
+	            layout.setHeading(new Label("Enter the date information"));
+	            layout.setBody(new Label("Please enter the exact date information"));
+	            JFXButton closeButton = new JFXButton("ACCEPT");
+	            closeButton.getStyleClass().add("dialog-accept");
+	            closeButton.setOnAction(event -> alert.hideWithAnimation());
+	            layout.setActions(closeButton);
+	            alert.setContent(layout);
+	            alert.show();
 			} else {
 				int beSendedQauntity = Integer.parseInt(str_quantity);
 				List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
@@ -346,17 +370,24 @@ public class SystemOverviewController implements Initializable {
 					expirationDateTextField.setText("");
 				} else {
 					// available의 양이 보내고자 하는 양(beSendedQuantity)보다 적을 때
-					Alert alert = new Alert(AlertType.INFORMATION);
-					alert.setTitle("Caution");
+		            alert.initModality(Modality.APPLICATION_MODAL);
+		            alert.setOverlayClose(true);
+		            JFXDialogLayout layout = new JFXDialogLayout();       
+
 					if (available == 0) {
 						// available이 0일 때는 보낼 수 있는 물건이 없을 때.
-						alert.setHeaderText("Wrong Quantity");
-						alert.setContentText("There is nothing to send");
+						layout.setHeading(new Label("Wrong Quantity"));
+			            layout.setBody(new Label("There is nothing to send"));
 					} else {
-						alert.setHeaderText("Wrong Quantity");
-						alert.setContentText("Please enter the 'Quantity' less than " + available);
+						layout.setHeading(new Label("Wrong Quantity"));
+			            layout.setBody(new Label("Please enter the 'Quantity' less than " + available));											
 					}
-					alert.showAndWait();
+		            JFXButton closeButton = new JFXButton("ACCEPT");
+		            closeButton.getStyleClass().add("dialog-accept");
+		            closeButton.setOnAction(event -> alert.hideWithAnimation());
+		            layout.setActions(closeButton);
+		            alert.setContent(layout);
+		            alert.show();
 				}
 			}
 		}
@@ -448,10 +479,11 @@ public class SystemOverviewController implements Initializable {
 		}
 	}
 
+	@FXML
 	public void handleQRGenerate() {
 
 	}
-
+	
 	public Map<NDKey, NDBox> makeNDBox(List<Map> productList) {
 
 		Map<NDKey, NDBox> result = new HashMap<NDKey, NDBox>();
@@ -609,7 +641,6 @@ public class SystemOverviewController implements Initializable {
 	}
 
 	public void showAddressBookDialog() {
-
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/AddressBookDialog.fxml"));
@@ -626,14 +657,39 @@ public class SystemOverviewController implements Initializable {
 			controller.setDialogStage(dialogStage);
 			controller.setCompanyTextField(companyTextField);
 			controller.setAddressTextField(addressTextField);
-
 			dialogStage.showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	@FXML
+	public void showChart() {
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/ChartDialog.fxml"));
+			AnchorPane chartPane = (AnchorPane) loader.load();
 
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Dashboard");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(mainApp.getPrimaryStage());
+			Scene scene = new Scene(chartPane);
+			dialogStage.setScene(scene);
+
+			ChartDialogController controller = loader.getController();
+			controller.setNDList(this.ndList);
+			controller.setNList(this.nList);
+			dialogStage.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
+	}
+
+	public void setPane(AnchorPane systemOverview) {
+		this.systemOverview = systemOverview;		
 	}
 }
