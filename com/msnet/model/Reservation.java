@@ -19,25 +19,28 @@ public class Reservation {
 	private IntegerProperty success;
 	private ArrayList<Product> productList;
 
-	public Reservation(String time, String toAddress, String toCompany, String productName, String productionDate,
-			String expirationDate, int quantity, int success, ArrayList<Product> productList) {
+	// Reservation을 아예 새로 생성하는 경우.
+	public Reservation(String time, String toAddress, String toCompany, NDBox selectedNDBox, int quantity) {
 		this.time = new SimpleStringProperty(time);
 		this.toAddress = new SimpleStringProperty(toAddress);
 		this.toCompany = new SimpleStringProperty(toCompany);
-		this.productName = new SimpleStringProperty(productName);
-		this.productionDate = new SimpleStringProperty(productionDate);
-		this.expirationDate = new SimpleStringProperty(expirationDate);
+		this.productName = new SimpleStringProperty(selectedNDBox.getProductName());
+		this.productionDate = new SimpleStringProperty(selectedNDBox.getProductionDate());
+		this.expirationDate = new SimpleStringProperty(selectedNDBox.getExpirationDate());
 		this.quantity = new SimpleIntegerProperty(quantity);
-		this.success = new SimpleIntegerProperty(success);
-		this.productList = productList;
+		this.success = new SimpleIntegerProperty(0);
+		this.productList = new ArrayList<>();
 	}
 
-	public Reservation(String time, String toAddress, String toCompany, String productName, int quantity, int success,
+	// Reservation을 파일에서 읽어와 ArrayList 형태로 추가하는 경우.
+	public Reservation(String time, String toAddress, String toCompany, String productName, String prodDate, String expDate, int quantity, int success,
 			ArrayList<Product> productList) {
 		this.time = new SimpleStringProperty(time);
 		this.toAddress = new SimpleStringProperty(toAddress);
 		this.toCompany = new SimpleStringProperty(toCompany);
 		this.productName = new SimpleStringProperty(productName);
+		this.productionDate = new SimpleStringProperty(prodDate);
+		this.expirationDate = new SimpleStringProperty(expDate);
 		this.quantity = new SimpleIntegerProperty(quantity);
 		this.success = new SimpleIntegerProperty(success);
 		this.productList = productList;
@@ -145,10 +148,5 @@ public class Reservation {
 
 	public void setProductList(ArrayList<Product> productList) {
 		this.productList = productList;
-	}
-
-	public String toString() {
-		return this.getTime() + " " + this.getToCompany() + " " + this.getProductName() + " " + this.getProductionDate()
-				+ " " + this.getExpirationDate() + " " + this.getQuantity() + " " + this.getSuccess();
 	}
 }

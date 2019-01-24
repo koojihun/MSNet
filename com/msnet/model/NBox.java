@@ -13,11 +13,25 @@ public class NBox {
 	private IntegerProperty quantity;
 	private IntegerProperty available;
 	
-	public NBox(String productName, ArrayList<Product> productList, int quantity, int available) {
-		this.productName = new SimpleStringProperty(productName);
-		this.productList =productList;
-		this.quantity = new SimpleIntegerProperty(quantity);
-		this.available = new SimpleIntegerProperty(available);
+	public NBox(String prodName) {
+		productName = new SimpleStringProperty(prodName);
+		productList = new ArrayList<Product>();
+		quantity = new SimpleIntegerProperty(0);
+		available = new SimpleIntegerProperty(0);
+	}
+	
+	public NBox(Product p) {
+		productName = new SimpleStringProperty(p.getProductName());
+		productList = new ArrayList<Product>(); 
+		productList.add(p);
+		quantity = new SimpleIntegerProperty(1);
+		available = new SimpleIntegerProperty(1);
+	}
+	
+	public void addProduct(Product p) {
+		productList.add(p);
+		quantity.set(quantity.get() + 1);
+		available.set(available.get() + 1);
 	}
 	
 	public String getProductName() {

@@ -58,7 +58,6 @@ public class LoginViewController implements Initializable{
 					handleEnter();
 				}
 			}
-			
 		});
 	}
 	
@@ -99,8 +98,10 @@ public class LoginViewController implements Initializable{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		if(result) {
 			new Settings(id, password);
+			
 			try {
 				mainApp.showSystemOverview();
 			} catch (Exception e) {
@@ -115,17 +116,10 @@ public class LoginViewController implements Initializable{
             layout.setBody(new Label("Check Your ID & Password again."));
             JFXButton closeButton = new JFXButton("ACCEPT");
             closeButton.getStyleClass().add("dialog-accept");
-            closeButton.setOnAction(event -> alert.hideWithAnimation());
+            closeButton.setOnAction(event -> alert.close());
             layout.setActions(closeButton);
             alert.setContent(layout);
             alert.show();
-			/*
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Login Error");
-			alert.setHeaderText("Login Error");
-			alert.setContentText("ID, PASSWORD CHECK AGAIN PLEASE.");
-			alert.showAndWait();
-			*/
 		}
 	}
 }

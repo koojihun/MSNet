@@ -55,6 +55,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import com.bitcoinClient.krotjson.Base64Coder;
 import com.bitcoinClient.krotjson.JSON;
+import com.msnet.model.Product;
 
 public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 
@@ -2159,10 +2160,13 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 		return new TxOutWrapper((Map) query("gettxout", txId, vout, includemempool));
 	}
 
-	// For MSNet - Added By Juhan
 	@Override
-	public List<Map> get_current_products() {
-		return (List<Map>) query("get_current_products");
+	public ArrayList<Product> get_current_products() {
+		ArrayList<Product> ret = new ArrayList<>();
+		List<Map> tmp = (List<Map>) query("get_current_products");
+		for (Map map : tmp)
+			ret.add(new Product(map));
+		return ret;
 	}
 
 	@Override

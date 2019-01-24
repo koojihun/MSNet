@@ -89,12 +89,19 @@ public class HTTP {
 			@Override
 			public void handle(HttpExchange httpExchange) throws IOException {
 				Map<String, String> query = queryToMap(httpExchange.getRequestURI().getQuery());
-				String pid = AES.decrypt(query.get("pid"));
-				String bitcoin_address = query.get("bitcoin_address");
-				
-				System.out.println(pid);
-				System.out.println(query.get("pid"));
-				System.out.println(bitcoin_address);
+				String method = query.get("method");
+				if (method.equals("send")) {
+					String pid = AES.decrypt(query.get("pid"));
+					String bitcoin_address = query.get("bitcoin_address");
+					
+					System.out.println(pid);
+					System.out.println(query.get("pid"));
+					System.out.println(bitcoin_address);
+				} else if (method.equals("workerLogOut")) {
+					
+				} else if (method.equals("workerLogIn")) {
+					
+				}
 				
 				// for return value.
 				String response = "Hi there!";

@@ -22,9 +22,12 @@
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import com.msnet.model.Product;
 
 /**
  *
@@ -1566,13 +1569,8 @@ public interface BitcoindRpcClient {
    */
   TxOut getTxOut(String txId, long vout);
   
-  /**
-   * For MSNet - Added by Juhan
-   * The get_current_products RPC returns details about the products the user has
-   * @return Information about the products the user has
-   */
-  List<Map> get_current_products();
   List<Map> get_pending_products();
+  ArrayList<Product> get_current_products();
   List<Map> get_current_products(String account);
 
   /**

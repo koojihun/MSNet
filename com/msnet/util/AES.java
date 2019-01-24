@@ -11,16 +11,17 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
 
 public class AES {
+	private static final String strKey = "HANYANG HIT B102";
 	private static SecretKeySpec secretKey ;
     private static byte[] key ;
     
     private static String decryptedString;
     private static String encryptedString;
     
-    public static void setKey(String myKey){
+    public static void setKey(){
         MessageDigest sha = null;
         try {
-            key = myKey.getBytes("UTF-8");
+            key = strKey.trim().getBytes("UTF-8");
             sha = MessageDigest.getInstance("SHA-1");
             key = sha.digest(key);
             key = Arrays.copyOf(key, 16); // use only first 128 bit

@@ -4,16 +4,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,9 +32,8 @@ import com.msnet.util.Settings;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 import com.msnet.model.NDKey;
+import com.msnet.model.PDB;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -140,18 +133,23 @@ public class SystemOverviewController implements Initializable {
 	private TextField expirationDateTextField;
 	//////////////////////////////////////////////////
 	private MainApp mainApp;
-	private ObservableList<NBox> nList;
-	private ObservableList<NDBox> ndList;
-	private ObservableList<Reservation> rList;
-	private ObservableList<String> list;
 	private ObservableList<String> dateList;
 	//////////////////////////////////////////////////
 
-	public SystemOverviewController() {
-	}
+	public SystemOverviewController() {}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		//////////////////////////////////
+		// Product Database Initialize. //
+		new PDB();						//
+		//////////////////////////////////
+		companyTextField.setEditable(false);
+		addressTextField.setEditable(false);
+		productNameTextField.setEditable(false);
+		productionDateTextField.setEditable(false);
+		expirationDateTextField.setEditable(false);
+		
 		dateList = FXCollections.observableArrayList("Hour", "Day", "Month", "Year");
 		dateBox.setItems(dateList);
 		dateBox.setPromptText("Select unit");
@@ -161,14 +159,13 @@ public class SystemOverviewController implements Initializable {
 		productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		availableColumn.setCellValueFactory(cellData -> cellData.getValue().availableProperty().asObject());
-		inventoryStatusTableView.setItems(ndList);
+		inventoryStatusTableView.setItems(PDB.getNDList());
 
 		total_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		total_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		total_availableColumn.setCellValueFactory(cellData -> cellData.getValue().availableProperty().asObject());
-		total_inventoryStatusTableView.setItems(nList);
+		total_inventoryStatusTableView.setItems(PDB.getNList());
 
-		rList = FXCollections.observableArrayList();
 		r_timeColumn.setCellValueFactory(cellData -> cellData.getValue().timeProperty());
 		r_companyColumn.setCellValueFactory(cellData -> cellData.getValue().toCompanyProperty());
 		r_productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
@@ -178,53 +175,20 @@ public class SystemOverviewController implements Initializable {
 		r_successColumn.setCellValueFactory(cellData -> cellData.getValue().successProperty().asObject());
 
 		// 프로그램이 실행될 때 reservation.dat에 저장된 reservation 데이터를 읽어서 rList에 추가
-		String filePath = "C:\\Users\\triz\\AppData\\Roaming\\Bitcoin\\reservation.dat";
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(filePath));
-			while (true) {
-				String line;
-				line = br.readLine();
-				if (line == null)
-					break;
-				JSONParser jsonParser = new JSONParser();
-				JSONObject jsonObject = (JSONObject) jsonParser.parse(line);
-				String time = jsonObject.get("time").toString();
-				String toAddress = jsonObject.get("toAddress").toString();
-				String toCompany = jsonObject.get("toCompany").toString();
-				String productName = jsonObject.get("productName").toString();
-				String productionDate = jsonObject.get("productionDate").toString();
-				String expirationDate = jsonObject.get("expirationDate").toString();
-				int quantity = Integer.parseInt(jsonObject.get("quantity").toString());
-				int success = Integer.parseInt(jsonObject.get("success").toString());
-
-				ArrayList<Product> productList = (ArrayList<Product>) jsonObject.get("productList");
-
-				Reservation tmpReservation = new Reservation(time, toAddress, toCompany, productName, productionDate,
-						expirationDate, quantity, success, productList);
-
-				rList.add(tmpReservation);
-			}
-			br.close();
-		} catch (IOException | ParseException e) {
-			e.printStackTrace();
-		}
-
-		reservationStatusTableView.setItems(rList);
+		reservationStatusTableView.setItems(PDB.getRList());
 
 		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
 				if (event.getClickCount() >= 2) {
 					NDBox selectedNDBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
-					showProductInfoDialog(selectedNDBox);
+					showProductInfoDialog(selectedNDBox.getProductList());
 				} else if (event.getClickCount() == 1) {
-					productionDateTextField.setDisable(false);
-					expirationDateTextField.setDisable(false);
-
 					NDBox selectedBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
 					productNameTextField.setText(selectedBox.getProductName());
 					productionDateTextField.setText(selectedBox.getProductionDate());
 					expirationDateTextField.setText(selectedBox.getExpirationDate());
+					quantityTextField.setText(String.valueOf(selectedBox.getAvailable()));
 				}
 			}
 		});
@@ -234,7 +198,7 @@ public class SystemOverviewController implements Initializable {
 			public void handle(MouseEvent event) {
 				if (event.getClickCount() >= 2) {
 					NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-					showProductInfoDialog(selectedNBox);
+					showProductInfoDialog(selectedNBox.getProductList());
 				}
 			}
 		});
@@ -249,7 +213,7 @@ public class SystemOverviewController implements Initializable {
 
 			}
 		});
-		bitcoindTextArea.setEditable(false);
+		
 		new Bitcoind(bitcoindTextArea).start();
 	}
 
@@ -276,8 +240,6 @@ public class SystemOverviewController implements Initializable {
 		String productionDate = productionDateTextField.getText();
 		String expirationDate = expirationDateTextField.getText();
 
-		Reservation r;
-
 		if (address.equals("") || prodName.equals("") || str_quantity.equals("") || productionDate.equals("")
 				|| expirationDate.equals("")) {
 			// 필수 정보(address, prodName, quantity)가 하나라도 없을 때
@@ -297,47 +259,13 @@ public class SystemOverviewController implements Initializable {
 				alert.setContentText("Please enter the exact date information");
 				alert.showAndWait();
 			} else {
+				
 				int beSendedQauntity = Integer.parseInt(str_quantity);
-				List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
-				Map<NDKey, NDBox> result_NDBox = makeNDBox(productList);
-				ArrayList<Product> prodList = new ArrayList<Product>();
-
-				// production date와 expiration date 둘다 있을 때 -> date에 따라 상품 send
-				NDKey key = new NDKey(prodName, productionDate, expirationDate);
-				NDBox selectedNDBox = result_NDBox.get(key);
+				NDBox selectedNDBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
 				int available = selectedNDBox.getAvailable();
+				
 				if (available >= beSendedQauntity) {
-					selectedNDBox.setAvailable(available - beSendedQauntity);
-					r = new Reservation(time, address, company, prodName, productionDate, expirationDate,
-							beSendedQauntity, 0, prodList);
-
-					try {
-						// File file = new File("C:\\Users\\" + Settings.getSysUsrName()
-						// + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
-						String filePath = "C:\\Users\\triz\\AppData\\Roaming\\Bitcoin\\reservation.dat";
-						FileWriter fw = new FileWriter(filePath, true);
-						JSONObject jsonObj = new JSONObject();
-						JSONArray jsonArray = arrayProductToJSONArray(prodList);
-
-						jsonObj.put("time", time);
-						jsonObj.put("toAddress", address);
-						jsonObj.put("toCompany", company);
-						jsonObj.put("productName", prodName);
-						jsonObj.put("productionDate", productionDate);
-						jsonObj.put("expirationDate", expirationDate);
-						jsonObj.put("quantity", beSendedQauntity);
-						jsonObj.put("success", 0);
-						jsonObj.put("productList", jsonArray);
-						fw.write(jsonObj.toJSONString() + "\n");
-						fw.close();
-					} catch (IOException e) {
-						System.err.println("File writer error");
-						e.printStackTrace();
-					}
-
-					rList.add(r);
-					// ndList.add(selectedNDBox);
-					handleInventoryStatus();
+					PDB.reserveProduct(time, address, company, selectedNDBox, beSendedQauntity);
 					companyTextField.setText("");
 					addressTextField.setText("");
 					productNameTextField.setText("");
@@ -362,39 +290,11 @@ public class SystemOverviewController implements Initializable {
 		}
 	}
 
-	public JSONArray arrayProductToJSONArray(ArrayList<Product> productList) {
-		JSONArray jsonArr = new JSONArray();
-		for (Product p : productList) {
-			JSONObject tmpObj = new JSONObject();
-			tmpObj.put("productionDate", p.getProductionDate());
-			tmpObj.put("expirationDate", p.getExpirationDate());
-			tmpObj.put("productName", p.getProductName());
-			tmpObj.put("pid", p.getPID());
-			jsonArr.add(tmpObj);
-		}
-		return jsonArr;
-	}
-
 	@FXML
 	public void handleInventoryStatus() {
-		List<Map> productList = MainApp.bitcoinJSONRPClient.get_current_products();
-		//////////////////////////////////////////////////////////////
-		Map<NDKey, NDBox> result_NDBox = makeNDBox(productList);
-		ndList = FXCollections.observableArrayList();
-
-		for (NDKey key : result_NDBox.keySet()) {
-			ndList.add(result_NDBox.get(key));
-		}
-		inventoryStatusTableView.setItems(ndList);
-		//////////////////////////////////////////////////////////////
-		Map<String, NBox> result_NBox = makeNBox(result_NDBox);
-		nList = FXCollections.observableArrayList();
-
-		for (String key : result_NBox.keySet()) {
-			nList.add(result_NBox.get(key));
-		}
-		total_inventoryStatusTableView.setItems(nList);
-		//////////////////////////////////////////////////////////////
+		PDB.refreshInventory(MainApp.bitcoinJSONRPClient.get_current_products());
+		inventoryStatusTableView.setItems(PDB.getNDList());
+		total_inventoryStatusTableView.setItems(PDB.getNList());
 	}
 
 	@FXML
@@ -413,8 +313,7 @@ public class SystemOverviewController implements Initializable {
 			alert.showAndWait();
 		} else {
 			int quantity = Integer.parseInt(str_quantity);
-			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate,
-					quantity);
+			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
 		}
 	}
 
@@ -448,142 +347,8 @@ public class SystemOverviewController implements Initializable {
 		}
 	}
 
-	public void handleQRGenerate() {
-
-	}
-
-	public Map<NDKey, NDBox> makeNDBox(List<Map> productList) {
-
-		Map<NDKey, NDBox> result = new HashMap<NDKey, NDBox>();
-		NDKey key;
-		Product tmpProduct;
-		ArrayList<Product> tmpList;
-		NDBox resultNDBox;
-		for (Map product : productList) {
-			key = new NDKey(String.valueOf(product.get("prodName")), String.valueOf(product.get("production date")),
-					String.valueOf(product.get("expiration date")));
-			if (result.get(key) == null) {
-				tmpProduct = new Product(product);
-				tmpList = new ArrayList<Product>();
-				tmpList.add(tmpProduct);
-				NDBox value = new NDBox(key.getProdName(), key.getProductionDate(), key.getExpirationDate(), tmpList, 1,
-						1);
-				result.put(key, value);
-			} else {
-				tmpProduct = new Product(product);
-				resultNDBox = result.get(key);
-				resultNDBox.addProduct(tmpProduct);
-				resultNDBox.setQuantity(resultNDBox.getQuantity() + 1);
-				resultNDBox.setAvailable(resultNDBox.getAvailable() + 1);
-			}
-		}
-
-		// Reservation List에서 NDBox map(result)의 key(prodName, prodDate, expDate)와 동일한
-		// 값을 갖는
-		// NDBox의 quantity를 구해서 result의 available에서 뺌.
-		Iterator<Reservation> reservationItr = rList.iterator();
-		Reservation thisReservation;
-		NDBox thisNDBox;
-		while (reservationItr.hasNext()) {
-			thisReservation = reservationItr.next();
-			for (NDKey resultKey : result.keySet()) {
-				if (thisReservation.getProductName().equals(resultKey.getProdName())
-						&& thisReservation.getProductionDate().equals(resultKey.getProductionDate())
-						&& thisReservation.getExpirationDate().equals(resultKey.getExpirationDate())) {
-					thisNDBox = result.get(resultKey);
-					thisNDBox.setAvailable(thisNDBox.getAvailable() - thisReservation.getQuantity());
-				}
-			}
-		}
-		return result;
-	}
-
-	public Map<String, NBox> makeNBox(Map<NDKey, NDBox> ndboxMap) {
-
-		Map<String, NBox> result = new HashMap<String, NBox>();
-		String name;
-		NDBox tmpNDBox;
-		ArrayList<Product> tmpProductList;
-		NBox resultNBox;
-		Iterator itr;
-		Product p;
-		NBox tmpProducts;
-
-		for (NDKey key : ndboxMap.keySet()) {
-
-			name = key.getProdName();
-			if (result.get(name) != null) {
-				// result에 key 값을 갖는 NBox가 하나라도 있을 때 -> 원래 있던 NBox에 추가
-				tmpNDBox = ndboxMap.get(key);
-				tmpProductList = tmpNDBox.getProductList();
-				resultNBox = result.get(name);
-				itr = tmpProductList.iterator();
-
-				while (itr.hasNext()) {
-					p = (Product) itr.next();
-					resultNBox.getProductList().add(p);
-					resultNBox.setQuantity(resultNBox.getQuantity() + 1);
-				}
-				resultNBox.setAvailable(resultNBox.getAvailable() + tmpNDBox.getAvailable());
-			} else {
-				// result에 key 값을 갖는 NBox가 하나도 없을 때 -> 새로 만들어줌
-				tmpNDBox = ndboxMap.get(key);
-				tmpProducts = new NBox(name, tmpNDBox.getProductList(), tmpNDBox.getQuantity(),
-						tmpNDBox.getAvailable());
-				result.put(name, tmpProducts);
-			}
-		}
-		return result;
-	}
-
-	public void showProductInfoDialog(NDBox ndBox) {
-		try {
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
-			AnchorPane productInfoPane = (AnchorPane) loader.load();
-
-			Stage dialogStage = new Stage();
-			dialogStage.setTitle("Product Info");
-			dialogStage.initModality(Modality.WINDOW_MODAL);
-			dialogStage.initOwner(mainApp.getPrimaryStage());
-			Scene scene = new Scene(productInfoPane);
-			dialogStage.setScene(scene);
-
-			ProductInfoDialogController controller = loader.getController();
-			controller.setDialogStage(dialogStage);
-			controller.setProduct(ndBox);
-
-			dialogStage.showAndWait();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void showProductInfoDialog(NBox nBox) {
-
-		try {
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
-			AnchorPane productInfoPane = (AnchorPane) loader.load();
-
-			Stage dialogStage = new Stage();
-			dialogStage.setTitle("Product Info");
-			dialogStage.initModality(Modality.WINDOW_MODAL);
-			dialogStage.initOwner(mainApp.getPrimaryStage());
-			Scene scene = new Scene(productInfoPane);
-			dialogStage.setScene(scene);
-
-			ProductInfoDialogController controller = loader.getController();
-			controller.setDialogStage(dialogStage);
-			controller.setProduct(nBox);
-
-			dialogStage.showAndWait();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+	public void handleQRGenerate() {}
+	
 	public void showProductInfoDialog(ArrayList<Product> prodList) {
 
 		try {
