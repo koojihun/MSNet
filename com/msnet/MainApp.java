@@ -37,13 +37,6 @@ public class MainApp extends Application {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("MSNet");
 		showLoginView();
-		/*
-		try {
-			showSystemOverview();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
-
 	}
 
 	@Override
@@ -57,11 +50,6 @@ public class MainApp extends Application {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/LoginView.fxml"));
 			AnchorPane loginPane = (AnchorPane) loader.load();
-
-			// FadeTransition ft = new FadeTransition(Duration.millis(2500), loginPane);
-			// ft.setFromValue(0);
-			// ft.setToValue(1);
-			// ft.play();
 
 			Scene loginScene = new Scene(loginPane);
 			LoginViewController controller = loader.getController();
@@ -85,17 +73,16 @@ public class MainApp extends Application {
 			Scene scene = new Scene(systemOverview);
 			primaryStage.setScene(scene);
 			centerStage(primaryStage, WIDTH, HEIGHT);
-			primaryStage.show();
 
 			SystemOverviewController controller = loader.getController();
 			controller.setPane(systemOverview);
 			controller.setMainApp(this);
 
 			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
-			//bitcoinJSONRPClient = new BitcoinJSONRPCClient("thehb02", "ca36511!!");
 			Settings.makeAndSendBitcoinAddress();
-			
 			HTTP.startHttpServer();
+			
+			primaryStage.show();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

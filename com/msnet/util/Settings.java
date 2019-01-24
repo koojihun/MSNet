@@ -38,7 +38,7 @@ public class Settings {
 		readBitcoinConfFile();
 		////////////////////////////////////////////////////////////////
 		// Set key for encrypt.
-		AES.setKey("HANYANG HIT B102".trim());
+		AES.setKey();
 	}
 
 	private boolean isThereConfFile() {

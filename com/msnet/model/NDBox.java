@@ -1,7 +1,6 @@
 package com.msnet.model;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -16,6 +15,25 @@ public class NDBox {
 	private IntegerProperty quantity;
 	private IntegerProperty available;
 
+	public NDBox(Product p) {
+		this.productName = new SimpleStringProperty(p.getProductName());
+		this.productionDate = new SimpleStringProperty(p.getProductionDate());
+		this.expirationDate = new SimpleStringProperty(p.getExpirationDate());
+		this.productList = new ArrayList<Product>();
+		productList.add(p);
+		this.quantity = new SimpleIntegerProperty(1);
+		this.available = new SimpleIntegerProperty(1);
+	}
+	
+	public NDBox(String prodName, String prodDate, String expDate) {
+		this.productName = new SimpleStringProperty(prodName);
+		this.productionDate = new SimpleStringProperty(prodDate);
+		this.expirationDate = new SimpleStringProperty(expDate);
+		this.productList = new ArrayList<Product>();
+		this.quantity = new SimpleIntegerProperty(0);
+		this.available = new SimpleIntegerProperty(0);
+	}
+	
 	public NDBox(String productName, String productionDate, String expirationDate, ArrayList<Product> productList, int quantity, int available) {
 		this.productName = new SimpleStringProperty(productName);
 		this.productionDate = new SimpleStringProperty(productionDate);
@@ -25,16 +43,10 @@ public class NDBox {
 		this.available = new SimpleIntegerProperty(available);
 	}
 	
-	public List<String> getPid(){
-		List<String> pidList = new ArrayList<String>();
-		for(Product product : productList) {
-			pidList.add(product.getPID()); 
-		}
-		return pidList;
-	}
-	
-	public void addProduct(Product input) {
-		productList.add(input);
+	public void addProduct(Product p) {
+		productList.add(p);
+		quantity.set(quantity.get() + 1);
+		available.set(available.get() + 1);
 	}
 	
 	public String getProductName() {

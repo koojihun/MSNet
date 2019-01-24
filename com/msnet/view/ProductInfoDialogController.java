@@ -82,27 +82,6 @@ public class ProductInfoDialogController implements Initializable {
 		dialogStage.setResizable(false);
 	}
 
-	public void setProduct(NBox nBox) {
-		this.nBox = nBox;
-		pList = FXCollections.observableArrayList();
-
-		for (Product product : nBox.getProductList()) {
-
-			pList.add(product);
-		}
-		productInfoTableView.setItems(pList);
-	}
-
-	public void setProduct(NDBox ndBox) {
-		this.ndBox = ndBox;
-		pList = FXCollections.observableArrayList();
-
-		for (Product product : ndBox.getProductList()) {
-			pList.add(product);
-		}
-		productInfoTableView.setItems(pList);
-	}
-
 	public void setProduct(ArrayList<Product> prodList) {
 		this.prodList = prodList;
 		pList = FXCollections.observableArrayList();
