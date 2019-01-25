@@ -56,6 +56,7 @@ import javax.net.ssl.SSLSocketFactory;
 import com.bitcoinClient.krotjson.Base64Coder;
 import com.bitcoinClient.krotjson.JSON;
 import com.msnet.model.Product;
+import com.msnet.util.PDB;
 
 public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 
@@ -2162,12 +2163,8 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 	}
 
 	@Override
-	public ArrayList<Product> get_current_products() {
-		ArrayList<Product> ret = new ArrayList<>();
-		List<Map> tmp = (List<Map>) query("get_current_products");
-		for (Map map : tmp)
-			ret.add(new Product(map));
-		return ret;
+	public List<Map> get_current_products() {
+		return (List<Map>) query("get_current_products");
 	}
 
 	@Override

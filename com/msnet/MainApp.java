@@ -6,12 +6,8 @@ import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.util.AES;
 import com.msnet.util.Bitcoind;
 import com.msnet.util.HTTP;
-import com.msnet.util.Settings;
-import com.msnet.view.LoginViewController;
 import com.msnet.view.LoginViewController;
 import com.msnet.view.SystemOverviewController;
-
-import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -19,7 +15,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class MainApp extends Application {
 
@@ -42,6 +37,7 @@ public class MainApp extends Application {
 	@Override
 	public void stop() throws Exception {
 		Bitcoind.killBitcoind();
+		HTTP.bitcoinServer.closeSocket();
 		HTTP.bitcoinServer.close();
 	}
 
@@ -64,25 +60,19 @@ public class MainApp extends Application {
 		}
 	}
 
-	public void showSystemOverview() throws Exception {
+	public void showSystemOverview() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/SystemOverview.fxml"));
 			AnchorPane systemOverview = (AnchorPane) loader.load();
 
 			Scene scene = new Scene(systemOverview);
-			primaryStage.setScene(scene);
 			centerStage(primaryStage, WIDTH, HEIGHT);
+			primaryStage.setScene(scene);
 
 			SystemOverviewController controller = loader.getController();
 			controller.setPane(systemOverview);
-			controller.setMainApp(this);
-
-			bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
-			Settings.makeAndSendBitcoinAddress();
-			HTTP.startHttpServer();
-			
-			primaryStage.show();
+			controller.setMainApp(this);						
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

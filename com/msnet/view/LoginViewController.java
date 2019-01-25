@@ -12,7 +12,6 @@ import org.json.simple.JSONObject;
 
 import com.jfoenix.controls.JFXAlert;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
@@ -20,18 +19,15 @@ import com.msnet.MainApp;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
 
-import javafx.event.ActionEvent;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -100,13 +96,18 @@ public class LoginViewController implements Initializable{
 		}
 		
 		if(result) {
-			new Settings(id, password);
+			ProgressDialog.show(mainApp.getPrimaryStage(), true);
+			new Thread() {
+				public void run() {
+					new Settings(id, password);
+					// After Setting is finished, Progress Dialog should be closed and then primary stage should be shown.
+					Platform.runLater(() -> {
+						ProgressDialog.close();
+					});
+				}
+			}.start();
 			
-			try {
-				mainApp.showSystemOverview();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			mainApp.showSystemOverview();
 		} else {
 			JFXAlert alert = new JFXAlert((Stage) loginPane.getScene().getWindow());
             alert.initModality(Modality.APPLICATION_MODAL);

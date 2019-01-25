@@ -2,12 +2,11 @@ package com.msnet.util;
 
 import java.io.*;
 import java.util.ArrayList;
-
-import org.json.simple.JSONObject;
-
+import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.MainApp;
+import com.msnet.view.ProgressDialog;
 
-import netscape.javascript.JSObject;
+import javafx.application.Platform;
 
 public class Settings {
 
@@ -17,7 +16,6 @@ public class Settings {
 	private static String sysUsrName;
 
 	public Settings(String id, String password) {
-		////////////////////////////////////////////////////////////////
 		this.id = id;
 		this.password = password;
 		this.sysUsrName = System.getProperty("user.name");
@@ -39,6 +37,16 @@ public class Settings {
 		////////////////////////////////////////////////////////////////
 		// Set key for encrypt.
 		AES.setKey();
+		////////////////////////////////////////////////////////////////
+		try {
+			MainApp.bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
+			makeAndSendBitcoinAddress();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		////////////////////////////////////////////////////////////////
+		HTTP.startHttpServer();
+		////////////////////////////////////////////////////////////////
 	}
 
 	private boolean isThereConfFile() {
@@ -130,7 +138,7 @@ public class Settings {
 			fw.newLine();
 			fw.write("printtoconsole=1");
 			fw.newLine();
-			
+
 			fw.flush();
 			fw.close();
 		} catch (Exception e) {
@@ -169,19 +177,23 @@ public class Settings {
 			}
 
 			String filePath = "C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\bitcoin.conf";
-			BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true));
-			bw.write("bitcoinAddress=" + Settings.getBitcoinAddress());
-			bw.newLine();
-			bw.close();
-			/////////////////////////////////////////////////////
-			ArrayList<String> keys = new ArrayList<>();
-			ArrayList<String> vals = new ArrayList<>();
-			keys.add("id");
-			keys.add("bitcoinAddress");
-			vals.add(Settings.getId());
-			vals.add(Settings.getBitcoinAddress());
-			HTTP.send("http://166.104.126.42:8090/NewSystem/reportAddress.do", "GET", keys, vals);
-			/////////////////////////////////////////////////////
+			try {
+				BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true));
+				bw.write("bitcoinAddress=" + Settings.getBitcoinAddress());
+				bw.newLine();
+				bw.close();
+				/////////////////////////////////////////////////////
+				ArrayList<String> keys = new ArrayList<>();
+				ArrayList<String> vals = new ArrayList<>();
+				keys.add("id");
+				keys.add("bitcoinAddress");
+				vals.add(Settings.getId());
+				vals.add(Settings.getBitcoinAddress());
+				HTTP.send("http://166.104.126.42:8090/NewSystem/reportAddress.do", "GET", keys, vals);
+				/////////////////////////////////////////////////////
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -34,15 +34,6 @@ public class NDBox {
 		this.available = new SimpleIntegerProperty(0);
 	}
 	
-	public NDBox(String productName, String productionDate, String expirationDate, ArrayList<Product> productList, int quantity, int available) {
-		this.productName = new SimpleStringProperty(productName);
-		this.productionDate = new SimpleStringProperty(productionDate);
-		this.expirationDate = new SimpleStringProperty(expirationDate);
-		this.productList = productList;
-		this.quantity = new SimpleIntegerProperty(quantity);
-		this.available = new SimpleIntegerProperty(available);
-	}
-	
 	public void addProduct(Product p) {
 		productList.add(p);
 		quantity.set(quantity.get() + 1);

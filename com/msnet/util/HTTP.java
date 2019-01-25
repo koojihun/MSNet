@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.BindException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,17 +16,12 @@ import java.util.Map;
 import com.jfoenix.controls.JFXAlert;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialogLayout;
-import com.msnet.MainApp;
-import com.msnet.model.NDKey;
-import com.msnet.model.PDB;
 import com.msnet.model.Reservation;
 import com.msnet.model.WDB;
-import com.msnet.model.WorkerInfo;
 import com.msnet.view.SystemOverviewController;
 import com.sun.net.httpserver.*;
 
 import javafx.scene.control.Label;
-import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -66,7 +61,7 @@ public class HTTP {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			int responseCode = con.getResponseCode();
-			ret = getResponseBody(con.getInputStream());
+			//ret = getResponseBody(con.getInputStream());
 			con.disconnect();
 		} else if (method == "POST" || method == "post") {
 			URL obj = new URL(strUrl);
@@ -101,7 +96,12 @@ public class HTTP {
 				System.exit(1);
 			}
 		}
-
+		
+		public static void closeSocket() {
+			httpServer.stop(0);
+			System.out.println("Bitcoin Server is closed!");
+		}
+		
 		public class Handler implements HttpHandler {
 			@Override
 			public void handle(HttpExchange httpExchange) throws IOException {
