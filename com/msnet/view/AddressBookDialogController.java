@@ -107,10 +107,9 @@ public class AddressBookDialogController implements Initializable {
 	@FXML
 	public void handleSearch() {
 		String search_str = searchTextField.getText();
-		System.out.println(search_str);
 		companyInfoTableView
-				.getItems().stream().filter(item -> ((item.getName().equals(search_str))
-						| (item.getAddress().equals(search_str)) | (item.getBitcoinAddress().equals(search_str))))
+				.getItems().stream().filter(item -> ((item.getName().contains(search_str))
+						| (item.getAddress().contains(search_str)) | (item.getBitcoinAddress().contains(search_str))))
 				.findAny().ifPresent(item -> {
 					companyInfoTableView.getSelectionModel().select(item);
 					companyInfoTableView.scrollTo(item);

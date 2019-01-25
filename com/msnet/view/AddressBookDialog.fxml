@@ -18,7 +18,7 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <JFXTextField fx:id="searchTextField" focusColor="WHITE" layoutX="24.0" layoutY="21.0" prefHeight="23.0" prefWidth="287.0" unFocusColor="#3cb0b4" AnchorPane.leftAnchor="17.0" AnchorPane.topAnchor="20.0" />
+      <JFXTextField fx:id="searchTextField" focusColor="WHITE" layoutX="24.0" layoutY="21.0" prefHeight="23.0" prefWidth="287.0" style="-fx-text-fill: white;" unFocusColor="#3cb0b4" AnchorPane.leftAnchor="17.0" AnchorPane.topAnchor="20.0" />
       <JFXButton layoutX="325.0" layoutY="20.0" onAction="#handleSearch" style="-fx-background-color: #3CB0B4; -fx-text-fill: white;" text="Search" AnchorPane.leftAnchor="320.0" AnchorPane.topAnchor="20.0" />
    </children>
 </AnchorPane>

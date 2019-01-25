@@ -11,28 +11,34 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import com.msnet.MainApp;
 import com.msnet.util.Settings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TableView;
 
 public class PDB {
 	private static ArrayList<Product> product_list;
 	private static HashMap<String, NBox> nMap;
 	private static HashMap<NDKey, NDBox> ndMap;
+	private static TableView<Reservation> reservationStatusTableView;
 	
 	private static ObservableList<NBox> nList;
 	private static ObservableList<NDBox> ndList;
 	private static ObservableList<Reservation> rList;
-	
-	public PDB() {
+
+	public PDB(TableView<Reservation> reservationStatusTableView) {
+		this.reservationStatusTableView = reservationStatusTableView;
+		
 		nList = FXCollections.observableArrayList();
 		ndList = FXCollections.observableArrayList();
 		rList = FXCollections.observableArrayList();
-		
+
 		product_list = new ArrayList<>();
 		nMap = new HashMap<String, NBox>();
 		ndMap = new HashMap<NDKey, NDBox>();
-		
+
 		// read Reservation objects from disk into rMap & rList.
 		fileReadReservation();
 	}
@@ -40,24 +46,25 @@ public class PDB {
 	public static void refreshInventory(ArrayList<Product> products) {
 		nList = FXCollections.observableArrayList();
 		ndList = FXCollections.observableArrayList();
-		
+
 		product_list = new ArrayList<>();
 		nMap = new HashMap<String, NBox>();
 		ndMap = new HashMap<NDKey, NDBox>();
-		
+
 		for (Product p : products)
 			addProduct(p);
-		
+
 		for (Reservation r : rList) {
 			NBox nBox = nMap.get(r.getProductName());
 			nBox.setAvailable(nBox.getAvailable() - r.getQuantity());
-			
-		
+
 			NDBox ndBox = ndMap.get(new NDKey(r.getProductName(), r.getProductionDate(), r.getExpirationDate()));
-			ndBox.setAvailable(ndBox.getAvailable() - r.getQuantity());
+			// hbhb
+			ndBox.setAvailable(ndBox.getAvailable() - (r.getQuantity() - r.getSuccess()));
+			// ndBox.setAvailable(ndBox.getAvailable() - r.getQuantity());
 		}
 	}
-	
+
 	public static void addProduct(Product p) {
 		product_list.add(p);
 
@@ -81,24 +88,25 @@ public class PDB {
 		}
 
 	}
-	
+
 	public static void reserveProduct(String time, String address, String company, NDBox selectedNDBox, int count) {
 		Reservation r = new Reservation(time, address, company, selectedNDBox, count);
-		fileWriteReservation(r); 
+		fileWriteReservation(r);
 		rList.add(r);
-		
+
 		NBox nBox = nMap.get(selectedNDBox.getProductName());
 		nBox.setAvailable(nBox.getAvailable() - count);
-		
+
 		selectedNDBox.setAvailable(selectedNDBox.getAvailable() - count);
 	}
-	
-	public static void reserveProduct(String time, String toAddress, String toCompany, String productName, String prodDate, String expDate,
-			int quantity, int success, ArrayList<Product> productList) {
-		
-		Reservation r = new Reservation(time, toAddress, toCompany, productName, prodDate, expDate, quantity, success, productList);
+
+	public static void reserveProduct(String time, String toAddress, String toCompany, String productName,
+			String prodDate, String expDate, int quantity, int success, ArrayList<Product> productList) {
+
+		Reservation r = new Reservation(time, toAddress, toCompany, productName, prodDate, expDate, quantity, success,
+				productList);
 		rList.add(r);
-		
+
 		NBox nBox = nMap.get(productName);
 		if (nBox == null) {
 			nBox = new NBox(productName);
@@ -107,7 +115,7 @@ public class PDB {
 		} else {
 			nBox.setAvailable(nBox.getAvailable() - quantity);
 		}
-		
+
 		NDBox ndBox = ndMap.get(new NDKey(productName, prodDate, expDate));
 		if (ndBox == null) {
 			ndBox = new NDBox(productName, prodDate, expDate);
@@ -117,10 +125,11 @@ public class PDB {
 			ndBox.setAvailable(ndBox.getAvailable() - quantity);
 		}
 	}
-	
+
 	public static void fileReadReservation() {
 		try {
-			File resDat = new File("C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
+			File resDat = new File(
+					"C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
 			if (resDat.exists()) {
 				BufferedReader br = new BufferedReader(new FileReader(resDat));
 				JSONParser parser = new JSONParser();
@@ -136,8 +145,9 @@ public class PDB {
 					int quantity = Integer.parseInt(jsonObject.get("quantity").toString());
 					int success = Integer.parseInt(jsonObject.get("success").toString());
 					ArrayList<Product> productList = (ArrayList<Product>) jsonObject.get("productList");
-					
-					PDB.reserveProduct(time, toAddress, toCompany, productName, productionDate, expirationDate, quantity, success, productList);
+
+					PDB.reserveProduct(time, toAddress, toCompany, productName, productionDate, expirationDate,
+							quantity, success, productList);
 				}
 				br.close();
 			}
@@ -145,13 +155,14 @@ public class PDB {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void fileWriteReservation(Reservation r) {
 		try {
-			File file = new File("C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
+			File file = new File(
+					"C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
 			FileWriter fw = new FileWriter(file, true);
 			JSONObject jsonObj = new JSONObject();
-			
+
 			jsonObj.put("time", r.getTime());
 			jsonObj.put("toAddress", r.getToAddress());
 			jsonObj.put("toCompany", r.getToCompany());
@@ -170,6 +181,18 @@ public class PDB {
 		}
 	}
 	
+	public static void fileReWriteReservation() {
+		File file = new File(
+				"C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
+		try {
+			FileWriter fw = new FileWriter(file, true);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JSONObject jsonObj = new JSONObject();
+	}
+
 	public static JSONArray arrayProductToJSONArray(ArrayList<Product> productList) {
 		JSONArray jsonArr = new JSONArray();
 		for (Product p : productList) {
@@ -182,7 +205,7 @@ public class PDB {
 		}
 		return jsonArr;
 	}
-	
+
 	public static ArrayList<Product> getProduct_list() {
 		return product_list;
 	}
@@ -194,11 +217,11 @@ public class PDB {
 	public static HashMap<NDKey, NDBox> getNDMap() {
 		return ndMap;
 	}
-	
+
 	public static NDBox getNDBox(NDKey key) {
 		return ndMap.get(key);
 	}
-	
+
 	public static NBox getNBox(String prodName) {
 		return nMap.get(prodName);
 	}
@@ -214,5 +237,29 @@ public class PDB {
 	public static ObservableList<Reservation> getRList() {
 		return rList;
 	}
-	
+
+	public static Reservation getSendRList(String prodName, String productionDate, String expirationDate,
+			String bitcoin_address) {
+		ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
+		Reservation tmpR;
+
+		for (int i = 0; i < rList.size(); i++) {
+			tmpR = rList.get(i);
+			if (prodName.equals(tmpR.getProductName()) && productionDate.equals(tmpR.getProductionDate())
+					&& expirationDate.equals(tmpR.getExpirationDate()) && bitcoin_address.equals(tmpR.getToAddress())
+					&& (tmpR.getQuantity() >= tmpR.getSuccess())) {
+				// Reservation 중 보낼 물건의 정보와 일치하고 [Quantity > Success]인 tmpR만 리스트에 추가  
+				return tmpR;
+			}
+		}
+		return null;
+	}
+
+	public static void sendProduct(Reservation sendReservation, String bitcoin_address, String pid, String prodName, String productionDate, String expirationDate) {
+		Product p = new Product(productionDate, expirationDate, prodName, pid);
+		sendReservation.getProductList().add(p);
+		sendReservation.setSuccess(sendReservation.getQuantity() - 1);
+		MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);	
+		reservationStatusTableView.setItems(rList);
+	}
 }

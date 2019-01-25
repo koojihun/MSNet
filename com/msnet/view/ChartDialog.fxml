@@ -19,7 +19,7 @@
                      <children>
                         <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <BarChart fx:id="barChart" prefHeight="671.0" prefWidth="800.0">
+                              <BarChart fx:id="barChart" prefHeight="671.0" prefWidth="1059.0">
                                 <xAxis>
                                   <CategoryAxis side="BOTTOM" fx:id="xAxis" />
                                 </xAxis>
@@ -39,7 +39,7 @@
                      <children>
                         <HBox prefHeight="671.0" prefWidth="998.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <LineChart prefHeight="671.0" prefWidth="772.0">
+                              <LineChart prefHeight="671.0" prefWidth="1106.0">
                                 <xAxis>
                                   <CategoryAxis side="BOTTOM" />
                                 </xAxis>

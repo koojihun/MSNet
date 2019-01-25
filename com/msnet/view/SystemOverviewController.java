@@ -30,6 +30,7 @@ import com.jfoenix.controls.JFXTextField;
 import com.msnet.MainApp;
 import com.msnet.model.Product;
 import com.msnet.model.Reservation;
+import com.msnet.model.WDB;
 import com.msnet.model.Worker;
 import com.msnet.util.Bitcoind;
 import com.msnet.model.NBox;
@@ -140,23 +141,25 @@ public class SystemOverviewController implements Initializable {
 	@FXML
 	private TableColumn<Worker, String> worker_idColumn;
 	@FXML
-	private TableColumn<Worker, String> worker_employeeNumberColumn;
+	private TableColumn<Worker, String> worker_nameColumn;
 	@FXML
 	private TableColumn<Worker, Boolean> worker_isLoginColumn;
 	//////////////////////////////////////////////////
 	private MainApp mainApp;
-	private ObservableList<Worker> workerList;
 	private ObservableList<String> dateList;
-	private AnchorPane systemOverview;
+	// 황보성훈
+	//private static AnchorPane systemOverview;
+	private static AnchorPane systemOverview;
 	//////////////////////////////////////////////////
 	public SystemOverviewController() {}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		//////////////////////////////////
-		// Product Database Initialize. //
-		new PDB();						//
-		//////////////////////////////////
+		//////////////////////////////////////
+		// Product Database Initialize.     //
+		new PDB(reservationStatusTableView);//
+		new WDB(workerTableView);		    //
+		//////////////////////////////////////
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
 		productNameTextField.setEditable(false);
@@ -191,9 +194,9 @@ public class SystemOverviewController implements Initializable {
 		reservationStatusTableView.setItems(PDB.getRList());
 
 		worker_idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty());
-		worker_employeeNumberColumn.setCellValueFactory(cellData -> cellData.getValue().employeeNumberProperty());
+		worker_nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
 		worker_isLoginColumn.setCellValueFactory(cellData -> cellData.getValue().isLoginProperty());
-		workerTableView.setItems(workerList);
+		workerTableView.setItems(WDB.getWorkerList());
 		
 		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
@@ -265,32 +268,17 @@ public class SystemOverviewController implements Initializable {
 		if (address.equals("") || prodName.equals("") || str_quantity.equals("") || productionDate.equals("")
 				|| expirationDate.equals("")) {
 			// 필수 정보(address, prodName, quantity)가 하나라도 없을 때
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setOverlayClose(true);
-            JFXDialogLayout layout = new JFXDialogLayout();
-            layout.setHeading(new Label("Enter the information"));
-            layout.setBody(new Label("Please enter the required information(Address, Product name, Quantity, Production date, Expiration date)"));
-            JFXButton closeButton = new JFXButton("ACCEPT");
-            closeButton.getStyleClass().add("dialog-accept");
-            closeButton.setOnAction(event -> alert.hideWithAnimation());
-            layout.setActions(closeButton);
-            alert.setContent(layout);
-            alert.show();
+            String head = "Enter the information";
+			String body = "Please enter the required information(Address, Product name, Quantity, Production date, Expiration date)";
+			showAlert(head, body);
+            
 		} else {
 			// 필수 정보(address, prodName, quantity, productionDate, expirationDate)가 모두 있을 때
 			if (productionDate.equals("") && expirationDate.equals("") == false) {
 				// production date와 expiration date 둘 중에 하나만 있을 때 -> 경고!!
-	            alert.initModality(Modality.APPLICATION_MODAL);
-	            alert.setOverlayClose(true);
-	            JFXDialogLayout layout = new JFXDialogLayout();
-	            layout.setHeading(new Label("Enter the date information"));
-	            layout.setBody(new Label("Please enter the exact date information"));
-	            JFXButton closeButton = new JFXButton("ACCEPT");
-	            closeButton.getStyleClass().add("dialog-accept");
-	            closeButton.setOnAction(event -> alert.hideWithAnimation());
-	            layout.setActions(closeButton);
-	            alert.setContent(layout);
-	            alert.show();
+	            String head = "Enter the date information";
+				String body = "Please enter the exact date information";
+				showAlert(head, body);
 			} else {
 				
 				int beSendedQauntity = Integer.parseInt(str_quantity);
@@ -307,24 +295,16 @@ public class SystemOverviewController implements Initializable {
 					expirationDateTextField.setText("");
 				} else {
 					// available의 양이 보내고자 하는 양(beSendedQuantity)보다 적을 때
-		            alert.initModality(Modality.APPLICATION_MODAL);
-		            alert.setOverlayClose(true);
-		            JFXDialogLayout layout = new JFXDialogLayout();       
-
-					if (available == 0) {
-						// available이 0일 때는 보낼 수 있는 물건이 없을 때.
-						layout.setHeading(new Label("Wrong Quantity"));
-			            layout.setBody(new Label("There is nothing to send"));
+		      		if (available == 0) {
+			            String head = "Wrong Quantity";
+						String body = "There is nothing to send";
+						showAlert(head, body);
+			            
 					} else {
-						layout.setHeading(new Label("Wrong Quantity"));
-			            layout.setBody(new Label("Please enter the 'Quantity' less than " + available));											
+						String head = "Wrong Quantity";
+						String body = "Please enter the 'Quantity' less than " + available;
+						showAlert(head, body);
 					}
-		            JFXButton closeButton = new JFXButton("ACCEPT");
-		            closeButton.getStyleClass().add("dialog-accept");
-		            closeButton.setOnAction(event -> alert.hideWithAnimation());
-		            layout.setActions(closeButton);
-		            alert.setContent(layout);
-		            alert.show();
 				}
 			}
 		}
@@ -345,15 +325,17 @@ public class SystemOverviewController implements Initializable {
 		String expirationDate = product_expirationDateTextField.getText();
 
 		if (name.equals("") || str_quantity.equals("") || productionDate.equals("") || expirationDate.equals("")) {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Caution");
-			alert.setHeaderText("Enter the information");
-			alert.setContentText(
-					"Please enter the required information(Name, Quantity, Production date, Expiration date)");
-			alert.showAndWait();
+			String head = "Enter the information";
+			String body = "Please enter the required information(Name, Quantity, Production date, Expiration date)";
+			showAlert(head, body);
 		} else {
 			int quantity = Integer.parseInt(str_quantity);
 			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
+			product_prodNameTextField.setText("");
+			product_quantityTextField.setText("");
+			product_productionDateTextField.setText("");
+			product_expirationDateTextField.setText("");
+			termTextField.setText("");
 		}
 	}
 
@@ -459,11 +441,33 @@ public class SystemOverviewController implements Initializable {
 			e.printStackTrace();
 		}
 	}
+	
+	public void showAlert(String head, String body) {
+		JFXAlert alert = new JFXAlert((Stage) systemOverview.getScene().getWindow());
+		alert.initModality(Modality.APPLICATION_MODAL);
+        alert.setOverlayClose(true);
+        JFXDialogLayout layout = new JFXDialogLayout();
+        layout.setHeading(new Label(head));
+        layout.setBody(new Label(body));
+        JFXButton closeButton = new JFXButton("ACCEPT");
+        closeButton.getStyleClass().add("dialog-accept");
+        closeButton.setOnAction(event -> alert.hideWithAnimation());
+        layout.setActions(closeButton);
+        alert.setContent(layout);
+        alert.show();
+	}
+	
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
+		
 	}
 
 	public void setPane(AnchorPane systemOverview) {
-		this.systemOverview = systemOverview;		
+		this.systemOverview =systemOverview;		
 	}
+	
+	public static AnchorPane getSystemOverview() {
+		return systemOverview;
+	}
+	
 }

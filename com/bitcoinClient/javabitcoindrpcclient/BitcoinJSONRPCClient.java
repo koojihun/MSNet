@@ -197,6 +197,7 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 			String r = new String(loadStream(in, close), QUERY_CHARSET);
 			logger.log(Level.FINE, "Bitcoin JSON-RPC response:\n{0}", r);
 			try {
+				
 				Map response = (Map) JSON.parse(r);
 				
 				if (!expectedID.equals(response.get("id")))

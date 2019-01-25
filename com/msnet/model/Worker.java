@@ -1,21 +1,18 @@
 package com.msnet.model;
 
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 
 public class Worker {
 	private StringProperty id;
-	private StringProperty employeeNumber;
+	private StringProperty name;
 	private BooleanProperty isLogin;
 	
-	public Worker(String id, String employeeNumber, boolean isLogin) {
+	public Worker(String id, String name, boolean isLogin) {
 		this.id = new SimpleStringProperty(id);
-		this.employeeNumber = new SimpleStringProperty(employeeNumber);
+		this.name = new SimpleStringProperty(name);
 		this.isLogin = new SimpleBooleanProperty(isLogin);
 	}
 	
@@ -31,16 +28,16 @@ public class Worker {
 		return id;
 	}
 	
-	public String getEmployeeNumber() {
-		return employeeNumber.get();
+	public String getName() {
+		return name.get();
 	}
 	
-	public void setEmployeeNumber(String employeeNumber) {
-		this.employeeNumber.set(employeeNumber); 
+	public void setName(String name) {
+		this.name.set(name); 
 	}
 	
-	public StringProperty employeeNumberProperty() {
-		return employeeNumber;
+	public StringProperty nameProperty() {
+		return name;
 	}
 	
 	public boolean getIsLogin() {

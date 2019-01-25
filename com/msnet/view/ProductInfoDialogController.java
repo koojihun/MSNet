@@ -70,7 +70,7 @@ public class ProductInfoDialogController implements Initializable {
 	@FXML
 	public void handleSearch() {
 		String search_str = searchTextField.getText();
-		productInfoTableView.getItems().stream().filter(item -> item.getPID().equals(search_str)).findAny()
+		productInfoTableView.getItems().stream().filter(item -> item.getPID().contains(search_str)).findAny()
 				.ifPresent(item -> {
 					productInfoTableView.getSelectionModel().select(item);
 					productInfoTableView.scrollTo(item);
