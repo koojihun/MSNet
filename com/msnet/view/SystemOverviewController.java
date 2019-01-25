@@ -1,26 +1,14 @@
 package com.msnet.view;
 
 import javafx.scene.control.Alert.AlertType;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import com.jfoenix.controls.JFXAlert;
 import com.jfoenix.controls.JFXButton;
@@ -32,11 +20,11 @@ import com.msnet.model.Product;
 import com.msnet.model.Reservation;
 import com.msnet.model.Worker;
 import com.msnet.util.Bitcoind;
+import com.msnet.util.PDB;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
-import com.msnet.model.NDKey;
-import com.msnet.model.PDB;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -198,15 +186,16 @@ public class SystemOverviewController implements Initializable {
 		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				if (event.getClickCount() >= 2) {
-					NDBox selectedNDBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
-					showProductInfoDialog(selectedNDBox.getProductList());
-				} else if (event.getClickCount() == 1) {
-					NDBox selectedBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
-					productNameTextField.setText(selectedBox.getProductName());
-					productionDateTextField.setText(selectedBox.getProductionDate());
-					expirationDateTextField.setText(selectedBox.getExpirationDate());
-					quantityTextField.setText(String.valueOf(selectedBox.getAvailable()));
+				NDBox selectedNDBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
+				if (selectedNDBox != null) {
+					if (event.getClickCount() >= 2) {
+						showProductInfoDialog(selectedNDBox.getProductList());
+					} else if (event.getClickCount() == 1) {
+						productNameTextField.setText(selectedNDBox.getProductName());
+						productionDateTextField.setText(selectedNDBox.getProductionDate());
+						expirationDateTextField.setText(selectedNDBox.getExpirationDate());
+						quantityTextField.setText(String.valueOf(selectedNDBox.getAvailable()));
+					}
 				}
 			}
 		});
@@ -216,7 +205,8 @@ public class SystemOverviewController implements Initializable {
 			public void handle(MouseEvent event) {
 				if (event.getClickCount() >= 2) {
 					NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-					showProductInfoDialog(selectedNBox.getProductList());
+					if (selectedNBox != null)
+						showProductInfoDialog(selectedNBox.getProductList());
 				}
 			}
 		});
@@ -292,7 +282,6 @@ public class SystemOverviewController implements Initializable {
 	            alert.setContent(layout);
 	            alert.show();
 			} else {
-				
 				int beSendedQauntity = Integer.parseInt(str_quantity);
 				NDBox selectedNDBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
 				int available = selectedNDBox.getAvailable();
@@ -332,9 +321,19 @@ public class SystemOverviewController implements Initializable {
 
 	@FXML
 	public void handleInventoryStatus() {
-		PDB.refreshInventory(MainApp.bitcoinJSONRPClient.get_current_products());
-		inventoryStatusTableView.setItems(PDB.getNDList());
-		total_inventoryStatusTableView.setItems(PDB.getNList());
+		ProgressDialog.show(mainApp.getPrimaryStage(), false);
+		new Thread() {
+			public void run() {
+				PDB.refreshInventory(MainApp.bitcoinJSONRPClient.get_current_products());
+			
+				inventoryStatusTableView.setItems(PDB.getNDList());
+				total_inventoryStatusTableView.setItems(PDB.getNList());
+				System.out.println("finished!!!");
+				Platform.runLater(()->{
+					ProgressDialog.close();
+				});
+			}
+		}.start();
 	}
 
 	@FXML
@@ -387,11 +386,9 @@ public class SystemOverviewController implements Initializable {
 		}
 	}
 
-
 	public void handleQRGenerate() {}
 	
 	public void showProductInfoDialog(ArrayList<Product> prodList) {
-
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));

@@ -1,4 +1,4 @@
-package com.msnet.model;
+package com.msnet.util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,11 +7,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import com.msnet.util.Settings;
+
+import com.msnet.model.NBox;
+import com.msnet.model.NDBox;
+import com.msnet.model.NDKey;
+import com.msnet.model.Product;
+import com.msnet.model.Reservation;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -36,8 +45,8 @@ public class PDB {
 		// read Reservation objects from disk into rMap & rList.
 		fileReadReservation();
 	}
-
-	public static void refreshInventory(ArrayList<Product> products) {
+	
+	public static void refreshInventory(List<Map> products) {
 		nList = FXCollections.observableArrayList();
 		ndList = FXCollections.observableArrayList();
 		
@@ -45,8 +54,8 @@ public class PDB {
 		nMap = new HashMap<String, NBox>();
 		ndMap = new HashMap<NDKey, NDBox>();
 		
-		for (Product p : products)
-			addProduct(p);
+		for (Map map : products)
+			addProduct(new Product(map));
 		
 		for (Reservation r : rList) {
 			NBox nBox = nMap.get(r.getProductName());

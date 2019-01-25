@@ -1570,7 +1570,7 @@ public interface BitcoindRpcClient {
   TxOut getTxOut(String txId, long vout);
   
   List<Map> get_pending_products();
-  ArrayList<Product> get_current_products();
+  List<Map> get_current_products();
   List<Map> get_current_products(String account);
 
   /**

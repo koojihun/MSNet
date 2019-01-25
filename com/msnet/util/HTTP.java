@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.BindException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +49,7 @@ public class HTTP {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			int responseCode = con.getResponseCode();
-			ret = getResponseBody(con.getInputStream());
+			//ret = getResponseBody(con.getInputStream());
 			con.disconnect();
 		} else if (method == "POST" || method == "post") {
 			URL obj = new URL(strUrl);
@@ -84,7 +84,12 @@ public class HTTP {
 				System.exit(1);
 			}
 		}
-
+		
+		public static void closeSocket() {
+			httpServer.stop(0);
+			System.out.println("Bitcoin Server is closed!");
+		}
+		
 		public class Handler implements HttpHandler {
 			@Override
 			public void handle(HttpExchange httpExchange) throws IOException {
