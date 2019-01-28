@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.json.simple.JSONObject;
@@ -20,23 +19,29 @@ import com.msnet.MainApp;
 import com.msnet.model.Reservation;
 import com.msnet.model.WDB;
 import com.msnet.model.Worker;
-import com.msnet.util.Bitcoind;
+import com.msnet.util.Alert;
 import com.msnet.util.PDB;
+import com.msnet.util.QRMaker;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
@@ -135,22 +140,24 @@ public class SystemOverviewController implements Initializable {
 	private MainApp mainApp;
 	private ObservableList<String> dateList;
 	private static AnchorPane systemOverview;
+
 	//////////////////////////////////////////////////
-	public SystemOverviewController() {}
+	public SystemOverviewController() {
+	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		//////////////////////////////////////
-		// Product Database Initialize.     //
+		// Product Database Initialize. //
 		new PDB(reservationStatusTableView);//
-		new WDB(workerTableView);		    //
+		new WDB(workerTableView); //
 		//////////////////////////////////////
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
 		productNameTextField.setEditable(false);
 		productionDateTextField.setEditable(false);
 		expirationDateTextField.setEditable(false);
-		
+
 		dateList = FXCollections.observableArrayList("Hour", "Day", "Month", "Year");
 		dateBox.setItems(dateList);
 		dateBox.setPromptText("Select date unit");
@@ -182,7 +189,7 @@ public class SystemOverviewController implements Initializable {
 		worker_nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
 		worker_isLoginColumn.setCellValueFactory(cellData -> cellData.getValue().isLoginProperty());
 		workerTableView.setItems(WDB.getWorkerList());
-		
+
 		inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -192,9 +199,10 @@ public class SystemOverviewController implements Initializable {
 						ProgressDialog.show(mainApp.getPrimaryStage(), false);
 						new Thread() {
 							public void run() {
-								List<JSONObject> plist = mainApp.bitcoinJSONRPClient.get_current_products_by_ndd(selectedNDBox.getProductName(),
-										selectedNDBox.getProductionDate(), selectedNDBox.getExpirationDate()); 
-								Platform.runLater(()->{
+								List<JSONObject> plist = mainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
+										selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
+										selectedNDBox.getExpirationDate());
+								Platform.runLater(() -> {
 									showProductInfoDialog(plist);
 									ProgressDialog.close();
 								});
@@ -209,6 +217,20 @@ public class SystemOverviewController implements Initializable {
 				}
 			}
 		});
+		/////////////////////////////////////////////////////////////////////////////////////
+		// 오른쪽 마우스 클릭하면 QR code 생성 관련 
+		MenuItem mi1 = new MenuItem("Generate QR code");
+		mi1.setOnAction((ActionEvent event) -> {
+			NDBox selectedNDBox = (NDBox)inventoryStatusTableView.getSelectionModel().getSelectedItem();
+		    System.out.println(selectedNDBox.getProductName());
+		    //QRMaker maker = new QRMaker(300, 300);
+		    
+		});
+
+		ContextMenu menu = new ContextMenu();
+		menu.getItems().add(mi1);
+		inventoryStatusTableView.setContextMenu(menu);
+		/////////////////////////////////////////////////////////////////////////////////////
 
 		total_inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
@@ -219,8 +241,9 @@ public class SystemOverviewController implements Initializable {
 						ProgressDialog.show(mainApp.getPrimaryStage(), false);
 						new Thread() {
 							public void run() {
-								List<JSONObject> plist = mainApp.bitcoinJSONRPClient.get_current_products_by_name(selectedNBox.getProductName());
-								Platform.runLater(()->{
+								List<JSONObject> plist = mainApp.bitcoinJSONRPClient
+										.get_current_products_by_name(selectedNBox.getProductName());
+								Platform.runLater(() -> {
 									showProductInfoDialog(plist);
 									ProgressDialog.close();
 								});
@@ -238,11 +261,8 @@ public class SystemOverviewController implements Initializable {
 					Reservation selectedReservation = reservationStatusTableView.getSelectionModel().getSelectedItem();
 					showProductInfoDialog(selectedReservation.getProductList());
 				}
-
 			}
 		});
-		
-		new Bitcoind(bitcoindTextArea).start();
 	}
 
 	@FXML
@@ -267,28 +287,25 @@ public class SystemOverviewController implements Initializable {
 		String str_quantity = quantityTextField.getText();
 		String productionDate = productionDateTextField.getText();
 		String expirationDate = expirationDateTextField.getText();
-		
-		JFXAlert alert = new JFXAlert((Stage) systemOverview.getScene().getWindow());
-		
+
 		if (address.equals("") || prodName.equals("") || str_quantity.equals("") || productionDate.equals("")
 				|| expirationDate.equals("")) {
 			// 필수 정보(address, prodName, quantity)가 하나라도 없을 때
-            String head = "Enter the information";
+			String head = "Enter the information";
 			String body = "Please enter the required information(Address, Product name, Quantity, Production date, Expiration date)";
-			showAlert(head, body);
-            
+			new Alert(systemOverview, head, body);
 		} else {
 			// 필수 정보(address, prodName, quantity, productionDate, expirationDate)가 모두 있을 때
 			if (productionDate.equals("") && expirationDate.equals("") == false) {
 				// production date와 expiration date 둘 중에 하나만 있을 때 -> 경고!!
-	            String head = "Enter the date information";
+				String head = "Enter the date information";
 				String body = "Please enter the exact date information";
-				showAlert(head, body);
+				new Alert(systemOverview, head, body);
 			} else {
 				int beSendedQauntity = Integer.parseInt(str_quantity);
 				NDBox selectedNDBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
 				int available = selectedNDBox.getAvailable();
-				
+
 				if (available >= beSendedQauntity) {
 					PDB.reserveProduct(time, address, company, selectedNDBox, beSendedQauntity);
 					companyTextField.setText("");
@@ -299,15 +316,15 @@ public class SystemOverviewController implements Initializable {
 					expirationDateTextField.setText("");
 				} else {
 					// available의 양이 보내고자 하는 양(beSendedQuantity)보다 적을 때
-		      		if (available == 0) {
-			            String head = "Wrong Quantity";
+					if (available == 0) {
+						String head = "Wrong Quantity";
 						String body = "There is nothing to send";
-						showAlert(head, body);
-			            
+						new Alert(systemOverview, head, body);
+
 					} else {
 						String head = "Wrong Quantity";
 						String body = "Please enter the 'Quantity' less than " + available;
-						showAlert(head, body);
+						new Alert(systemOverview, head, body);
 					}
 				}
 			}
@@ -322,7 +339,7 @@ public class SystemOverviewController implements Initializable {
 				PDB.refreshInventory(MainApp.bitcoinJSONRPClient.get_ndd_boxes());
 				inventoryStatusTableView.setItems(PDB.getNDList());
 				total_inventoryStatusTableView.setItems(PDB.getNList());
-				Platform.runLater(()->{
+				Platform.runLater(() -> {
 					ProgressDialog.close();
 				});
 			}
@@ -339,14 +356,14 @@ public class SystemOverviewController implements Initializable {
 		if (name.equals("") || str_quantity.equals("") || productionDate.equals("") || expirationDate.equals("")) {
 			String head = "Enter the information";
 			String body = "Please enter the required information(Name, Quantity, Production date, Expiration date)";
-			showAlert(head, body);
+			new Alert(systemOverview, head, body);
 		} else {
 			int quantity = Integer.parseInt(str_quantity);
 			ProgressDialog.show(mainApp.getPrimaryStage(), false);
 			new Thread() {
 				public void run() {
 					MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
-					Platform.runLater(()->{
+					Platform.runLater(() -> {
 						ProgressDialog.close();
 					});
 				}
@@ -389,8 +406,9 @@ public class SystemOverviewController implements Initializable {
 		}
 	}
 
-	public void handleQRGenerate() {}
-	
+	public void handleQRGenerate() {
+	}
+
 	public void showProductInfoDialog(List<JSONObject> prodList) {
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -402,7 +420,7 @@ public class SystemOverviewController implements Initializable {
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.initOwner(mainApp.getPrimaryStage());
 			dialogStage.setResizable(false);
-			
+
 			Scene scene = new Scene(productInfoPane);
 			dialogStage.setScene(scene);
 
@@ -437,7 +455,7 @@ public class SystemOverviewController implements Initializable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@FXML
 	public void showChart() {
 		try {
@@ -460,33 +478,18 @@ public class SystemOverviewController implements Initializable {
 			e.printStackTrace();
 		}
 	}
-	
-	public void showAlert(String head, String body) {
-		JFXAlert alert = new JFXAlert((Stage) systemOverview.getScene().getWindow());
-		alert.initModality(Modality.APPLICATION_MODAL);
-        alert.setOverlayClose(true);
-        JFXDialogLayout layout = new JFXDialogLayout();
-        layout.setHeading(new Label(head));
-        layout.setBody(new Label(body));
-        JFXButton closeButton = new JFXButton("ACCEPT");
-        closeButton.getStyleClass().add("dialog-accept");
-        closeButton.setOnAction(event -> alert.hideWithAnimation());
-        layout.setActions(closeButton);
-        alert.setContent(layout);
-        alert.show();
-	}
-	
+
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
-		
+
 	}
 
 	public void setPane(AnchorPane systemOverview) {
-		this.systemOverview = systemOverview;		
+		this.systemOverview = systemOverview;
 	}
-	
+
 	public static AnchorPane getSystemOverview() {
 		return systemOverview;
 	}
-	
+
 }

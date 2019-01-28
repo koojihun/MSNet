@@ -59,14 +59,14 @@ public class PDB {
 		if (nddBoxes == null)
 			return;
 		
-		for (Map map : nddBoxes) {
-			String result = (String) map.get("result");
+		for (JSONObject obj : nddBoxes) {
+			String result = (String) obj.get("result");
 			int length = result.length();
 			String expiration_date = result.substring(length - 15);
 			String production_date = result.substring(length - 30, length - 15);
 			String prodName = result.substring(0, length - 30);
 			
-			int quantity = Integer.parseInt((String) map.get("quantity"));
+			int quantity = Integer.parseInt((String) obj.get("quantity"));
 			
 			NBox nBox = nMap.get(prodName);
 			if (nBox == null) {
@@ -163,18 +163,6 @@ public class PDB {
 			System.err.println("File writer error");
 			e.printStackTrace();
 		}
-	}
-	
-	public static void fileReWriteReservation() {
-		File file = new File(
-				"C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
-		try {
-			FileWriter fw = new FileWriter(file, true);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		JSONObject jsonObj = new JSONObject();
 	}
 
 	public static JSONArray arrayProductToJSONArray(ArrayList<JSONObject> productList) {

@@ -9,11 +9,8 @@ public class Bitcoind extends Thread {
 	
 	private static String fileName = "bincoind.exe";
 	private static Process process_bincoind;
-	private TextArea bincoind_screen;
 
-	public Bitcoind(TextArea bincoind_screen) {
-		this.bincoind_screen = bincoind_screen;
-	}
+	public Bitcoind() {}
 
 	public void run() {
 		try {

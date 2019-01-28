@@ -144,7 +144,7 @@ public class HTTP {
 				} else if (method.equals("workerSignOut")) {
 					String id = query.get("id");
 					System.out.println("[" + id + "] Sign Out!!!!!!!!!!!!!!!!");
-					WDB.setLogin(id, false);
+					WDB.setIsLogin(id, false);
 				} else if (method.equals("workerSignIn")) {
 					String id = query.get("id");
 					String password = query.get("password");
@@ -152,7 +152,7 @@ public class HTTP {
 					String result;
 
 					if (isConfirm) {
-						WDB.setLogin(id, true);
+						WDB.setIsLogin(id, true);
 						result = "true";
 					} else {
 						result = "false";
@@ -164,7 +164,7 @@ public class HTTP {
 					String name = query.get("name");
 					String phone = query.get("phone");
 
-					boolean isExist = WDB.searchExist(id, password, name, phone);
+					boolean isExist = WDB.searchExist(id);
 					String result;
 					if (isExist) {
 						// 같은 아이디가 존재하면 false를 전달
@@ -172,6 +172,7 @@ public class HTTP {
 					} else {
 						// 같은 아이디가 존재하지 않으면 true 전달
 						result = "true";
+						WDB.insert(id, password, name, phone);
 					}
 					// for return value.
 					sendReturnValue(httpExchange, "result", result);
@@ -192,7 +193,6 @@ public class HTTP {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 		}
 
 		// url 뒤 parameter들을 파싱 하기 위한 함수들. (ex. ip주소:port/?method=1&address=~~~&pid=~~)

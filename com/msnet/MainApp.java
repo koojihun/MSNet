@@ -71,7 +71,7 @@ public class MainApp extends Application {
 
 			SystemOverviewController controller = loader.getController();
 			controller.setPane(systemOverview);
-			controller.setMainApp(this);						
+			controller.setMainApp(this);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -34,40 +34,24 @@ public class WDB {
 		fileReadWorkerInfo();
 	}
 
-	public static boolean searchExist(String id, String password, String name, String phone) {	
-		
-		boolean isExist = false;
-		
+	public static boolean searchExist(String id) {	
 		for (int i = 0; i < workerList.size(); i++) {
-			isExist = workerList.get(i).getID().equals(id);
-			if (isExist) {
-				break;
-			}
+			if(workerList.get(i).getID().equals(id))
+				return true;
 		}
-		
-		if(isExist) {
-			// 동일 아이디가 존재할 때 false를 return
-			return true;
-		} else {
-			// 동일 아이디가 존재하지 않을 때 true를 return하고 workerList와 파일에 쓴다
-			Worker w = new Worker(id, name, false);
-			WorkerInfo wInfo = new WorkerInfo(id, password, name, phone);
-			workerList.add(w);
-			workerInfoList.add(wInfo);
-			
-			fileWriteWorkerInfo(wInfo);
-
-			showWorker(); // worker table 갱신
-			
-			return false;
-		}
+		return false;
+	}
+	
+	public static void insert(String id, String password, String name, String phone) {
+		Worker w = new Worker(id, name, false);
+		WorkerInfo wInfo = new WorkerInfo(id, password, name, phone);
+		workerList.add(w);
+		workerInfoList.add(wInfo);
+		fileWriteWorkerInfo(wInfo);
 	}
 
 	public static void fileReadWorkerInfo() {
-		try {
-			workerList = FXCollections.observableArrayList();
-			workerInfoList = FXCollections.observableArrayList();
-			
+		try {			
 			File resDat = new File(
 					"C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\workerInfo.dat");
 			if (resDat.exists()) {
@@ -96,10 +80,6 @@ public class WDB {
 			e.printStackTrace();
 		}
 	}
-
-	public static void showWorker() {
-		workerTableView.setItems(workerList);
-	}
 	
 	public static void fileWriteWorkerInfo(WorkerInfo w) {
 		try {
@@ -123,7 +103,7 @@ public class WDB {
 		return workerList;
 	}
 
-	public static void setLogin(String id, boolean isLogin) {
+	public static void setIsLogin(String id, boolean isLogin) {
 		Worker tmp;
 		for (int i = 0; i < workerList.size(); i++) {
 			tmp = workerList.get(i);
@@ -131,8 +111,7 @@ public class WDB {
 				tmp.setIsLogin(isLogin);
 				break;
 			}
-		}		
-		showWorker();
+		}
 	}
 
 	public static boolean confirmIDPW(String id, String password) {
