@@ -53,6 +53,10 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import com.bitcoinClient.krotjson.Base64Coder;
 import com.bitcoinClient.krotjson.JSON;
 import com.msnet.model.Product;
@@ -198,8 +202,13 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 			String r = new String(loadStream(in, close), QUERY_CHARSET);
 			logger.log(Level.FINE, "Bitcoin JSON-RPC response:\n{0}", r);
 			try {
-				
-				Map response = (Map) JSON.parse(r);
+				JSONParser jsonParser = new JSONParser();
+				JSONObject response = null;
+				try {
+					response = (JSONObject) jsonParser.parse(r);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 				
 				if (!expectedID.equals(response.get("id")))
 					throw new BitcoinRPCException("Wrong response ID (expected: " + String.valueOf(expectedID)
@@ -2163,6 +2172,21 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 	}
 
 	@Override
+	public List<JSONObject> get_current_products_by_name(String prodName) {
+		return (List<JSONObject>) query("get_current_products_by_name", prodName);
+	}
+	
+	@Override
+	public List<JSONObject> get_current_products_by_ndd(String prodName, String production_date, String expiration_date) {
+		return (List<JSONObject>) query("get_current_products_by_ndd", prodName, production_date, expiration_date);
+	}
+	
+	@Override
+	public List<JSONObject> get_ndd_boxes() {
+		return (List<JSONObject>) query("get_ndd_boxes");
+	}
+	
+	@Override
 	public List<Map> get_current_products() {
 		return (List<Map>) query("get_current_products");
 	}
@@ -2204,9 +2228,8 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 	}
 	*/
 	@Override
-	public List<String> gen_new_product(String prodName, String prodDate, String expDate, int count) {
-		List<String> ret = (List<String>) query("gen_new_product", prodName, prodDate, expDate, count);
-		return ret;
+	public void gen_new_product(String prodName, String prodDate, String expDate, int count) {
+		query("gen_new_product", prodName, prodDate, expDate, count);
 	}
 
 	@Override

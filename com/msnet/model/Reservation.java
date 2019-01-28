@@ -1,6 +1,9 @@
 package com.msnet.model;
 
 import java.util.ArrayList;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -17,7 +20,7 @@ public class Reservation {
 	private StringProperty expirationDate;
 	private IntegerProperty quantity;
 	private IntegerProperty success;
-	private ArrayList<Product> productList;
+	private ArrayList<JSONObject> productList;
 
 	// Reservation을 아예 새로 생성하는 경우.
 	public Reservation(String time, String toAddress, String toCompany, NDBox selectedNDBox, int quantity) {
@@ -34,7 +37,7 @@ public class Reservation {
 
 	// Reservation을 파일에서 읽어와 ArrayList 형태로 추가하는 경우.
 	public Reservation(String time, String toAddress, String toCompany, String productName, String prodDate, String expDate, int quantity, int success,
-			ArrayList<Product> productList) {
+			ArrayList<JSONObject> productList) {
 		this.time = new SimpleStringProperty(time);
 		this.toAddress = new SimpleStringProperty(toAddress);
 		this.toCompany = new SimpleStringProperty(toCompany);
@@ -142,11 +145,11 @@ public class Reservation {
 		return success;
 	}
 
-	public ArrayList<Product> getProductList() {
+	public ArrayList<JSONObject> getProductList() {
 		return this.productList;
 	}
 
-	public void setProductList(ArrayList<Product> productList) {
+	public void setProductList(ArrayList<JSONObject> productList) {
 		this.productList = productList;
 	}
 }

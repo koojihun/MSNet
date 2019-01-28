@@ -3,7 +3,6 @@ package com.msnet;
 import java.io.IOException;
 
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
-import com.msnet.util.AES;
 import com.msnet.util.Bitcoind;
 import com.msnet.util.HTTP;
 import com.msnet.view.LoginViewController;
@@ -20,7 +19,7 @@ public class MainApp extends Application {
 
 	public static final double WIDTH = 1300;
 	public static final double HEIGHT = 900;
-	public Stage primaryStage;
+	private Stage primaryStage;
 	public static BitcoinJSONRPCClient bitcoinJSONRPClient;
 
 	public static void main(String[] args) throws Exception {
