@@ -39,8 +39,8 @@ public class Settings {
 		AES.setKey();
 		////////////////////////////////////////////////////////////////
 		try {
-			MainApp.bitcoinJSONRPClient = new BitcoinJSONRPCClient(Settings.getId(), Settings.getPassword());
-			makeAndSendBitcoinAddress();
+			MainApp.bitcoinJSONRPClient = new BitcoinJSONRPCClient(id, password);
+			//makeAndSendBitcoinAddress();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

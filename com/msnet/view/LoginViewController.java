@@ -79,7 +79,7 @@ public class LoginViewController implements Initializable{
 	public void handleEnter() {
 		String id = idField.getText();
 		String password = passwordField.getText();
-
+		
 		boolean result = false;
 		
 		ArrayList<String> key = new ArrayList<String>();
@@ -100,7 +100,6 @@ public class LoginViewController implements Initializable{
 			new Thread() {
 				public void run() {
 					new Settings(id, password);
-					// After Setting is finished, Progress Dialog should be closed and then primary stage should be shown.
 					Platform.runLater(() -> {
 						ProgressDialog.close();
 					});

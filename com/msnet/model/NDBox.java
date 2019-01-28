@@ -1,7 +1,5 @@
 package com.msnet.model;
 
-import java.util.ArrayList;
-
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -11,33 +9,16 @@ public class NDBox {
 	private StringProperty productName;
 	private StringProperty productionDate;
 	private StringProperty expirationDate;
-	private ArrayList<Product> productList;
 	private IntegerProperty quantity;
 	private IntegerProperty available;
-
-	public NDBox(Product p) {
-		this.productName = new SimpleStringProperty(p.getProductName());
-		this.productionDate = new SimpleStringProperty(p.getProductionDate());
-		this.expirationDate = new SimpleStringProperty(p.getExpirationDate());
-		this.productList = new ArrayList<Product>();
-		productList.add(p);
-		this.quantity = new SimpleIntegerProperty(1);
-		this.available = new SimpleIntegerProperty(1);
-	}
 	
-	public NDBox(String prodName, String prodDate, String expDate) {
+	
+	public NDBox(String prodName, String prodDate, String expDate, int amount) {
 		this.productName = new SimpleStringProperty(prodName);
 		this.productionDate = new SimpleStringProperty(prodDate);
 		this.expirationDate = new SimpleStringProperty(expDate);
-		this.productList = new ArrayList<Product>();
-		this.quantity = new SimpleIntegerProperty(0);
-		this.available = new SimpleIntegerProperty(0);
-	}
-	
-	public void addProduct(Product p) {
-		productList.add(p);
-		quantity.set(quantity.get() + 1);
-		available.set(available.get() + 1);
+		this.quantity = new SimpleIntegerProperty(amount);
+		this.available = new SimpleIntegerProperty(amount);
 	}
 	
 	public String getProductName() {
@@ -51,7 +32,6 @@ public class NDBox {
 	public StringProperty productNameProperty() {
 		return productName;
 	}
-	
 
 	public String getProductionDate() {
 		return productionDate.get();
@@ -75,14 +55,6 @@ public class NDBox {
 	
 	public StringProperty expirationDateProperty() {
 		return expirationDate;
-	}
-	
-	public ArrayList<Product> getProductList(){
-		return productList;
-	}
-	
-	public void setProductList(ArrayList<Product> productList) {
-		this.productList = productList;
 	}
 	
 	public int getQuantity() {

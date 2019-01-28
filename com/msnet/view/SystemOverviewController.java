@@ -1,14 +1,15 @@
 package com.msnet.view;
 
-import javafx.scene.control.Alert.AlertType;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+
+import org.json.simple.JSONObject;
 
 import com.jfoenix.controls.JFXAlert;
 import com.jfoenix.controls.JFXButton;
@@ -16,7 +17,6 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
 import com.msnet.MainApp;
-import com.msnet.model.Product;
 import com.msnet.model.Reservation;
 import com.msnet.model.WDB;
 import com.msnet.model.Worker;
@@ -33,7 +33,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -135,8 +134,6 @@ public class SystemOverviewController implements Initializable {
 	//////////////////////////////////////////////////
 	private MainApp mainApp;
 	private ObservableList<String> dateList;
-	// 황보성훈
-	//private static AnchorPane systemOverview;
 	private static AnchorPane systemOverview;
 	//////////////////////////////////////////////////
 	public SystemOverviewController() {}
@@ -192,7 +189,17 @@ public class SystemOverviewController implements Initializable {
 				NDBox selectedNDBox = inventoryStatusTableView.getSelectionModel().getSelectedItem();
 				if (selectedNDBox != null) {
 					if (event.getClickCount() >= 2) {
-						showProductInfoDialog(selectedNDBox.getProductList());
+						ProgressDialog.show(mainApp.getPrimaryStage(), false);
+						new Thread() {
+							public void run() {
+								List<JSONObject> plist = mainApp.bitcoinJSONRPClient.get_current_products_by_ndd(selectedNDBox.getProductName(),
+										selectedNDBox.getProductionDate(), selectedNDBox.getExpirationDate()); 
+								Platform.runLater(()->{
+									showProductInfoDialog(plist);
+									ProgressDialog.close();
+								});
+							}
+						}.start();
 					} else if (event.getClickCount() == 1) {
 						productNameTextField.setText(selectedNDBox.getProductName());
 						productionDateTextField.setText(selectedNDBox.getProductionDate());
@@ -208,8 +215,18 @@ public class SystemOverviewController implements Initializable {
 			public void handle(MouseEvent event) {
 				if (event.getClickCount() >= 2) {
 					NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-					if (selectedNBox != null)
-						showProductInfoDialog(selectedNBox.getProductList());
+					if (selectedNBox != null) {
+						ProgressDialog.show(mainApp.getPrimaryStage(), false);
+						new Thread() {
+							public void run() {
+								List<JSONObject> plist = mainApp.bitcoinJSONRPClient.get_current_products_by_name(selectedNBox.getProductName());
+								Platform.runLater(()->{
+									showProductInfoDialog(plist);
+									ProgressDialog.close();
+								});
+							}
+						}.start();
+					}
 				}
 			}
 		});
@@ -250,8 +267,6 @@ public class SystemOverviewController implements Initializable {
 		String str_quantity = quantityTextField.getText();
 		String productionDate = productionDateTextField.getText();
 		String expirationDate = expirationDateTextField.getText();
-
-		Reservation r;
 		
 		JFXAlert alert = new JFXAlert((Stage) systemOverview.getScene().getWindow());
 		
@@ -304,11 +319,9 @@ public class SystemOverviewController implements Initializable {
 		ProgressDialog.show(mainApp.getPrimaryStage(), false);
 		new Thread() {
 			public void run() {
-				PDB.refreshInventory(MainApp.bitcoinJSONRPClient.get_current_products());
-			
+				PDB.refreshInventory(MainApp.bitcoinJSONRPClient.get_ndd_boxes());
 				inventoryStatusTableView.setItems(PDB.getNDList());
 				total_inventoryStatusTableView.setItems(PDB.getNList());
-				System.out.println("finished!!!");
 				Platform.runLater(()->{
 					ProgressDialog.close();
 				});
@@ -329,7 +342,15 @@ public class SystemOverviewController implements Initializable {
 			showAlert(head, body);
 		} else {
 			int quantity = Integer.parseInt(str_quantity);
-			List<String> pid = MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
+			ProgressDialog.show(mainApp.getPrimaryStage(), false);
+			new Thread() {
+				public void run() {
+					MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
+					Platform.runLater(()->{
+						ProgressDialog.close();
+					});
+				}
+			}.start();
 			product_prodNameTextField.setText("");
 			product_quantityTextField.setText("");
 			product_productionDateTextField.setText("");
@@ -370,7 +391,7 @@ public class SystemOverviewController implements Initializable {
 
 	public void handleQRGenerate() {}
 	
-	public void showProductInfoDialog(ArrayList<Product> prodList) {
+	public void showProductInfoDialog(List<JSONObject> prodList) {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
@@ -380,11 +401,12 @@ public class SystemOverviewController implements Initializable {
 			dialogStage.setTitle("Product Info");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.initOwner(mainApp.getPrimaryStage());
+			dialogStage.setResizable(false);
+			
 			Scene scene = new Scene(productInfoPane);
 			dialogStage.setScene(scene);
 
 			ProductInfoDialogController controller = loader.getController();
-			controller.setDialogStage(dialogStage);
 			controller.setProduct(prodList);
 
 			dialogStage.showAndWait();
@@ -460,7 +482,7 @@ public class SystemOverviewController implements Initializable {
 	}
 
 	public void setPane(AnchorPane systemOverview) {
-		this.systemOverview =systemOverview;		
+		this.systemOverview = systemOverview;		
 	}
 	
 	public static AnchorPane getSystemOverview() {

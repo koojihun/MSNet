@@ -1,7 +1,5 @@
 package com.msnet.model;
 
-import java.util.ArrayList;
-
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -9,29 +7,18 @@ import javafx.beans.property.StringProperty;
 
 public class NBox {
 	private StringProperty productName;
-	private ArrayList<Product> productList;
 	private IntegerProperty quantity;
 	private IntegerProperty available;
 	
-	public NBox(String prodName) {
+	public NBox(String prodName, int amount) {
 		productName = new SimpleStringProperty(prodName);
-		productList = new ArrayList<Product>();
-		quantity = new SimpleIntegerProperty(0);
-		available = new SimpleIntegerProperty(0);
+		quantity = new SimpleIntegerProperty(amount);
+		available = new SimpleIntegerProperty(amount);
 	}
 	
-	public NBox(Product p) {
-		productName = new SimpleStringProperty(p.getProductName());
-		productList = new ArrayList<Product>(); 
-		productList.add(p);
-		quantity = new SimpleIntegerProperty(1);
-		available = new SimpleIntegerProperty(1);
-	}
-	
-	public void addProduct(Product p) {
-		productList.add(p);
-		quantity.set(quantity.get() + 1);
-		available.set(available.get() + 1);
+	public void increaseQuantityAndAvailable(int plus) {
+		quantity.setValue(quantity.getValue() + plus);
+		available.setValue(available.getValue() + plus);
 	}
 	
 	public String getProductName() {
@@ -44,14 +31,6 @@ public class NBox {
 	
 	public StringProperty productNameProperty() {
 		return productName;
-	}
-	
-	public ArrayList<Product> getProductList(){
-		return productList;
-	}
-	
-	public void setProductList(ArrayList<Product> productList) {
-		this.productList = productList;
 	}
 	
 	public int getQuantity() {

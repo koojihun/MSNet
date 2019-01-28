@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.json.simple.JSONObject;
+
 import com.msnet.model.Product;
 
 /**
@@ -1570,6 +1572,9 @@ public interface BitcoindRpcClient {
   TxOut getTxOut(String txId, long vout);
   
   List<Map> get_pending_products();
+  List<JSONObject> get_current_products_by_name(String prodName);
+  List<JSONObject> get_current_products_by_ndd(String prodName, String production_date, String expiration_date);
+  List<JSONObject> get_ndd_boxes();
   List<Map> get_current_products();
   List<Map> get_current_products(String account);
 
@@ -1581,7 +1586,7 @@ public interface BitcoindRpcClient {
    */
   //void gen_new_product(String prodDate, String expDate, int count);
   // List<String> gen_new_product(String prodDate, String expDate, int count);
-  List<String> gen_new_product(String prodName, String prodDate, String expDate, int count);
+  void gen_new_product(String prodName, String prodDate, String expDate, int count);
   boolean find_product(String id, long countryCode, long zipCode);
   /**
    * For MSNet - Added by Juhan
