@@ -105,10 +105,9 @@ public class LoginViewController implements Initializable{
 					});
 				}
 			}.start();
-			
 			mainApp.showSystemOverview();
 		} else {
-			JFXAlert alert = new JFXAlert((Stage) loginPane.getScene().getWindow());
+			JFXAlert<Object> alert = new JFXAlert<Object>((Stage) loginPane.getScene().getWindow());
             alert.initModality(Modality.APPLICATION_MODAL);
             alert.setOverlayClose(true);
             JFXDialogLayout layout = new JFXDialogLayout();
