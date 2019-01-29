@@ -2,13 +2,20 @@ package com.msnet.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.google.zxing.qrcode.decoder.Mode;
+import com.google.zxing.qrcode.decoder.Version;
+import com.google.zxing.qrcode.encoder.ByteMatrix;
+import com.google.zxing.qrcode.encoder.QRCode;
 
 public class QRMaker {
 	
@@ -37,18 +44,20 @@ public class QRMaker {
 			// 큐알코드 배경색상값
 			int backgroundColor = 0xFFFFFFFF;
 			
-			//Hashtable<EncodeHintType, ErrorCorrectionLevel> hintMap = new Hashtable<>();
-			//hintMap.put(EncodeHintType.QR_VERSION, 13);
-			//hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+			Hashtable<EncodeHintType, Object> hintMap = new Hashtable<>();
+			hintMap.put(EncodeHintType.QR_VERSION, 13);
+			hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
 			QRCodeWriter qrCodeWriter = new QRCodeWriter();
 			
 			// 3,4번째 parameter값 : width/height값 지정
-			BitMatrix bitMatrix = qrCodeWriter.encode(codeurl, BarcodeFormat.QR_CODE, width, height);
+			BitMatrix bitMatrix = qrCodeWriter.encode(codeurl, BarcodeFormat.QR_CODE, width, height, hintMap);
+			
 			MatrixToImageConfig matrixToImageConfig = new MatrixToImageConfig(qrcodeColor, backgroundColor);
 			BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix, matrixToImageConfig);
 			
 			// ImageIO를 사용한 바코드 파일쓰기
 			ImageIO.write(bufferedImage, "png", new File(filePath + "\\" + fileName + ".png"));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

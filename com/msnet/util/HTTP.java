@@ -124,8 +124,12 @@ public class HTTP {
 							bitcoinAddress);
 					
 					if(sendReservation == null) {
-						// Reservation list에 조건에 부합하는 reservation이 없을 때 경고창 띄움 
-						JFXAlert alert = new JFXAlert((Stage) SystemOverviewController.getSystemOverview().getScene().getWindow());
+						// Reservation list에 조건에 부합하는 reservation이 없을 때 경고창 띄움
+						//JFXAlert alert = new JFXAlert((Stage) SystemOverviewController.getSystemOverview().getScene().getWindow());
+						String head = "Not exists the reservation";
+						String body = "Please send a correct product";
+						new Alert(SystemOverviewController.getSystemOverview(), head, body);
+						/*
 						alert.initModality(Modality.APPLICATION_MODAL);
 			            alert.setOverlayClose(true);
 			            JFXDialogLayout layout = new JFXDialogLayout();
@@ -136,9 +140,11 @@ public class HTTP {
 			            closeButton.setOnAction(event -> alert.hideWithAnimation());
 			            layout.setActions(closeButton);
 			            alert.setContent(layout);
+			            */
 					} else {
 						//Reservation list에 조건에 부합하는 reservation이 있을 때 send_to_address 실행
 						PDB.sendProduct(sendReservation, bitcoinAddress, pid, prodName, productionDate, expirationDate);
+						PDB.fileWriteReservation(sendReservation);
 					}
 					
 				} else if (method.equals("workerSignOut")) {
@@ -163,7 +169,7 @@ public class HTTP {
 					String password = query.get("password");
 					String name = query.get("name");
 					String phone = query.get("phone");
-
+					System.out.println("[Sign Up] " + id);
 					boolean isExist = WDB.searchExist(id);
 					String result;
 					if (isExist) {

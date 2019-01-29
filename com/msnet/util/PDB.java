@@ -225,7 +225,7 @@ public class PDB {
 		p.put("prodName", productionDate);
 		p.put("PID", pid);
 		sendReservation.getProductList().add(p);
-		sendReservation.setSuccess(sendReservation.getQuantity() - 1);
+		sendReservation.setSuccess(sendReservation.getSuccess() + 1);
 		MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);	
 		reservationStatusTableView.setItems(rList);
 	}

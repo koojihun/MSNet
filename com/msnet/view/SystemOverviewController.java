@@ -10,15 +10,14 @@ import java.util.ResourceBundle;
 
 import org.json.simple.JSONObject;
 
-import com.jfoenix.controls.JFXAlert;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
 import com.msnet.MainApp;
 import com.msnet.model.Reservation;
 import com.msnet.model.WDB;
 import com.msnet.model.Worker;
+import com.msnet.util.AES;
 import com.msnet.util.Alert;
 import com.msnet.util.PDB;
 import com.msnet.util.QRMaker;
@@ -35,13 +34,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
@@ -199,7 +195,7 @@ public class SystemOverviewController implements Initializable {
 						ProgressDialog.show(mainApp.getPrimaryStage(), false);
 						new Thread() {
 							public void run() {
-								List<JSONObject> plist = mainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
+								List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
 										selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
 										selectedNDBox.getExpirationDate());
 								Platform.runLater(() -> {
@@ -217,20 +213,46 @@ public class SystemOverviewController implements Initializable {
 				}
 			}
 		});
+
 		/////////////////////////////////////////////////////////////////////////////////////
-		// 오른쪽 마우스 클릭하면 QR code 생성 관련 
-		MenuItem mi1 = new MenuItem("Generate QR code");
-		mi1.setOnAction((ActionEvent event) -> {
-			NDBox selectedNDBox = (NDBox)inventoryStatusTableView.getSelectionModel().getSelectedItem();
-		    System.out.println(selectedNDBox.getProductName());
-		    //QRMaker maker = new QRMaker(300, 300);
-		    
+		// (inventoryStatus에서) 오른쪽 마우스 클릭하면 QR code 생성 관련
+		MenuItem mi_qr_inventory = new MenuItem("Generate QR code");
+		mi_qr_inventory.setOnAction((ActionEvent event) -> {
+			QRMaker qrMaker = new QRMaker(300, 300);
+			NDBox selectedNDBox = (NDBox) inventoryStatusTableView.getSelectionModel().getSelectedItem();
+			List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
+					selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
+					selectedNDBox.getExpirationDate());
+			String fileName;
+			String pid;
+			String prodName;
+			String productionDate;
+			String expirationDate;
+			String input;
+			SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd:HHmmss");
+			Date current = new Date(System.currentTimeMillis());
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(current);
+			String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			int i = 1;
+			for (JSONObject p : plist) {
+				pid = AES.encrypt(((String) p.get("PID")));
+				prodName = (String) p.get("prodName");
+				productionDate = (String) p.get("production date");
+				expirationDate = (String) p.get("expiration date");
+				input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName="
+						+ prodName + "&productionDate=" + productionDate
+						+ "&expirationDate=" + expirationDate;
+				fileName = prodTime + "_" + prodName + "_" + i;
+				qrMaker.makeQR(fileName, input);
+				i++;
+			}
 		});
 
-		ContextMenu menu = new ContextMenu();
-		menu.getItems().add(mi1);
-		inventoryStatusTableView.setContextMenu(menu);
-		/////////////////////////////////////////////////////////////////////////////////////
+		ContextMenu menu_inventory = new ContextMenu();
+		menu_inventory.getItems().add(mi_qr_inventory);
+		inventoryStatusTableView.setContextMenu(menu_inventory);
+		////////////////////////////////////////////////////////////////////////////////////
 
 		total_inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
@@ -241,7 +263,7 @@ public class SystemOverviewController implements Initializable {
 						ProgressDialog.show(mainApp.getPrimaryStage(), false);
 						new Thread() {
 							public void run() {
-								List<JSONObject> plist = mainApp.bitcoinJSONRPClient
+								List<JSONObject> plist = MainApp.bitcoinJSONRPClient
 										.get_current_products_by_name(selectedNBox.getProductName());
 								Platform.runLater(() -> {
 									showProductInfoDialog(plist);
@@ -253,6 +275,45 @@ public class SystemOverviewController implements Initializable {
 				}
 			}
 		});
+
+		/////////////////////////////////////////////////////////////////////////////////////
+		// (total_inventoryStatus에서) 오른쪽 마우스 클릭하면 QR code 생성 관련
+		MenuItem mi_qr_totalInventory = new MenuItem("Generate QR code");
+		mi_qr_totalInventory.setOnAction((ActionEvent event) -> {
+			QRMaker qrMaker = new QRMaker(300, 300);
+			NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
+			List<JSONObject> plist = MainApp.bitcoinJSONRPClient
+					.get_current_products_by_name(selectedNBox.getProductName());
+			String fileName;
+			String pid;
+			String prodName;
+			String productionDate;
+			String expirationDate;
+			String input;
+			SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd:HHmmss");
+			Date current = new Date(System.currentTimeMillis());
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(current);
+			String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			int i = 1;
+			for (JSONObject p : plist) {
+				pid = AES.encrypt(((String) p.get("PID")));
+				prodName = (String) p.get("prodName");
+				productionDate = (String) p.get("production date");
+				expirationDate = (String) p.get("expiration date");
+				input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName="
+						+ prodName + "&productionDate" + productionDate
+						+ "&expirationDate" + expirationDate;
+				fileName = prodTime + "_" + prodName + "_" + i;
+				qrMaker.makeQR(fileName, input);
+				i++;
+			}
+		});
+
+		ContextMenu menu_totalInvtory = new ContextMenu();
+		menu_totalInvtory.getItems().add(mi_qr_totalInventory);
+		total_inventoryStatusTableView.setContextMenu(menu_totalInvtory);
+		/////////////////////////////////////////////////////////////////////////////////////
 
 		reservationStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
@@ -272,7 +333,16 @@ public class SystemOverviewController implements Initializable {
 
 	@FXML
 	public void handleMining() {
-		MainApp.bitcoinJSONRPClient.set_generate();
+		ProgressDialog.show(mainApp.getPrimaryStage(), false);
+		new Thread() {
+			public void run() {
+				MainApp.bitcoinJSONRPClient.set_generate();
+				Platform.runLater(() -> {
+					ProgressDialog.close();
+				});
+			}
+		}.start();
+
 	}
 
 	@FXML
@@ -359,20 +429,27 @@ public class SystemOverviewController implements Initializable {
 			new Alert(systemOverview, head, body);
 		} else {
 			int quantity = Integer.parseInt(str_quantity);
-			ProgressDialog.show(mainApp.getPrimaryStage(), false);
-			new Thread() {
-				public void run() {
-					MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
-					Platform.runLater(() -> {
-						ProgressDialog.close();
-					});
-				}
-			}.start();
-			product_prodNameTextField.setText("");
-			product_quantityTextField.setText("");
-			product_productionDateTextField.setText("");
-			product_expirationDateTextField.setText("");
-			termTextField.setText("");
+
+			if (quantity > 10000) {
+				String head = "Too much quantities.";
+				String body = "Please enter the 'Quantity' less than 10000";
+				new Alert(systemOverview, head, body);
+			} else {
+				ProgressDialog.show(mainApp.getPrimaryStage(), false);
+				new Thread() {
+					public void run() {
+						MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
+						Platform.runLater(() -> {
+							ProgressDialog.close();
+						});
+					}
+				}.start();
+				product_prodNameTextField.setText("");
+				product_quantityTextField.setText("");
+				product_productionDateTextField.setText("");
+				product_expirationDateTextField.setText("");
+				termTextField.setText("");
+			}
 		}
 	}
 
@@ -485,7 +562,7 @@ public class SystemOverviewController implements Initializable {
 	}
 
 	public void setPane(AnchorPane systemOverview) {
-		this.systemOverview = systemOverview;
+		SystemOverviewController.systemOverview = systemOverview;
 	}
 
 	public static AnchorPane getSystemOverview() {
