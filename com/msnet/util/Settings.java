@@ -40,7 +40,7 @@ public class Settings {
 		////////////////////////////////////////////////////////////////
 		try {
 			MainApp.bitcoinJSONRPClient = new BitcoinJSONRPCClient(id, password);
-			//makeAndSendBitcoinAddress();
+			sendMyBitcoinAddress();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -167,7 +167,7 @@ public class Settings {
 		}
 	}
 
-	public static void makeAndSendBitcoinAddress() throws Exception {
+	public static void sendMyBitcoinAddress() throws Exception {
 		if (bitcoinAddress == null) {
 			while (bitcoinAddress == null) {
 				try {

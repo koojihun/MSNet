@@ -51,7 +51,6 @@ public class QRMaker {
 			
 			// 3,4번째 parameter값 : width/height값 지정
 			BitMatrix bitMatrix = qrCodeWriter.encode(codeurl, BarcodeFormat.QR_CODE, width, height, hintMap);
-			
 			MatrixToImageConfig matrixToImageConfig = new MatrixToImageConfig(qrcodeColor, backgroundColor);
 			BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix, matrixToImageConfig);
 			

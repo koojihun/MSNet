@@ -2312,4 +2312,9 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 	public List<Map> track_product(String pid) {
 		return (List<Map>) query("track_product", pid);
 	}
+
+	@Override
+	public String get_default_address() {
+		return (String) query("get_default_address");
+	}
 }
