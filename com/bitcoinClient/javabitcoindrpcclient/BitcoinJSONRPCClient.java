@@ -168,7 +168,7 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 		this.sslSocketFactory = sslSocketFactory;
 	}
 
-	public static final Charset QUERY_CHARSET = Charset.forName("EUC-KR");
+	public static final Charset QUERY_CHARSET = Charset.forName("UTF-8");
 
 	public byte[] prepareRequest(final String method, final Object... params) {
 		return JSON.stringify(new LinkedHashMap() {
@@ -2228,8 +2228,8 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 	}
 	*/
 	@Override
-	public void gen_new_product(String prodName, String prodDate, String expDate, int count) {
-		query("gen_new_product", prodName, prodDate, expDate, count);
+	public void gen_new_product(String prodName, String prodDate, String expDate, int count, String bitcoinAddress) {
+		query("gen_new_product", prodName, prodDate, expDate, count, bitcoinAddress);
 	}
 
 	@Override
