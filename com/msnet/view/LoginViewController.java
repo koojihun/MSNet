@@ -16,6 +16,7 @@ import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.msnet.MainApp;
+import com.msnet.util.Alert;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
 
@@ -107,18 +108,9 @@ public class LoginViewController implements Initializable{
 			}.start();
 			mainApp.showSystemOverview();
 		} else {
-			JFXAlert<Object> alert = new JFXAlert<Object>((Stage) loginPane.getScene().getWindow());
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setOverlayClose(true);
-            JFXDialogLayout layout = new JFXDialogLayout();
-            layout.setHeading(new Label("Login ERROR"));
-            layout.setBody(new Label("Check Your ID & Password again."));
-            JFXButton closeButton = new JFXButton("ACCEPT");
-            closeButton.getStyleClass().add("dialog-accept");
-            closeButton.setOnAction(event -> alert.close());
-            layout.setActions(closeButton);
-            alert.setContent(layout);
-            alert.show();
+			String head = "Login ERROR";
+			String body = "Check Your ID & Password again.";
+			new Alert(loginPane, head, body);
 		}
 	}
 }

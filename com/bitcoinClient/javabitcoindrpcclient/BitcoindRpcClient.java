@@ -1586,7 +1586,6 @@ public interface BitcoindRpcClient {
    */
   //void gen_new_product(String prodDate, String expDate, int count);
   // List<String> gen_new_product(String prodDate, String expDate, int count);
-  void gen_new_product(String prodName, String prodDate, String expDate, int count);
   boolean find_product(String id, long countryCode, long zipCode);
   /**
    * For MSNet - Added by Juhan
@@ -1639,6 +1638,8 @@ public interface BitcoindRpcClient {
    * [TODO] Add to https://bitcoin.org/en/developer-reference
    */
   SmartFeeResult getEstimateSmartFee(int blocks);
+
+void gen_new_product(String prodName, String prodDate, String expDate, int count, String bitcoinAddress);
   
   /**
    * the result returned by

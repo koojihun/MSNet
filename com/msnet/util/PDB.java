@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -19,8 +18,8 @@ import com.msnet.MainApp;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 import com.msnet.model.NDKey;
-import com.msnet.model.Product;
 import com.msnet.model.Reservation;
+import com.msnet.view.SystemOverviewController;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,14 +29,14 @@ public class PDB {
 	private static HashMap<String, NBox> nMap;
 	private static HashMap<NDKey, NDBox> ndMap;
 	private static TableView<Reservation> reservationStatusTableView;
-	
+
 	private static ObservableList<NBox> nList;
 	private static ObservableList<NDBox> ndList;
 	private static ObservableList<Reservation> rList;
 
 	public PDB(TableView<Reservation> reservationStatusTableView) {
 		this.reservationStatusTableView = reservationStatusTableView;
-		
+
 		nList = FXCollections.observableArrayList();
 		ndList = FXCollections.observableArrayList();
 		rList = FXCollections.observableArrayList();
@@ -48,26 +47,26 @@ public class PDB {
 		// read Reservation objects from disk into rList.
 		fileReadReservation();
 	}
-	
+
 	public static void refreshInventory(List<JSONObject> nddBoxes) {
 		nList = FXCollections.observableArrayList();
 		ndList = FXCollections.observableArrayList();
 
 		nMap = new HashMap<String, NBox>();
 		ndMap = new HashMap<NDKey, NDBox>();
-		
+
 		if (nddBoxes == null)
 			return;
-		
+
 		for (JSONObject obj : nddBoxes) {
 			String result = (String) obj.get("result");
 			int length = result.length();
 			String expiration_date = result.substring(length - 15);
 			String production_date = result.substring(length - 30, length - 15);
 			String prodName = result.substring(0, length - 30);
-			
+
 			int quantity = Integer.parseInt((String) obj.get("quantity"));
-			
+
 			NBox nBox = nMap.get(prodName);
 			if (nBox == null) {
 				nBox = new NBox(prodName, quantity);
@@ -76,25 +75,25 @@ public class PDB {
 			} else {
 				nBox.increaseQuantityAndAvailable(quantity);
 			}
-			
+
 			NDBox newNDBox = new NDBox(prodName, production_date, expiration_date, quantity);
 			ndMap.put(new NDKey(prodName, production_date, expiration_date), newNDBox);
 			ndList.add(newNDBox);
 		}
-		
+
 		for (Reservation r : rList) {
 			NBox nBox = nMap.get(r.getProductName());
-			nBox.setAvailable(nBox.getAvailable() - r.getQuantity());
+			nBox.setAvailable(nBox.getQuantity() - (r.getQuantity() - r.getSuccess()));
 
 			NDBox ndBox = ndMap.get(new NDKey(r.getProductName(), r.getProductionDate(), r.getExpirationDate()));
-			ndBox.setAvailable(ndBox.getAvailable() - (r.getQuantity() - r.getSuccess()));
+			ndBox.setAvailable(ndBox.getQuantity() - (r.getQuantity() - r.getSuccess()));
 		}
 	}
 
 	public static void reserveProduct(String time, String address, String company, NDBox selectedNDBox, int count) {
 		Reservation r = new Reservation(time, address, company, selectedNDBox, count);
-		fileWriteReservation(r);
 		rList.add(r);
+		fileWriteOneReservation(r);
 
 		NBox nBox = nMap.get(selectedNDBox.getProductName());
 		nBox.setAvailable(nBox.getAvailable() - count);
@@ -140,7 +139,36 @@ public class PDB {
 		}
 	}
 
-	public static void fileWriteReservation(Reservation r) {
+	public static void fileWriteAllReservation() {
+		try {
+			File file = new File(
+					"C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
+			FileWriter fw = new FileWriter(file, false);
+
+			Reservation r;
+			JSONObject jsonObj = new JSONObject();
+			for (int i = 0; i < rList.size(); i++) {
+				r = rList.get(i);
+				jsonObj.put("time", r.getTime());
+				jsonObj.put("toAddress", r.getToAddress());
+				jsonObj.put("toCompany", r.getToCompany());
+				jsonObj.put("productName", r.getProductName());
+				jsonObj.put("productionDate", r.getProductionDate());
+				jsonObj.put("expirationDate", r.getExpirationDate());
+				jsonObj.put("quantity", r.getQuantity());
+				jsonObj.put("success", r.getSuccess());
+				JSONArray jsonArray = arrayProductToJSONArray(r.getProductList());
+				jsonObj.put("productList", jsonArray);
+				fw.write(jsonObj.toJSONString() + "\n");
+			}
+			fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void fileWriteOneReservation(Reservation r) {
 		try {
 			File file = new File(
 					"C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
@@ -211,22 +239,35 @@ public class PDB {
 			if (prodName.equals(tmpR.getProductName()) && productionDate.equals(tmpR.getProductionDate())
 					&& expirationDate.equals(tmpR.getExpirationDate()) && bitcoin_address.equals(tmpR.getToAddress())
 					&& (tmpR.getQuantity() >= tmpR.getSuccess())) {
-				// Reservation 중 보낼 물건의 정보와 일치하고 [Quantity > Success]인 tmpR만 리스트에 추가  
+				// Reservation 중 보낼 물건의 정보와 일치하고 [Quantity > Success]인 tmpR만 리스트에 추가
 				return tmpR;
 			}
 		}
 		return null;
 	}
 
-	public static void sendProduct(Reservation sendReservation, String bitcoin_address, String pid, String prodName, String productionDate, String expirationDate) {
+	public static void sendProduct(String bitcoin_address, String pid, String prodName, String productionDate,
+			String expirationDate) {
+		Reservation sendReservation = PDB.getSendRList(prodName, productionDate, expirationDate, bitcoin_address);
+		if (sendReservation == null) {
+			// Reservation list에 조건에 부합하는 reservation이 없을 때 경고창 띄움
+			String head = "Not exists the reservation";
+			String body = "Please send a correct product";
+			new Alert(SystemOverviewController.getSystemOverview(), head, body);
+		} else {
+			// Reservation list에 조건에 부합하는 reservation이 있을 때 send_to_address 실행
+			PDB.fileWriteAllReservation();
+		}
+
 		JSONObject p = new JSONObject();
 		p.put("production date", productionDate);
 		p.put("expiration date", productionDate);
 		p.put("prodName", productionDate);
 		p.put("PID", pid);
+
 		sendReservation.getProductList().add(p);
 		sendReservation.setSuccess(sendReservation.getSuccess() + 1);
-		MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);	
-		reservationStatusTableView.setItems(rList);
+
+		MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
 	}
 }

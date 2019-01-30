@@ -38,16 +38,18 @@ public class Settings {
 		// Set key for encrypt.
 		AES.setKey();
 		////////////////////////////////////////////////////////////////
+		
+		////////////////////////////////////////////////////////////////
+		HTTP.startHttpServer();
+		////////////////////////////////////////////////////////////////
+		new Bitcoind().start();
+		
 		try {
 			MainApp.bitcoinJSONRPClient = new BitcoinJSONRPCClient(id, password);
 			sendMyBitcoinAddress();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		////////////////////////////////////////////////////////////////
-		HTTP.startHttpServer();
-		////////////////////////////////////////////////////////////////
-		new Bitcoind().start();
 	}
 
 	private boolean isThereConfFile() {
@@ -138,6 +140,8 @@ public class Settings {
 			fw.write("msnet=1");
 			fw.newLine();
 			fw.write("printtoconsole=1");
+			fw.newLine();
+			fw.write("addnode=166.104.126.22");
 			fw.newLine();
 
 			fw.flush();

@@ -21,6 +21,7 @@ import com.msnet.util.AES;
 import com.msnet.util.Alert;
 import com.msnet.util.PDB;
 import com.msnet.util.QRMaker;
+import com.msnet.util.Settings;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 
@@ -438,7 +439,7 @@ public class SystemOverviewController implements Initializable {
 				ProgressDialog.show(mainApp.getPrimaryStage(), false);
 				new Thread() {
 					public void run() {
-						MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity);
+						MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity, Settings.getBitcoinAddress());
 						Platform.runLater(() -> {
 							ProgressDialog.close();
 						});
