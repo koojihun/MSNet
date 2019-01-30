@@ -1584,9 +1584,9 @@ public interface BitcoindRpcClient {
    * @param expDate - expiration date
    * Must be called before set_generate
    */
-  //void gen_new_product(String prodDate, String expDate, int count);
-  // List<String> gen_new_product(String prodDate, String expDate, int count);
+  
   void gen_new_product(String prodName, String prodDate, String expDate, int count, String bitcoinAddress);
+
   boolean find_product(String id, long countryCode, long zipCode);
   /**
    * For MSNet - Added by Juhan

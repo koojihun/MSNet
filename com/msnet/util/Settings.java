@@ -38,10 +38,19 @@ public class Settings {
 		// Set key for encrypt.
 		AES.setKey();
 		////////////////////////////////////////////////////////////////
+<<<<<<< HEAD
 		HTTP.startHttpServer();
 		////////////////////////////////////////////////////////////////
 		new Bitcoind().start();
 		////////////////////////////////////////////////////////////////
+=======
+		
+		////////////////////////////////////////////////////////////////
+		HTTP.startHttpServer();
+		////////////////////////////////////////////////////////////////
+		new Bitcoind().start();
+		
+>>>>>>> 3885451ebec9cc2df38210306028e848514779b7
 		try {
 			MainApp.bitcoinJSONRPClient = new BitcoinJSONRPCClient(id, password);
 			sendMyBitcoinAddress();
@@ -138,6 +147,8 @@ public class Settings {
 			fw.write("msnet=1");
 			fw.newLine();
 			fw.write("printtoconsole=1");
+			fw.newLine();
+			fw.write("addnode=166.104.126.22");
 			fw.newLine();
 
 			fw.flush();
