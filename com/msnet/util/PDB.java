@@ -389,15 +389,14 @@ public class PDB {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				return "success";
+				
 			} else {
 				sendReservation.getProductList().add(p);
 				sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success
 				MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
-				PDB.fileWriteAllReservation();
-				return "success";
 			}
-			
+			PDB.fileWriteAllReservation();
+			return "success";
 		} else {
 			System.out.println("===== 할당량 끝 =====");
 			return "overflow";

@@ -140,7 +140,8 @@ public class SystemOverviewController implements Initializable {
 	private static AnchorPane systemOverview;
 
 	//////////////////////////////////////////////////
-	public SystemOverviewController() { }
+	public SystemOverviewController() {
+	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -243,9 +244,8 @@ public class SystemOverviewController implements Initializable {
 				prodName = (String) p.get("prodName");
 				productionDate = (String) p.get("production date");
 				expirationDate = (String) p.get("expiration date");
-				input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName="
-						+ prodName + "&productionDate=" + productionDate
-						+ "&expirationDate=" + expirationDate;
+				input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName=" + prodName
+						+ "&productionDate=" + productionDate + "&expirationDate=" + expirationDate;
 				fileName = prodTime + "_" + prodName + "_" + i;
 				filePath = "C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\QRcodes\\" + prodName;
 				qrMaker.makeQR(fileName, input, filePath);
@@ -305,9 +305,8 @@ public class SystemOverviewController implements Initializable {
 				prodName = (String) p.get("prodName");
 				productionDate = (String) p.get("production date");
 				expirationDate = (String) p.get("expiration date");
-				input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName="
-						+ prodName + "&productionDate" + productionDate
-						+ "&expirationDate" + expirationDate;
+				input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName=" + prodName
+						+ "&productionDate" + productionDate + "&expirationDate" + expirationDate;
 				fileName = prodTime + "_" + prodName + "_" + i;
 				qrMaker.makeQR(fileName, input, prodName);
 				i++;
@@ -366,8 +365,8 @@ public class SystemOverviewController implements Initializable {
 		String productionDate = productionDateTextField.getText();
 		String expirationDate = expirationDateTextField.getText();
 
-		if (address.equals("") || prodName.equals("") || str_quantity.equals("") || productionDate.equals("")
-				|| expirationDate.equals("")) {
+		if (company.equals("") || address.equals("") || prodName.equals("") || str_quantity.equals("")
+				|| productionDate.equals("") || expirationDate.equals("")) {
 			// 필수 정보(address, prodName, quantity)가 하나라도 없을 때
 			String head = "Enter the information";
 			String body = "Please enter the required information(Address, Product name, Quantity, Production date, Expiration date)";
@@ -413,7 +412,7 @@ public class SystemOverviewController implements Initializable {
 	public void handleTest() {
 		PDB.fileReadCompletedReservation();
 	}
-	
+
 	@FXML
 	public void handleInventoryStatus() {
 		ProgressDialog.show(mainApp.getPrimaryStage(), false);
@@ -453,7 +452,8 @@ public class SystemOverviewController implements Initializable {
 				Thread t = new Thread() {
 					public void run() {
 						System.out.println(prodName);
-						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate, quantity, Settings.getBitcoinAddress());
+						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate, quantity,
+								Settings.getBitcoinAddress());
 						Platform.runLater(() -> {
 							ProgressDialog.close();
 						});
