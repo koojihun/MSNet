@@ -4,9 +4,6 @@ import java.io.*;
 import java.util.ArrayList;
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.MainApp;
-import com.msnet.view.ProgressDialog;
-
-import javafx.application.Platform;
 
 public class Settings {
 
@@ -16,9 +13,9 @@ public class Settings {
 	private static String sysUsrName;
 
 	public Settings(String id, String password) {
-		this.id = id;
-		this.password = password;
-		this.sysUsrName = System.getProperty("user.name");
+		Settings.id = id;
+		Settings.password = password;
+		Settings.sysUsrName = System.getProperty("user.name");
 		////////////////////////////////////////////////////////////////
 		// Bitcoin daemon.
 		if (!isThereBitcoind())
@@ -40,7 +37,8 @@ public class Settings {
 		////////////////////////////////////////////////////////////////
 		HTTP.startHttpServer();
 		////////////////////////////////////////////////////////////////
-		new Bitcoind().start();
+		Thread t = new Bitcoind();
+		ThreadGroup.addThread(t);
 		////////////////////////////////////////////////////////////////
 		try {
 			MainApp.bitcoinJSONRPClient = new BitcoinJSONRPCClient(id, password);
@@ -139,7 +137,7 @@ public class Settings {
 			fw.newLine();
 			fw.write("printtoconsole=1");
 			fw.newLine();
-			fw.write("addnode=166.104.126.22");
+			fw.write("addnode=166.104.126.42");
 			fw.newLine();
 
 			fw.flush();
@@ -159,7 +157,7 @@ public class Settings {
 			while ((s = in.readLine()) != null) {
 				if (s.contains("bitcoinAddress")) {
 					int equalIndex = s.indexOf('=');
-					this.bitcoinAddress = s.substring(equalIndex + 1);
+					Settings.bitcoinAddress = s.substring(equalIndex + 1);
 				}
 			}
 			in.close();

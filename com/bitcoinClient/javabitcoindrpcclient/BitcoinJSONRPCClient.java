@@ -59,8 +59,6 @@ import org.json.simple.parser.ParseException;
 
 import com.bitcoinClient.krotjson.Base64Coder;
 import com.bitcoinClient.krotjson.JSON;
-import com.msnet.model.Product;
-import com.msnet.util.PDB;
 
 public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 
@@ -88,7 +86,7 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 			throw new IllegalArgumentException(rpc.toString(), ex);
 		}
 		authStr = rpc.getUserInfo() == null ? null
-				: String.valueOf(Base64Coder.encode(rpc.getUserInfo().getBytes(Charset.forName("ISO8859-1"))));
+				: String.valueOf(Base64Coder.encode(rpc.getUserInfo().getBytes(Charset.forName("EUC-KR"))));
 	}
 
 	public static final URL DEFAULT_JSONRPC_URL;
@@ -168,7 +166,7 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 		this.sslSocketFactory = sslSocketFactory;
 	}
 
-	public static final Charset QUERY_CHARSET = Charset.forName("UTF-8");
+	public static final Charset QUERY_CHARSET = Charset.forName("EUC-KR");
 
 	public byte[] prepareRequest(final String method, final Object... params) {
 		return JSON.stringify(new LinkedHashMap() {

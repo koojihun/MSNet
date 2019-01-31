@@ -65,6 +65,8 @@ public class PDB {
 			String production_date = result.substring(length - 30, length - 15);
 			String prodName = result.substring(0, length - 30);
 
+			System.out.println(prodName);
+			
 			int quantity = Integer.parseInt((String) obj.get("quantity"));
 
 			NBox nBox = nMap.get(prodName);

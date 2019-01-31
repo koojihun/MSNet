@@ -9,28 +9,23 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import org.json.simple.JSONObject;
-
-import com.jfoenix.controls.JFXAlert;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.msnet.MainApp;
 import com.msnet.util.Alert;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
+import com.msnet.util.ThreadGroup;
 
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 public class LoginViewController implements Initializable{
 	private final String serverURL = "http://166.104.126.42:8090/NewSystem/";
@@ -98,14 +93,15 @@ public class LoginViewController implements Initializable{
 		
 		if(result) {
 			ProgressDialog.show(mainApp.getPrimaryStage(), true);
-			new Thread() {
+			Thread t = new Thread() {
 				public void run() {
 					new Settings(id, password);
 					Platform.runLater(() -> {
 						ProgressDialog.close();
 					});
 				}
-			}.start();
+			}; 
+			ThreadGroup.addThread(t);
 			mainApp.showSystemOverview();
 		} else {
 			String head = "Login ERROR";

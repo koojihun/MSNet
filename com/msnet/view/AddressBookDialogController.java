@@ -9,7 +9,6 @@ import org.json.simple.JSONObject;
 
 import com.jfoenix.controls.JFXTextField;
 import com.msnet.model.Company;
-import com.msnet.model.NDBox;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
 
@@ -55,13 +54,14 @@ public class AddressBookDialogController implements Initializable {
 		val.add(Settings.getPassword());
 
 		try {
-			JSONObject response = HTTP.send("http://166.104.126.42:8090/NewSystem/listCompany.do", "post", key, val);
+			JSONObject response = HTTP.send("http://166.104.126.42:8090/NewSystem/getAddressBook.do", "post", key, val);
 			JSONArray arr = (JSONArray) response.get("result");
 			companyList = FXCollections.observableArrayList();
 
 			for (int i = 0; i < arr.size(); i++) {
 				JSONObject tmp = (JSONObject) arr.get(i);
 				String company_name = (String) tmp.get("company_name");
+				System.out.println(company_name);
 				String company_address = (String) tmp.get("company_address");
 				String bitcoin_address = (String) tmp.get("bitcoin_address");
 				Company tmpCompany = new Company(company_name, company_address, bitcoin_address);

@@ -22,6 +22,7 @@ import com.msnet.util.Alert;
 import com.msnet.util.PDB;
 import com.msnet.util.QRMaker;
 import com.msnet.util.Settings;
+import com.msnet.util.ThreadGroup;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 
@@ -193,7 +194,7 @@ public class SystemOverviewController implements Initializable {
 				if (selectedNDBox != null) {
 					if (event.getClickCount() >= 2) {
 						ProgressDialog.show(mainApp.getPrimaryStage(), false);
-						new Thread() {
+						Thread t = new Thread() {
 							public void run() {
 								List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
 										selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
@@ -203,7 +204,8 @@ public class SystemOverviewController implements Initializable {
 									ProgressDialog.close();
 								});
 							}
-						}.start();
+						};
+						ThreadGroup.addThread(t);
 					} else if (event.getClickCount() == 1) {
 						productNameTextField.setText(selectedNDBox.getProductName());
 						productionDateTextField.setText(selectedNDBox.getProductionDate());
@@ -253,7 +255,6 @@ public class SystemOverviewController implements Initializable {
 		menu_inventory.getItems().add(mi_qr_inventory);
 		inventoryStatusTableView.setContextMenu(menu_inventory);
 		////////////////////////////////////////////////////////////////////////////////////
-
 		total_inventoryStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -261,7 +262,7 @@ public class SystemOverviewController implements Initializable {
 					NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
 					if (selectedNBox != null) {
 						ProgressDialog.show(mainApp.getPrimaryStage(), false);
-						new Thread() {
+						Thread t = new Thread() {
 							public void run() {
 								List<JSONObject> plist = MainApp.bitcoinJSONRPClient
 										.get_current_products_by_name(selectedNBox.getProductName());
@@ -270,7 +271,8 @@ public class SystemOverviewController implements Initializable {
 									ProgressDialog.close();
 								});
 							}
-						}.start();
+						};
+						ThreadGroup.addThread(t);
 					}
 				}
 			}
@@ -314,7 +316,6 @@ public class SystemOverviewController implements Initializable {
 		menu_totalInvtory.getItems().add(mi_qr_totalInventory);
 		total_inventoryStatusTableView.setContextMenu(menu_totalInvtory);
 		/////////////////////////////////////////////////////////////////////////////////////
-
 		reservationStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -334,15 +335,20 @@ public class SystemOverviewController implements Initializable {
 	@FXML
 	public void handleMining() {
 		ProgressDialog.show(mainApp.getPrimaryStage(), false);
-		new Thread() {
+		Thread t = new Thread() {
 			public void run() {
-				MainApp.bitcoinJSONRPClient.set_generate();
-				Platform.runLater(() -> {
-					ProgressDialog.close();
-				});
+				try {
+					MainApp.bitcoinJSONRPClient.set_generate();
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					Platform.runLater(() -> {
+						ProgressDialog.close();
+					});
+				}
 			}
-		}.start();
-
+		};
+		ThreadGroup.addThread(t);
 	}
 
 	@FXML
@@ -404,7 +410,7 @@ public class SystemOverviewController implements Initializable {
 	@FXML
 	public void handleInventoryStatus() {
 		ProgressDialog.show(mainApp.getPrimaryStage(), false);
-		new Thread() {
+		Thread t = new Thread() {
 			public void run() {
 				PDB.refreshInventory(MainApp.bitcoinJSONRPClient.get_ndd_boxes());
 				inventoryStatusTableView.setItems(PDB.getNDList());
@@ -413,17 +419,18 @@ public class SystemOverviewController implements Initializable {
 					ProgressDialog.close();
 				});
 			}
-		}.start();
+		};
+		ThreadGroup.addThread(t);
 	}
 
 	@FXML
 	public void handleMakeProducts() {
-		String name = product_prodNameTextField.getText();
+		String prodName = product_prodNameTextField.getText();
 		String str_quantity = product_quantityTextField.getText();
 		String productionDate = product_productionDateTextField.getText();
 		String expirationDate = product_expirationDateTextField.getText();
 
-		if (name.equals("") || str_quantity.equals("") || productionDate.equals("") || expirationDate.equals("")) {
+		if (prodName.equals("") || str_quantity.equals("") || productionDate.equals("") || expirationDate.equals("")) {
 			String head = "Enter the information";
 			String body = "Please enter the required information(Name, Quantity, Production date, Expiration date)";
 			new Alert(systemOverview, head, body);
@@ -436,14 +443,16 @@ public class SystemOverviewController implements Initializable {
 				new Alert(systemOverview, head, body);
 			} else {
 				ProgressDialog.show(mainApp.getPrimaryStage(), false);
-				new Thread() {
+				Thread t = new Thread() {
 					public void run() {
-						MainApp.bitcoinJSONRPClient.gen_new_product(name, productionDate, expirationDate, quantity, Settings.getBitcoinAddress());
+						System.out.println(prodName);
+						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate, quantity, Settings.getBitcoinAddress());
 						Platform.runLater(() -> {
 							ProgressDialog.close();
 						});
 					}
-				}.start();
+				};
+				ThreadGroup.addThread(t);
 				product_prodNameTextField.setText("");
 				product_quantityTextField.setText("");
 				product_productionDateTextField.setText("");

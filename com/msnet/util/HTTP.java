@@ -104,7 +104,6 @@ public class HTTP {
 		public class Handler implements HttpHandler {
 			@Override
 			public void handle(HttpExchange httpExchange) throws IOException {
-				System.out.println(httpExchange.getRequestURI());
 				Map<String, String> query = queryToMap(httpExchange.getRequestURI().getQuery());
 				String method = query.get("method");
 				if (method.equals("send")) {
@@ -113,24 +112,21 @@ public class HTTP {
 					String expirationDate = query.get("expirationDate");
 					String pid = AES.decrypt(query.get("pid"));
 					String bitcoinAddress = query.get("bitcoinAddress");
-					
-					System.out.println("prodName: " + prodName);
-					System.out.println("productionDate: " + productionDate);
-					System.out.println("expirationDate: " + expirationDate);
-					System.out.println("pid: " + pid);
-					System.out.println("bitcoinAddress: " + bitcoinAddress);
+					String wid = query.get("wid");
 					
 					PDB.sendProduct(bitcoinAddress, pid, prodName, productionDate, expirationDate);
+					
+					if (!WDB.isLogin(wid))
+						WDB.setIsLogin(wid, true);
+					
 				} else if (method.equals("workerSignOut")) {
 					String id = query.get("id");
-					System.out.println("[" + id + "] Sign Out!!!!!!!!!!!!!!!!");
 					WDB.setIsLogin(id, false);
 				} else if (method.equals("workerSignIn")) {
 					String id = query.get("id");
 					String password = query.get("password");
 					boolean isConfirm = WDB.confirmIDPW(id, password);
 					String result;
-
 					if (isConfirm) {
 						WDB.setIsLogin(id, true);
 						result = "true";

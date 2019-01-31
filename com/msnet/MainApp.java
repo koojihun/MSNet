@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.util.Bitcoind;
 import com.msnet.util.HTTP;
+import com.msnet.util.ThreadGroup;
 import com.msnet.view.LoginViewController;
 import com.msnet.view.SystemOverviewController;
 import javafx.application.Application;
@@ -37,7 +38,7 @@ public class MainApp extends Application {
 	public void stop() throws Exception {
 		Bitcoind.killBitcoind();
 		HTTP.bitcoinServer.closeSocket();
-		HTTP.bitcoinServer.close();
+		ThreadGroup.destroyAllThread();
 	}
 
 	public void showLoginView() {
