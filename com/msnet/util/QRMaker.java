@@ -25,7 +25,7 @@ public class QRMaker {
 		this.filePath = "C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\QRcodes";
 	}
 
-	public void makeQR(String fileName, String content) {
+	public void makeQR(String fileName, String content, String filePath) {
 		try {
 			File file = null;
 			// 큐알이미지를 저장할 디렉토리 지정

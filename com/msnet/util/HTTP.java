@@ -12,17 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.jfoenix.controls.JFXAlert;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.msnet.model.Reservation;
 import com.msnet.model.WDB;
-import com.msnet.view.SystemOverviewController;
 import com.sun.net.httpserver.*;
-
-import javafx.scene.control.Label;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -60,7 +51,6 @@ public class HTTP {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			int responseCode = con.getResponseCode();
-			//ret = getResponseBody(con.getInputStream());
 			con.disconnect();
 		} else if (method == "POST" || method == "post") {
 			URL obj = new URL(strUrl);
@@ -106,22 +96,23 @@ public class HTTP {
 			public void handle(HttpExchange httpExchange) throws IOException {
 				Map<String, String> query = queryToMap(httpExchange.getRequestURI().getQuery());
 				String method = query.get("method");
+				
 				if (method.equals("send")) {
 					String prodName = query.get("prodName");
 					String productionDate = query.get("productionDate");
 					String expirationDate = query.get("expirationDate");
 					String pid = AES.decrypt(query.get("pid"));
 					String bitcoinAddress = query.get("bitcoinAddress");
-					String wid = query.get("wid");
 					
-					PDB.sendProduct(bitcoinAddress, pid, prodName, productionDate, expirationDate);
+					String wid = query.get("wid");
+					sendReturnValue(httpExchange, "result", PDB.sendProduct(bitcoinAddress, pid, prodName, productionDate, expirationDate));
 					
 					if (!WDB.isLogin(wid))
 						WDB.setIsLogin(wid, true);
-					
 				} else if (method.equals("workerSignOut")) {
 					String id = query.get("id");
 					WDB.setIsLogin(id, false);
+					sendReturnValue(httpExchange, "result", "true");
 				} else if (method.equals("workerSignIn")) {
 					String id = query.get("id");
 					String password = query.get("password");
@@ -139,7 +130,7 @@ public class HTTP {
 					String password = query.get("password");
 					String name = query.get("name");
 					String phone = query.get("phone");
-					System.out.println("[Sign Up] " + id);
+										
 					boolean isExist = WDB.searchExist(id);
 					String result;
 					if (isExist) {
@@ -153,7 +144,6 @@ public class HTTP {
 					// for return value.
 					sendReturnValue(httpExchange, "result", result);
 				}
-
 			}
 		}
 

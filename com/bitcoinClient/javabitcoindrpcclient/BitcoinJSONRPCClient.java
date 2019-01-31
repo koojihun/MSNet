@@ -198,6 +198,7 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 			throws IOException, GenericRpcException {
 		try {
 			String r = new String(loadStream(in, close), QUERY_CHARSET);
+			
 			logger.log(Level.FINE, "Bitcoin JSON-RPC response:\n{0}", r);
 			try {
 				JSONParser jsonParser = new JSONParser();

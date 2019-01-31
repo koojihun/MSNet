@@ -236,6 +236,7 @@ public class SystemOverviewController implements Initializable {
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(current);
 			String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+			String filePath;
 			int i = 1;
 			for (JSONObject p : plist) {
 				pid = AES.encrypt(((String) p.get("PID")));
@@ -246,7 +247,8 @@ public class SystemOverviewController implements Initializable {
 						+ prodName + "&productionDate=" + productionDate
 						+ "&expirationDate=" + expirationDate;
 				fileName = prodTime + "_" + prodName + "_" + i;
-				qrMaker.makeQR(fileName, input);
+				filePath = "C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\QRcodes\\" + prodName;
+				qrMaker.makeQR(fileName, input, filePath);
 				i++;
 			}
 		});
@@ -307,7 +309,7 @@ public class SystemOverviewController implements Initializable {
 						+ prodName + "&productionDate" + productionDate
 						+ "&expirationDate" + expirationDate;
 				fileName = prodTime + "_" + prodName + "_" + i;
-				qrMaker.makeQR(fileName, input);
+				qrMaker.makeQR(fileName, input, prodName);
 				i++;
 			}
 		});
@@ -407,6 +409,11 @@ public class SystemOverviewController implements Initializable {
 		}
 	}
 
+	@FXML
+	public void handleTest() {
+		PDB.fileReadCompletedReservation();
+	}
+	
 	@FXML
 	public void handleInventoryStatus() {
 		ProgressDialog.show(mainApp.getPrimaryStage(), false);
