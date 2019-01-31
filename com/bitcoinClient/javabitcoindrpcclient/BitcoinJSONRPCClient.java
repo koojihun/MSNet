@@ -168,7 +168,7 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 		this.sslSocketFactory = sslSocketFactory;
 	}
 
-	public static final Charset QUERY_CHARSET = Charset.forName("UTF-8");
+	public static final Charset QUERY_CHARSET = Charset.forName("EUC-KR");
 
 	public byte[] prepareRequest(final String method, final Object... params) {
 		return JSON.stringify(new LinkedHashMap() {
@@ -200,6 +200,7 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 			throws IOException, GenericRpcException {
 		try {
 			String r = new String(loadStream(in, close), QUERY_CHARSET);
+			
 			logger.log(Level.FINE, "Bitcoin JSON-RPC response:\n{0}", r);
 			try {
 				JSONParser jsonParser = new JSONParser();

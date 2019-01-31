@@ -12,17 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.jfoenix.controls.JFXAlert;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.msnet.model.Reservation;
 import com.msnet.model.WDB;
-import com.msnet.view.SystemOverviewController;
 import com.sun.net.httpserver.*;
-
-import javafx.scene.control.Label;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -60,7 +51,6 @@ public class HTTP {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			int responseCode = con.getResponseCode();
-			//ret = getResponseBody(con.getInputStream());
 			con.disconnect();
 		} else if (method == "POST" || method == "post") {
 			URL obj = new URL(strUrl);
@@ -103,10 +93,11 @@ public class HTTP {
 		
 		public class Handler implements HttpHandler {
 			@Override
-			public void handle(HttpExchange httpExchange) throws IOException {
-				System.out.println(httpExchange.getRequestURI());
+			public void handle(HttpExchange httpExchange) throws IOException {				
+				
 				Map<String, String> query = queryToMap(httpExchange.getRequestURI().getQuery());
 				String method = query.get("method");
+				
 				if (method.equals("send")) {
 					String prodName = query.get("prodName");
 					String productionDate = query.get("productionDate");
@@ -114,17 +105,11 @@ public class HTTP {
 					String pid = AES.decrypt(query.get("pid"));
 					String bitcoinAddress = query.get("bitcoinAddress");
 					
-					System.out.println("prodName: " + prodName);
-					System.out.println("productionDate: " + productionDate);
-					System.out.println("expirationDate: " + expirationDate);
-					System.out.println("pid: " + pid);
-					System.out.println("bitcoinAddress: " + bitcoinAddress);
-					
-					PDB.sendProduct(bitcoinAddress, pid, prodName, productionDate, expirationDate);
+					sendReturnValue(httpExchange, "result", PDB.sendProduct(bitcoinAddress, pid, prodName, productionDate, expirationDate));					
 				} else if (method.equals("workerSignOut")) {
 					String id = query.get("id");
-					System.out.println("[" + id + "] Sign Out!!!!!!!!!!!!!!!!");
 					WDB.setIsLogin(id, false);
+					sendReturnValue(httpExchange, "result", "true");
 				} else if (method.equals("workerSignIn")) {
 					String id = query.get("id");
 					String password = query.get("password");
@@ -143,7 +128,7 @@ public class HTTP {
 					String password = query.get("password");
 					String name = query.get("name");
 					String phone = query.get("phone");
-					System.out.println("[Sign Up] " + id);
+										
 					boolean isExist = WDB.searchExist(id);
 					String result;
 					if (isExist) {
@@ -157,7 +142,6 @@ public class HTTP {
 					// for return value.
 					sendReturnValue(httpExchange, "result", result);
 				}
-
 			}
 		}
 
