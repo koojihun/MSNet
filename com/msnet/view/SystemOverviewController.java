@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.json.simple.JSONObject;
@@ -145,9 +146,9 @@ public class SystemOverviewController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		//////////////////////////////////////
-		// Product Database Initialize. //
+		// Product Database Initialize.     //
 		new PDB(reservationStatusTableView);//
-		new WDB(workerTableView); //
+		new WDB(workerTableView);           //
 		//////////////////////////////////////
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
@@ -197,8 +198,7 @@ public class SystemOverviewController implements Initializable {
 						Thread t = new Thread() {
 							public void run() {
 								List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
-										selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
-										selectedNDBox.getExpirationDate());
+										selectedNDBox.getProductName(), selectedNDBox.getProductionDate(), selectedNDBox.getExpirationDate());
 								Platform.runLater(() -> {
 									showProductInfoDialog(plist);
 									ProgressDialog.close();
@@ -220,37 +220,10 @@ public class SystemOverviewController implements Initializable {
 		// (inventoryStatus에서) 오른쪽 마우스 클릭하면 QR code 생성 관련
 		MenuItem mi_qr_inventory = new MenuItem("Generate QR code");
 		mi_qr_inventory.setOnAction((ActionEvent event) -> {
-			QRMaker qrMaker = new QRMaker(300, 300);
 			NDBox selectedNDBox = (NDBox) inventoryStatusTableView.getSelectionModel().getSelectedItem();
 			List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
-					selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
-					selectedNDBox.getExpirationDate());
-			String fileName;
-			String pid;
-			String prodName;
-			String productionDate;
-			String expirationDate;
-			String input;
-			SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd:HHmmss");
-			Date current = new Date(System.currentTimeMillis());
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(current);
-			String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
-			String filePath;
-			int i = 1;
-			for (JSONObject p : plist) {
-				pid = AES.encrypt(((String) p.get("PID")));
-				prodName = (String) p.get("prodName");
-				productionDate = (String) p.get("production date");
-				expirationDate = (String) p.get("expiration date");
-				input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName="
-						+ prodName + "&productionDate=" + productionDate
-						+ "&expirationDate=" + expirationDate;
-				fileName = prodTime + "_" + prodName + "_" + i;
-				filePath = "C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\QRcodes\\" + prodName;
-				qrMaker.makeQR(fileName, input, filePath);
-				i++;
-			}
+					selectedNDBox.getProductName(), selectedNDBox.getProductionDate(), selectedNDBox.getExpirationDate());
+			handleQRGenerate(plist);
 		});
 
 		ContextMenu menu_inventory = new ContextMenu();
@@ -284,34 +257,9 @@ public class SystemOverviewController implements Initializable {
 		// (total_inventoryStatus에서) 오른쪽 마우스 클릭하면 QR code 생성 관련
 		MenuItem mi_qr_totalInventory = new MenuItem("Generate QR code");
 		mi_qr_totalInventory.setOnAction((ActionEvent event) -> {
-			QRMaker qrMaker = new QRMaker(300, 300);
 			NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-			List<JSONObject> plist = MainApp.bitcoinJSONRPClient
-					.get_current_products_by_name(selectedNBox.getProductName());
-			String fileName;
-			String pid;
-			String prodName;
-			String productionDate;
-			String expirationDate;
-			String input;
-			SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd:HHmmss");
-			Date current = new Date(System.currentTimeMillis());
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(current);
-			String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
-			int i = 1;
-			for (JSONObject p : plist) {
-				pid = AES.encrypt(((String) p.get("PID")));
-				prodName = (String) p.get("prodName");
-				productionDate = (String) p.get("production date");
-				expirationDate = (String) p.get("expiration date");
-				input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName="
-						+ prodName + "&productionDate" + productionDate
-						+ "&expirationDate" + expirationDate;
-				fileName = prodTime + "_" + prodName + "_" + i;
-				qrMaker.makeQR(fileName, input, prodName);
-				i++;
-			}
+			List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_name(selectedNBox.getProductName());
+			handleQRGenerate(plist);			
 		});
 
 		ContextMenu menu_totalInvtory = new ContextMenu();
@@ -452,7 +400,6 @@ public class SystemOverviewController implements Initializable {
 				ProgressDialog.show(mainApp.getPrimaryStage(), false);
 				Thread t = new Thread() {
 					public void run() {
-						System.out.println(prodName);
 						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate, quantity, Settings.getBitcoinAddress());
 						Platform.runLater(() -> {
 							ProgressDialog.close();
@@ -499,7 +446,25 @@ public class SystemOverviewController implements Initializable {
 		}
 	}
 
-	public void handleQRGenerate() {
+	public void handleQRGenerate(List<JSONObject> plist) {
+		QRMaker qrMaker = new QRMaker(300, 300);
+		
+		String fileName;
+		String pid;
+		String input;
+		
+		SimpleDateFormat formatter = new SimpleDateFormat ( "yyyy.MM.dd HH:mm:ss", Locale.KOREA );
+		Date currentTime = new Date ();
+		String qrTime = formatter.format (currentTime);
+		
+		for (int cnt = 0; cnt < plist.size(); cnt++) {
+			JSONObject p = plist.get(cnt);
+			pid = AES.encrypt(((String) p.get("PID")));
+			input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid;
+			fileName = qrTime + "_" + p.get("prodName") + "_" + cnt;
+			String filePath = "C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\QRcodes\\" + (String) p.get("prodName");
+			qrMaker.makeQR(fileName, input, filePath);
+		}
 	}
 
 	public void showProductInfoDialog(List<JSONObject> prodList) {
