@@ -10,12 +10,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.msnet.util.DataReader;
 import com.msnet.util.Settings;
 
 import javafx.collections.FXCollections;
@@ -25,16 +27,25 @@ import javafx.scene.control.TableView;
 public class WDB {
 
 	private static ObservableList<Worker> workerList;
-	private static ArrayList<WorkerInfo> workerInfoList;
+	//private static ArrayList<WorkerInfo> workerInfoList;
 	private static TableView<Worker> workerTableView;
 
 	public WDB(TableView<Worker> inputTableView) {
 		workerTableView = inputTableView;
 		workerList = FXCollections.observableArrayList();
-		workerInfoList = new ArrayList<>();
-		fileReadWorkerInfo();
+		//workerInfoList = new ArrayList<>();
+		
+		DataReader dr = new DataReader("C:\\Users\\triz\\AppData\\Roaming\\msnetDB.db");
+		dr.open();
+		try {
+			dr.readWorker();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		dr.close();
+		//fileReadWorkerInfo();
 	}
-
+	/*
 	public static boolean searchExist(String id) {	
 		for (int i = 0; i < workerList.size(); i++) {
 			if(workerList.get(i).getID().equals(id))
@@ -42,15 +53,15 @@ public class WDB {
 		}
 		return false;
 	}
-	
+	*/
 	public static void insert(String id, String password, String name, String phone) {
 		Worker w = new Worker(id, name, false);
-		WorkerInfo wInfo = new WorkerInfo(id, password, name, phone);
+		// WorkerInfo wInfo = new WorkerInfo(id, password, name, phone);
 		workerList.add(w);
-		workerInfoList.add(wInfo);
-		fileWriteWorkerInfo(wInfo);
+		// workerInfoList.add(wInfo);
+		// fileWriteWorkerInfo(wInfo);
 	}
-
+	/*
 	public static void fileReadWorkerInfo() {
 		try {			
 			File resDat = new File(
@@ -99,7 +110,7 @@ public class WDB {
 			e.printStackTrace();
 		}
 	}
-
+*/
 	public static ObservableList<Worker> getWorkerList() {
 		return workerList;
 	}
@@ -123,7 +134,7 @@ public class WDB {
 		}
 		return false;
 	}
-
+/*
 	public static boolean confirmIDPW(String id, String password) {
 		WorkerInfo tmp;
 		for(int i = 0; i < workerInfoList.size(); i++) {
@@ -134,4 +145,5 @@ public class WDB {
 		}
 		return false;
 	}
+	*/
 }

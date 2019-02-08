@@ -35,16 +35,19 @@ public class ProductInfoDialogController implements Initializable {
 	private JFXTextField searchTextField;
 	@FXML
 	private JFXButton searchButton;
-	
+
 	private ObservableList<JSONObject> pList;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		productInfoTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty((String) cellData.getValue().get("prodName")));
+		nameColumn.setCellValueFactory(
+				cellData -> new SimpleStringProperty((String) cellData.getValue().get("prodName")));
 		idColumn.setCellValueFactory(cellData -> new SimpleStringProperty((String) cellData.getValue().get("PID")));
-		productionDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty((String) cellData.getValue().get("production date")));
-		expirationDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty((String) cellData.getValue().get("expiration date")));
+		productionDateColumn.setCellValueFactory(
+				cellData -> new SimpleStringProperty((String) cellData.getValue().get("production date")));
+		expirationDateColumn.setCellValueFactory(
+				cellData -> new SimpleStringProperty((String) cellData.getValue().get("expiration date")));
 
 		searchTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
@@ -59,13 +62,13 @@ public class ProductInfoDialogController implements Initializable {
 	@FXML
 	public void handleSearch() {
 		String search_str = searchTextField.getText();
-		productInfoTableView.getItems().stream().filter(item -> ((String) item.get("PID")).contains(search_str)).findAny()
-				.ifPresent(item -> {
+		productInfoTableView.getItems().stream().filter(item -> ((String) item.get("PID")).contains(search_str))
+				.findAny().ifPresent(item -> {
 					productInfoTableView.getSelectionModel().select(item);
 					productInfoTableView.scrollTo(item);
 				});
 	}
-	
+
 	public void setProduct(List<JSONObject> product_list) {
 		pList = FXCollections.observableArrayList(product_list);
 		productInfoTableView.setItems(pList);

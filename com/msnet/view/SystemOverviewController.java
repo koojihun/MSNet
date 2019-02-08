@@ -2,6 +2,7 @@ package com.msnet.view;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,6 +20,7 @@ import com.msnet.model.WDB;
 import com.msnet.model.Worker;
 import com.msnet.util.AES;
 import com.msnet.util.Alert;
+import com.msnet.util.DataReader;
 import com.msnet.util.PDB;
 import com.msnet.util.QRMaker;
 import com.msnet.util.Settings;
@@ -409,11 +411,6 @@ public class SystemOverviewController implements Initializable {
 	}
 
 	@FXML
-	public void handleTest() {
-		PDB.fileReadCompletedReservation();
-	}
-
-	@FXML
 	public void handleInventoryStatus() {
 		ProgressDialog.show(mainApp.getPrimaryStage(), false);
 		Thread t = new Thread() {
@@ -451,7 +448,6 @@ public class SystemOverviewController implements Initializable {
 				ProgressDialog.show(mainApp.getPrimaryStage(), false);
 				Thread t = new Thread() {
 					public void run() {
-						System.out.println(prodName);
 						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate, quantity,
 								Settings.getBitcoinAddress());
 						Platform.runLater(() -> {
@@ -499,9 +495,6 @@ public class SystemOverviewController implements Initializable {
 		}
 	}
 
-	public void handleQRGenerate() {
-	}
-
 	public void showProductInfoDialog(List<JSONObject> prodList) {
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -519,7 +512,6 @@ public class SystemOverviewController implements Initializable {
 
 			ProductInfoDialogController controller = loader.getController();
 			controller.setProduct(prodList);
-
 			dialogStage.showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -566,6 +558,8 @@ public class SystemOverviewController implements Initializable {
 			ChartDialogController controller = loader.getController();
 			controller.setNDList(PDB.getNDList());
 			controller.setNList(PDB.getNList());
+			controller.setLineChart();
+			controller.setStackChart();
 			dialogStage.show();
 		} catch (IOException e) {
 			e.printStackTrace();
