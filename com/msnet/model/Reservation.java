@@ -1,6 +1,9 @@
 package com.msnet.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
@@ -11,7 +14,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class Reservation {
-	
+
+	private IntegerProperty rid;
 	private StringProperty time;
 	private StringProperty toAddress;
 	private StringProperty toCompany;
@@ -24,6 +28,7 @@ public class Reservation {
 
 	// Reservation을 아예 새로 생성하는 경우.
 	public Reservation(String time, String toAddress, String toCompany, NDBox selectedNDBox, int quantity) {
+		this.rid = new SimpleIntegerProperty(0);
 		this.time = new SimpleStringProperty(time);
 		this.toAddress = new SimpleStringProperty(toAddress);
 		this.toCompany = new SimpleStringProperty(toCompany);
@@ -36,8 +41,9 @@ public class Reservation {
 	}
 
 	// Reservation을 파일에서 읽어와 ArrayList 형태로 추가하는 경우.
-	public Reservation(String time, String toAddress, String toCompany, String productName, String prodDate, String expDate, int quantity, int success,
-			ArrayList<JSONObject> productList) {
+	public Reservation(int rid, String time, String toAddress, String toCompany, String productName, String prodDate,
+			String expDate, int quantity, int success, ArrayList<JSONObject> productList) {
+		this.rid = new SimpleIntegerProperty(rid);
 		this.time = new SimpleStringProperty(time);
 		this.toAddress = new SimpleStringProperty(toAddress);
 		this.toCompany = new SimpleStringProperty(toCompany);
@@ -48,9 +54,36 @@ public class Reservation {
 		this.success = new SimpleIntegerProperty(success);
 		this.productList = productList;
 	}
+	
+	public int getRid() {
+		return rid.get();
+	}
+	
+	public void setRid(int rid) {
+		this.rid.set(rid);
+	}
+	
+	public IntegerProperty ridProperty() {
+		return rid;
+	}
 
 	public String getTime() {
 		return time.get();
+	}
+
+	public String getYEARMONTH() {
+		try {
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date from;
+			from = df.parse(time.get());
+			//SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM");
+			SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			String to = transFormat.format(from);
+			return to;
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}	
 	}
 
 	public void setTime(String time) {

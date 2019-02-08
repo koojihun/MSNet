@@ -2,6 +2,7 @@ package com.msnet.view;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -141,7 +142,8 @@ public class SystemOverviewController implements Initializable {
 	private static AnchorPane systemOverview;
 
 	//////////////////////////////////////////////////
-	public SystemOverviewController() { }
+	public SystemOverviewController() {
+	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -222,10 +224,10 @@ public class SystemOverviewController implements Initializable {
 		mi_qr_inventory.setOnAction((ActionEvent event) -> {
 			NDBox selectedNDBox = (NDBox) inventoryStatusTableView.getSelectionModel().getSelectedItem();
 			List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
-					selectedNDBox.getProductName(), selectedNDBox.getProductionDate(), selectedNDBox.getExpirationDate());
+			selectedNDBox.getProductName(), selectedNDBox.getProductionDate(), selectedNDBox.getExpirationDate());
 			handleQRGenerate(plist);
 		});
-
+		
 		ContextMenu menu_inventory = new ContextMenu();
 		menu_inventory.getItems().add(mi_qr_inventory);
 		inventoryStatusTableView.setContextMenu(menu_inventory);
@@ -259,7 +261,7 @@ public class SystemOverviewController implements Initializable {
 		mi_qr_totalInventory.setOnAction((ActionEvent event) -> {
 			NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
 			List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_name(selectedNBox.getProductName());
-			handleQRGenerate(plist);			
+			handleQRGenerate(plist);	
 		});
 
 		ContextMenu menu_totalInvtory = new ContextMenu();
@@ -314,8 +316,8 @@ public class SystemOverviewController implements Initializable {
 		String productionDate = productionDateTextField.getText();
 		String expirationDate = expirationDateTextField.getText();
 
-		if (address.equals("") || prodName.equals("") || str_quantity.equals("") || productionDate.equals("")
-				|| expirationDate.equals("")) {
+		if (company.equals("") || address.equals("") || prodName.equals("") || str_quantity.equals("")
+				|| productionDate.equals("") || expirationDate.equals("")) {
 			// 필수 정보(address, prodName, quantity)가 하나라도 없을 때
 			String head = "Enter the information";
 			String body = "Please enter the required information(Address, Product name, Quantity, Production date, Expiration date)";
@@ -357,11 +359,6 @@ public class SystemOverviewController implements Initializable {
 		}
 	}
 
-	@FXML
-	public void handleTest() {
-		PDB.fileReadCompletedReservation();
-	}
-	
 	@FXML
 	public void handleInventoryStatus() {
 		ProgressDialog.show(mainApp.getPrimaryStage(), false);
@@ -466,7 +463,7 @@ public class SystemOverviewController implements Initializable {
 			qrMaker.makeQR(fileName, input, filePath);
 		}
 	}
-
+	
 	public void showProductInfoDialog(List<JSONObject> prodList) {
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -484,7 +481,6 @@ public class SystemOverviewController implements Initializable {
 
 			ProductInfoDialogController controller = loader.getController();
 			controller.setProduct(prodList);
-
 			dialogStage.showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -531,6 +527,8 @@ public class SystemOverviewController implements Initializable {
 			ChartDialogController controller = loader.getController();
 			controller.setNDList(PDB.getNDList());
 			controller.setNList(PDB.getNList());
+			controller.setLineChart();
+			controller.setStackChart();
 			dialogStage.show();
 		} catch (IOException e) {
 			e.printStackTrace();
