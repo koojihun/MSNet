@@ -445,22 +445,34 @@ public class SystemOverviewController implements Initializable {
 
 	public void handleQRGenerate(List<JSONObject> plist) {
 		QRMaker qrMaker = new QRMaker(300, 300);
+		NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
 		
 		String fileName;
 		String pid;
+		String prodName;
+		String productionDate;
+		String expirationDate;
 		String input;
-		
-		SimpleDateFormat formatter = new SimpleDateFormat ( "yyyy.MM.dd HH:mm:ss", Locale.KOREA );
-		Date currentTime = new Date ();
-		String qrTime = formatter.format (currentTime);
-		
-		for (int cnt = 0; cnt < plist.size(); cnt++) {
-			JSONObject p = plist.get(cnt);
+		String filePath;
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd:HHmmss", Locale.KOREA);
+		SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMdd", Locale.KOREA);
+		Date current = new Date(System.currentTimeMillis());
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(current);
+		String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+		String prodTime2  = format2.format(cal.getTimeInMillis());
+		int i = 1;
+		for (JSONObject p : plist) {
 			pid = AES.encrypt(((String) p.get("PID")));
-			input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid;
-			fileName = qrTime + "_" + p.get("prodName") + "_" + cnt;
-			String filePath = "C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\QRcodes\\" + (String) p.get("prodName");
+			prodName = (String) p.get("prodName");
+			productionDate = (String) p.get("production date");
+			expirationDate = (String) p.get("expiration date");
+			input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName=" + prodName
+					+ "&productionDate=" + productionDate + "&expirationDate=" + expirationDate;
+			fileName = prodTime + "_" + prodName + "_" + i;
+			filePath = prodName + "\\" + prodTime2;
 			qrMaker.makeQR(fileName, input, filePath);
+			i++;
 		}
 	}
 	
