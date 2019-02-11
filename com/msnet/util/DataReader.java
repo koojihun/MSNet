@@ -279,4 +279,17 @@ public class DataReader {
 		prep.executeUpdate();
 		prep.close();	
 	}
+
+	public void deleteWorker(Worker w) throws SQLException {
+		if(this.isOpened == false) {
+			return;
+		}
+		String query = "delete from workerInfo where id=?;";
+		PreparedStatement prep = this.connection.prepareStatement(query);
+		String id = w.getID();
+		prep.setString(1, id);
+		prep.executeUpdate();
+		prep.close();
+		
+	}
 }

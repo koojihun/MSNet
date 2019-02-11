@@ -21,6 +21,7 @@ import com.msnet.model.WDB;
 import com.msnet.model.Worker;
 import com.msnet.util.AES;
 import com.msnet.util.Alert;
+import com.msnet.util.DataReader;
 import com.msnet.util.PDB;
 import com.msnet.util.QRMaker;
 import com.msnet.util.Settings;
@@ -148,9 +149,9 @@ public class SystemOverviewController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		//////////////////////////////////////
-		// Product Database Initialize.     //
+		// Product Database Initialize. //
 		new PDB(reservationStatusTableView);//
-		new WDB(workerTableView);           //
+		new WDB(workerTableView); //
 		//////////////////////////////////////
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
@@ -200,7 +201,8 @@ public class SystemOverviewController implements Initializable {
 						Thread t = new Thread() {
 							public void run() {
 								List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
-										selectedNDBox.getProductName(), selectedNDBox.getProductionDate(), selectedNDBox.getExpirationDate());
+										selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
+										selectedNDBox.getExpirationDate());
 								Platform.runLater(() -> {
 									showProductInfoDialog(plist);
 									ProgressDialog.close();
@@ -224,10 +226,11 @@ public class SystemOverviewController implements Initializable {
 		mi_qr_inventory.setOnAction((ActionEvent event) -> {
 			NDBox selectedNDBox = (NDBox) inventoryStatusTableView.getSelectionModel().getSelectedItem();
 			List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
-			selectedNDBox.getProductName(), selectedNDBox.getProductionDate(), selectedNDBox.getExpirationDate());
+					selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
+					selectedNDBox.getExpirationDate());
 			handleQRGenerate(plist);
 		});
-		
+
 		ContextMenu menu_inventory = new ContextMenu();
 		menu_inventory.getItems().add(mi_qr_inventory);
 		inventoryStatusTableView.setContextMenu(menu_inventory);
@@ -260,8 +263,9 @@ public class SystemOverviewController implements Initializable {
 		MenuItem mi_qr_totalInventory = new MenuItem("Generate QR code");
 		mi_qr_totalInventory.setOnAction((ActionEvent event) -> {
 			NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-			List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_name(selectedNBox.getProductName());
-			handleQRGenerate(plist);	
+			List<JSONObject> plist = MainApp.bitcoinJSONRPClient
+					.get_current_products_by_name(selectedNBox.getProductName());
+			handleQRGenerate(plist);
 		});
 
 		ContextMenu menu_totalInvtory = new ContextMenu();
@@ -277,6 +281,48 @@ public class SystemOverviewController implements Initializable {
 				}
 			}
 		});
+		///////////////////////////////////////////////////////////////////
+		// Reservation tab에서 오른쪽 마우스 눌러서 reservation을 지울 수 있는 기능
+		MenuItem mi_reservation = new MenuItem("Delete");
+		mi_reservation.setOnAction((ActionEvent event) -> {
+			Reservation r = reservationStatusTableView.getSelectionModel().getSelectedItem();
+			DataReader dr = new DataReader("C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\msnetDB.db");
+			dr.open();
+			try {
+				if (r.getSuccess() > 0) {
+					System.out.println("Success: " + r.getSuccess());
+					r.setQuantity(r.getSuccess());
+					dr.writeCompletedReservation(r);					
+				}
+				dr.deleteReservation(r);
+				PDB.getRList().remove(r);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			dr.close();
+		});
+		ContextMenu menu_reservation = new ContextMenu();
+		menu_reservation.getItems().add(mi_reservation);
+		reservationStatusTableView.setContextMenu(menu_reservation);
+		///////////////////////////////////////////////////////////////////		
+		// worker tab에서 오른쪽 마우스 눌러서 worker를 지울 수 있는 기능
+		MenuItem mi_worker = new MenuItem("Delete");
+		mi_worker.setOnAction((ActionEvent event) -> {
+			Worker w = workerTableView.getSelectionModel().getSelectedItem();
+			DataReader dr = new DataReader("C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\msnetDB.db");
+			dr.open();
+			try {
+				dr.deleteWorker(w);
+				WDB.delete(w);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			dr.close();
+		});
+		ContextMenu menu_worker = new ContextMenu();
+		menu_worker.getItems().add(mi_worker);
+		workerTableView.setContextMenu(menu_worker);
+		///////////////////////////////////////////////////////////////////	
 	}
 
 	@FXML
@@ -397,7 +443,8 @@ public class SystemOverviewController implements Initializable {
 				ProgressDialog.show(mainApp.getPrimaryStage(), false);
 				Thread t = new Thread() {
 					public void run() {
-						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate, quantity, Settings.getBitcoinAddress());
+						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate, quantity,
+								Settings.getBitcoinAddress());
 						Platform.runLater(() -> {
 							ProgressDialog.close();
 						});
@@ -446,7 +493,7 @@ public class SystemOverviewController implements Initializable {
 	public void handleQRGenerate(List<JSONObject> plist) {
 		QRMaker qrMaker = new QRMaker(300, 300);
 		NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-		
+
 		String fileName;
 		String pid;
 		String prodName;
@@ -460,7 +507,7 @@ public class SystemOverviewController implements Initializable {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(current);
 		String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
-		String prodTime2  = format2.format(cal.getTimeInMillis());
+		String prodTime2 = format2.format(cal.getTimeInMillis());
 		int i = 1;
 		for (JSONObject p : plist) {
 			pid = AES.encrypt(((String) p.get("PID")));
@@ -475,7 +522,7 @@ public class SystemOverviewController implements Initializable {
 			i++;
 		}
 	}
-	
+
 	public void showProductInfoDialog(List<JSONObject> prodList) {
 		try {
 			FXMLLoader loader = new FXMLLoader();
