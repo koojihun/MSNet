@@ -1,12 +1,17 @@
 package com.msnet.view;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import org.json.simple.JSONObject;
+
+import com.msnet.MainApp;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 import com.msnet.model.Reservation;
@@ -14,9 +19,12 @@ import com.msnet.util.PDB;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -24,8 +32,15 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
-public class ChartDialogController {
+public class ChartDialogController implements Initializable {
+	private MainApp mainApp;
 	@FXML
 	private BarChart<String, Integer> barChart;
 	@FXML
@@ -41,12 +56,76 @@ public class ChartDialogController {
 	@FXML
 	private CategoryAxis stack_xAxis;
 	
+	@FXML
+	private TableView<Reservation> reservationStatusTableView;
+	@FXML
+	private TableColumn<Reservation, String> r_timeColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_companyColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_productNameColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_productionDateColumn;
+	@FXML
+	private TableColumn<Reservation, String> r_expirationDateColumn;
+	@FXML
+	private TableColumn<Reservation, Integer> r_quantityColumn;
+	@FXML
+	private TableColumn<Reservation, Integer> r_successColumn;
+	
 	private ObservableList<NDBox> ndList = FXCollections.observableArrayList();
 	private ObservableList<NBox> nList = FXCollections.observableArrayList();
 	private ObservableList<String> nameList = FXCollections.observableArrayList();
 	private ObservableList<Reservation> completedRList = FXCollections.observableArrayList();
 
 	public ChartDialogController() {
+	}
+	
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		r_timeColumn.setCellValueFactory(cellData -> cellData.getValue().timeProperty());
+		r_companyColumn.setCellValueFactory(cellData -> cellData.getValue().toCompanyProperty());
+		r_productionDateColumn.setCellValueFactory(cellData -> cellData.getValue().productionDateProperty());
+		r_expirationDateColumn.setCellValueFactory(cellData -> cellData.getValue().expirationDateProperty());
+		r_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
+		r_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+		r_successColumn.setCellValueFactory(cellData -> cellData.getValue().successProperty().asObject());
+
+		// 프로그램이 실행될 때 reservation.dat에 저장된 reservation 데이터를 읽어서 rList에 추가
+		reservationStatusTableView.setItems(PDB.getComplitedRList());
+		
+		reservationStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if (event.getClickCount() >= 2) {
+					Reservation selectedReservation = reservationStatusTableView.getSelectionModel().getSelectedItem();
+					showProductInfoDialog(selectedReservation.getProductList());
+				}
+			}
+		});
+	}
+	
+	public void showProductInfoDialog(List<JSONObject> prodList) {
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));
+			AnchorPane productInfoPane = (AnchorPane) loader.load();
+
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Product Info");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(mainApp.getPrimaryStage());
+			dialogStage.setResizable(false);
+
+			Scene scene = new Scene(productInfoPane);
+			dialogStage.setScene(scene);
+
+			ProductInfoDialogController controller = loader.getController();
+			controller.setProduct(prodList);
+			dialogStage.showAndWait();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void setNDList(ObservableList<NDBox> ndList) {
@@ -101,5 +180,9 @@ public class ChartDialogController {
 			}
 			stackChart.getData().add(seriesSuccess);
 		} 	
+	}
+
+	public void setMain(MainApp mainApp) {
+		this.mainApp = mainApp;
 	}
 }

@@ -1,6 +1,5 @@
 package com.msnet.util;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,15 +33,9 @@ public class PDB {
 		nMap = new HashMap<String, NBox>();
 		ndMap = new HashMap<NDKey, NDBox>();
 
-		DB dr = new DB();
-		dr.open();
-		try {
-			dr.readReservation();
-			dr.readCompletedReservation();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		dr.close();
+		DB db = new DB();
+		db.readReservation();
+		db.readCompletedReservation();
 	}
 
 	public static void refreshInventory(List<JSONObject> nddBoxes) {
@@ -91,15 +84,8 @@ public class PDB {
 		Reservation r = new Reservation(time, address, company, selectedNDBox, count);
 		rList.add(r);
 		
-		DB dr = new DB();
-		dr.open();
-		try {
-			dr.writeReservation(r);
-		} catch (SQLException e) {
-			System.err.println("reserveProduct할 때 문제 생김");
-			e.printStackTrace();
-		}
-		dr.close();
+		DB db = new DB();
+		db.writeReservation(r);
 		
 		NBox nBox = nMap.get(selectedNDBox.getProductName());
 		nBox.setAvailable(nBox.getAvailable() - count);
@@ -139,9 +125,7 @@ public class PDB {
 		return completedRList;
 	}
 
-	public static Reservation findReservation(String prodName, String productionDate, String expirationDate,
-			String bitcoin_address) {
-		ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
+	public static Reservation findReservation(String prodName, String productionDate, String expirationDate, String bitcoin_address) {
 		Reservation tmpR;
 
 		for (int i = 0; i < rList.size(); i++) {
@@ -168,6 +152,7 @@ public class PDB {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static String sendProduct(String bitcoin_address, String pid, String prodName, String productionDate,
 			String expirationDate, String wid) {
 		// sendReservation: reservation that matches the information to be sent in the
@@ -196,37 +181,24 @@ public class PDB {
 			p.put("prodName", prodName);
 			p.put("PID", pid);
 
-			DB dr = new DB();
+			DB db = new DB();
 
 			if (sendReservation.getQuantity() - 1 == sendReservation.getSuccess()) {
-				System.out.println("========== 마지막 상품 ==========");	
-				try {
-					dr.open();			
-					sendReservation.getProductList().add(p); // productList에 p 추가
-					dr.writeProductList(pid, prodName, productionDate, expirationDate, sendReservation.getRid(), wid); // db에서도 p 추가
-					sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success + 1		
-					dr.setSuccessPlusOne(sendReservation.getRid()); // db에서도 success + 1
-					MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
-					completedRList.add(sendReservation);
-					dr.writeCompletedReservation(sendReservation);
-					rList.remove(sendReservation);	
-					dr.deleteReservation(sendReservation);				
-					dr.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}	
-			} else {		
-				try {
-					dr.open();
-					sendReservation.getProductList().add(p);
-					dr.writeProductList(pid, prodName, productionDate, expirationDate, sendReservation.getRid(), wid);
-					sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success
-					dr.setSuccessPlusOne(sendReservation.getRid());					
-					MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
-					dr.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}		
+				sendReservation.getProductList().add(p); // productList에 p 추가
+				db.writeProductList(pid, prodName, productionDate, expirationDate, sendReservation.getRid(), wid); // db에서도 p 추가
+				sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success + 1		
+				db.setSuccessPlusOne(sendReservation.getRid()); // db에서도 success + 1
+				MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
+				completedRList.add(sendReservation);
+				db.writeCompletedReservation(sendReservation);
+				rList.remove(sendReservation);	
+				db.deleteReservation(sendReservation);
+			} else {
+				sendReservation.getProductList().add(p);
+				db.writeProductList(pid, prodName, productionDate, expirationDate, sendReservation.getRid(), wid);
+				sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success
+				db.setSuccessPlusOne(sendReservation.getRid());					
+				MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
 			}
 			return "success";
 		} else {

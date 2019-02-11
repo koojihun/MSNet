@@ -61,7 +61,6 @@ public class AddressBookDialogController implements Initializable {
 			for (int i = 0; i < arr.size(); i++) {
 				JSONObject tmp = (JSONObject) arr.get(i);
 				String company_name = (String) tmp.get("company_name");
-				System.out.println(company_name);
 				String company_address = (String) tmp.get("company_address");
 				String bitcoin_address = (String) tmp.get("bitcoin_address");
 				Company tmpCompany = new Company(company_name, company_address, bitcoin_address);

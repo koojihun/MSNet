@@ -11,10 +11,11 @@
    <children>
       <TableView fx:id="productInfoTableView" prefHeight="644.0" prefWidth="900.0" stylesheets="@tableview.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
          <columns>
-            <TableColumn fx:id="nameColumn" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" style="-fx-alignment: CENTER;" text="Name" />
-            <TableColumn fx:id="idColumn" maxWidth="450.0" minWidth="200.0" prefWidth="450.0" style="-fx-alignment: CENTER;" text="ID" />
+            <TableColumn fx:id="nameColumn" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" style="-fx-alignment: CENTER;" text="Name" />
+            <TableColumn fx:id="idColumn" maxWidth="300.0" minWidth="200.0" prefWidth="450.0" style="-fx-alignment: CENTER;" text="ID" />
             <TableColumn fx:id="productionDateColumn" maxWidth="250.0" minWidth="120.0" prefWidth="190.0" style="-fx-alignment: CENTER;" text="Production date" />
-            <TableColumn fx:id="expirationDateColumn" maxWidth="250.0" minWidth="120.0" prefWidth="190.0" style="-fx-alignment: CENTER;" text="Expiration date" />
+            <TableColumn fx:id="expirationDateColumn" maxWidth="250.0" minWidth="120.0" prefWidth="181.0" style="-fx-alignment: CENTER;" text="Expiration date" />
+            <TableColumn fx:id="workerIDColumn" maxWidth="200.0" minWidth="114.0" prefWidth="114.0" style="-fx-alignment: CENTER;" text="Worker" />
          </columns>
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

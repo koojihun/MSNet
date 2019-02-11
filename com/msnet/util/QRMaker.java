@@ -29,6 +29,7 @@ public class QRMaker {
 		try {
 			File file = null;
 			// 큐알이미지를 저장할 디렉토리 지정
+			filePath = this.filePath + "\\" + filePath;
 			file = new File(filePath);
 			if (!file.exists())
 				file.mkdirs();
@@ -49,7 +50,6 @@ public class QRMaker {
 			BitMatrix bitMatrix = qrCodeWriter.encode(codeurl, BarcodeFormat.QR_CODE, width, height, hintMap);
 			MatrixToImageConfig matrixToImageConfig = new MatrixToImageConfig(qrcodeColor, backgroundColor);
 			BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix, matrixToImageConfig);
-			
 			// ImageIO를 사용한 바코드 파일쓰기
 			ImageIO.write(bufferedImage, "png", new File(filePath + "\\" + fileName + ".png"));
 			

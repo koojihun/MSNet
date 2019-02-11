@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.MainApp;
-import com.msnet.model.WDB;
 
 public class Settings {
 
@@ -51,13 +50,7 @@ public class Settings {
 		////////////////////////////////////////////////////////////////
 		// DB init.
 		DB db = new DB();
-		db.open();
-		try {
-			db.init();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		db.close();
+		db.init();
 		//////////////////////////////////////
 		// In Memory Database Initialize.   //
 		new PDB();							//

@@ -32,6 +32,8 @@ public class ProductInfoDialogController implements Initializable {
 	@FXML
 	private TableColumn<JSONObject, String> expirationDateColumn;
 	@FXML
+	private TableColumn<JSONObject, String> workerIDColumn;
+	@FXML
 	private JFXTextField searchTextField;
 	@FXML
 	private JFXButton searchButton;
@@ -48,7 +50,9 @@ public class ProductInfoDialogController implements Initializable {
 				cellData -> new SimpleStringProperty((String) cellData.getValue().get("production date")));
 		expirationDateColumn.setCellValueFactory(
 				cellData -> new SimpleStringProperty((String) cellData.getValue().get("expiration date")));
-
+		workerIDColumn.setCellValueFactory(
+				cellData -> new SimpleStringProperty((String) cellData.getValue().get("wid")));
+		
 		searchTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
@@ -72,5 +76,9 @@ public class ProductInfoDialogController implements Initializable {
 	public void setProduct(List<JSONObject> product_list) {
 		pList = FXCollections.observableArrayList(product_list);
 		productInfoTableView.setItems(pList);
+	}
+	
+	public ObservableList<JSONObject> getPList(){
+		return pList;
 	}
 }

@@ -10,7 +10,7 @@ public class Product {
 	private StringProperty productName;
 	private StringProperty pid;
 	
-	public Product(Map product) {
+	public Product(Map<String, String> product) {
 		this.productionDate = new SimpleStringProperty(String.valueOf(product.get("production date")));
 		this.expirationDate = new SimpleStringProperty(String.valueOf(product.get("expiration date")));
 		this.productName = new SimpleStringProperty(String.valueOf(product.get("prodName")));

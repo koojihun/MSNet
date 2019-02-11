@@ -2,7 +2,6 @@ package com.msnet.view;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,14 +16,15 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.msnet.MainApp;
 import com.msnet.model.Reservation;
-import com.msnet.model.WDB;
 import com.msnet.model.Worker;
 import com.msnet.util.AES;
 import com.msnet.util.Alert;
+import com.msnet.util.DB;
 import com.msnet.util.PDB;
 import com.msnet.util.QRMaker;
 import com.msnet.util.Settings;
 import com.msnet.util.ThreadGroup;
+import com.msnet.util.WDB;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 
@@ -147,6 +147,8 @@ public class SystemOverviewController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		product_expirationDateTextField.setEditable(false);
+
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
 		productNameTextField.setEditable(false);
@@ -195,7 +197,8 @@ public class SystemOverviewController implements Initializable {
 						Thread t = new Thread() {
 							public void run() {
 								List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
-										selectedNDBox.getProductName(), selectedNDBox.getProductionDate(), selectedNDBox.getExpirationDate());
+										selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
+										selectedNDBox.getExpirationDate());
 								Platform.runLater(() -> {
 									showProductInfoDialog(plist);
 									ProgressDialog.close();
@@ -219,10 +222,11 @@ public class SystemOverviewController implements Initializable {
 		mi_qr_inventory.setOnAction((ActionEvent event) -> {
 			NDBox selectedNDBox = (NDBox) inventoryStatusTableView.getSelectionModel().getSelectedItem();
 			List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
-			selectedNDBox.getProductName(), selectedNDBox.getProductionDate(), selectedNDBox.getExpirationDate());
+					selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
+					selectedNDBox.getExpirationDate());
 			handleQRGenerate(plist);
 		});
-		
+
 		ContextMenu menu_inventory = new ContextMenu();
 		menu_inventory.getItems().add(mi_qr_inventory);
 		inventoryStatusTableView.setContextMenu(menu_inventory);
@@ -255,8 +259,9 @@ public class SystemOverviewController implements Initializable {
 		MenuItem mi_qr_totalInventory = new MenuItem("Generate QR code");
 		mi_qr_totalInventory.setOnAction((ActionEvent event) -> {
 			NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-			List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_name(selectedNBox.getProductName());
-			handleQRGenerate(plist);	
+			List<JSONObject> plist = MainApp.bitcoinJSONRPClient
+					.get_current_products_by_name(selectedNBox.getProductName());
+			handleQRGenerate(plist);
 		});
 
 		ContextMenu menu_totalInvtory = new ContextMenu();
@@ -272,6 +277,36 @@ public class SystemOverviewController implements Initializable {
 				}
 			}
 		});
+		///////////////////////////////////////////////////////////////////
+		// Reservation tab에서 오른쪽 마우스 눌러서 reservation을 지울 수 있는 기능
+		MenuItem mi_reservation = new MenuItem("Delete");
+		mi_reservation.setOnAction((ActionEvent event) -> {
+			Reservation r = reservationStatusTableView.getSelectionModel().getSelectedItem();
+			DB db = new DB();
+			if (r.getSuccess() > 0) {
+				System.out.println("Success: " + r.getSuccess());
+				r.setQuantity(r.getSuccess());
+				db.writeCompletedReservation(r);					
+			}
+			db.deleteReservation(r);
+			PDB.getRList().remove(r);
+		});
+		ContextMenu menu_reservation = new ContextMenu();
+		menu_reservation.getItems().add(mi_reservation);
+		reservationStatusTableView.setContextMenu(menu_reservation);
+		///////////////////////////////////////////////////////////////////		
+		// worker tab에서 오른쪽 마우스 눌러서 worker를 지울 수 있는 기능
+		MenuItem mi_worker = new MenuItem("Delete");
+		mi_worker.setOnAction((ActionEvent event) -> {
+			Worker w = workerTableView.getSelectionModel().getSelectedItem();
+			DB db = new DB();
+			db.deleteWorker(w);
+			WDB.delete(w);
+		});
+		ContextMenu menu_worker = new ContextMenu();
+		menu_worker.getItems().add(mi_worker);
+		workerTableView.setContextMenu(menu_worker);
+		///////////////////////////////////////////////////////////////////	
 	}
 
 	@FXML
@@ -376,8 +411,9 @@ public class SystemOverviewController implements Initializable {
 		String str_quantity = product_quantityTextField.getText();
 		String productionDate = product_productionDateTextField.getText();
 		String expirationDate = product_expirationDateTextField.getText();
-
-		if (prodName.equals("") || str_quantity.equals("") || productionDate.equals("") || expirationDate.equals("")) {
+		String productionDate2 = productionDate.replaceAll(":", "").replaceAll(" ", "T").replaceAll("-", "");
+		String expirationDate2 = expirationDate.replaceAll(":", "").replaceAll(" ", "T").replaceAll("-", "");
+		if (prodName.equals("") || str_quantity.equals("") || productionDate2.equals("") || expirationDate2.equals("")) {
 			String head = "Enter the information";
 			String body = "Please enter the required information(Name, Quantity, Production date, Expiration date)";
 			new Alert(systemOverview, head, body);
@@ -392,7 +428,8 @@ public class SystemOverviewController implements Initializable {
 				ProgressDialog.show(mainApp.getPrimaryStage(), false);
 				Thread t = new Thread() {
 					public void run() {
-						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate, quantity, Settings.getBitcoinAddress());
+						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate2, expirationDate2, quantity,
+								Settings.getBitcoinAddress());
 						Platform.runLater(() -> {
 							ProgressDialog.close();
 						});
@@ -410,11 +447,11 @@ public class SystemOverviewController implements Initializable {
 
 	@FXML
 	public void handleGetCurrentTime() {
-		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd:HHmmss");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date current = new Date(System.currentTimeMillis());
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(current);
-		String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+		String prodTime = format.format(cal.getTimeInMillis()); //format.format(cal.getTimeInMillis()).replace(":", "T");
 		String str_term = termTextField.getText();
 		product_productionDateTextField.setText(prodTime);
 		if (!str_term.equals("")) {
@@ -423,16 +460,16 @@ public class SystemOverviewController implements Initializable {
 			String expTime = "";
 			if (unitOfTerm.equals("Hour")) {
 				cal.add(Calendar.HOUR, term);
-				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
 			} else if (unitOfTerm.equals("Day")) {
 				cal.add(Calendar.DATE, term);
-				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
 			} else if (unitOfTerm.equals("Month")) {
 				cal.add(Calendar.MONTH, term);
-				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
 			} else if (unitOfTerm.equals("Year")) {
 				cal.add(Calendar.YEAR, term);
-				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
 			}
 			product_expirationDateTextField.setText(expTime);
 		}
@@ -440,25 +477,35 @@ public class SystemOverviewController implements Initializable {
 
 	public void handleQRGenerate(List<JSONObject> plist) {
 		QRMaker qrMaker = new QRMaker(300, 300);
-		
 		String fileName;
 		String pid;
+		String prodName;
+		String productionDate;
+		String expirationDate;
 		String input;
-		
-		SimpleDateFormat formatter = new SimpleDateFormat ( "yyyy.MM.dd HH:mm:ss", Locale.KOREA );
-		Date currentTime = new Date ();
-		String qrTime = formatter.format (currentTime);
-		
-		for (int cnt = 0; cnt < plist.size(); cnt++) {
-			JSONObject p = plist.get(cnt);
+		String filePath;
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd:HHmmss", Locale.KOREA);
+		SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMdd", Locale.KOREA);
+		Date current = new Date(System.currentTimeMillis());
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(current);
+		String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+		String prodTime2 = format2.format(cal.getTimeInMillis());
+		int i = 1;
+		for (JSONObject p : plist) {
 			pid = AES.encrypt(((String) p.get("PID")));
-			input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid;
-			fileName = qrTime + "_" + p.get("prodName") + "_" + cnt;
-			String filePath = "C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\QRcodes\\" + (String) p.get("prodName");
+			prodName = (String) p.get("prodName");
+			productionDate = (String) p.get("production date");
+			expirationDate = (String) p.get("expiration date");
+			input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName=" + prodName
+					+ "&productionDate=" + productionDate + "&expirationDate=" + expirationDate;
+			fileName = prodTime + "_" + prodName + "_" + i;
+			filePath = prodName + "\\" + prodTime2;
 			qrMaker.makeQR(fileName, input, filePath);
+			i++;
 		}
 	}
-	
+
 	public void showProductInfoDialog(List<JSONObject> prodList) {
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -520,6 +567,7 @@ public class SystemOverviewController implements Initializable {
 			dialogStage.setScene(scene);
 
 			ChartDialogController controller = loader.getController();
+			controller.setMain(mainApp);
 			controller.setNDList(PDB.getNDList());
 			controller.setNList(PDB.getNList());
 			controller.setLineChart();

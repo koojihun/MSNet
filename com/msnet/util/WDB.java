@@ -1,9 +1,6 @@
-package com.msnet.model;
+package com.msnet.util;
 
-import java.sql.SQLException;
-
-import com.msnet.util.DB;
-
+import com.msnet.model.Worker;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -13,21 +10,37 @@ public class WDB {
 
 	public WDB() {
 		workerList = FXCollections.observableArrayList();
+		DB db = new DB();
+		db.readWorker();
+	}
+	
+	public static boolean signIn(String id, String password) {
+		DB db = new DB();
+		boolean result = db.signIn(id, password);
+		if (result)
+			setIsLogin(id, true);
+		return result;
+	}
+	
+	public static boolean signUp(String id, String password, String name, String phone) {
+		DB db = new DB();
+		boolean result = db.signUp(id, password, name, phone);
 		
-		DB dr = new DB();
-		dr.open();
-		try {
-			dr.readWorker();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		dr.close();
+		if (result)
+			insert(id, password, name, phone);
+		
+		return result;
 	}
 	
 	public static void insert(String id, String password, String name, String phone) {
 		Worker w = new Worker(id, name, false);
 		workerList.add(w);
 	}
+
+	public static void delete(Worker w) {
+		workerList.remove(w);
+	}
+	
 	public static ObservableList<Worker> getWorkerList() {
 		return workerList;
 	}
@@ -41,14 +54,5 @@ public class WDB {
 				break;
 			}
 		}
-	}
-	
-	public static boolean isLogin(String id) {
-		for (Worker w : workerList) {
-			if (w.getID().equals(id)) {
-				return w.getIsLogin();
-			}
-		}
-		return false;
 	}
 }

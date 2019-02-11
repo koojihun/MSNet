@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
 
 import org.json.simple.JSONObject;
 
@@ -77,7 +76,7 @@ public class Reservation {
 			Date from;
 			from = df.parse(time.get());
 			//SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM");
-			SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH");
 			String to = transFormat.format(from);
 			return to;
 		} catch (ParseException e) {
