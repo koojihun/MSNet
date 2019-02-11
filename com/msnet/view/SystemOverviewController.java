@@ -147,11 +147,6 @@ public class SystemOverviewController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		//////////////////////////////////////
-		// Product Database Initialize.     //
-		new PDB(reservationStatusTableView);//
-		new WDB(workerTableView);           //
-		//////////////////////////////////////
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
 		productNameTextField.setEditable(false);

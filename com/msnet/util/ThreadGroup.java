@@ -1,14 +1,14 @@
 package com.msnet.util;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ThreadGroup {
-	public static ArrayList<Thread> thread_group = new ArrayList<>();
+	public static HashMap<Long, Thread> thread_group = new HashMap<>();
 	
 	public ThreadGroup() {}
 	
 	public static void addThread(Thread t) {
-		thread_group.add(t);
+		thread_group.put(t.getId(), t);
 		t.start();
 	}
 	
@@ -17,7 +17,8 @@ public class ThreadGroup {
 	}
 	
 	public static void destroyAllThread() {
-		for (Thread t : thread_group) {
+		for (Long tid : thread_group.keySet()) {
+			Thread t = thread_group.get(tid);
 			if (t.isAlive())
 				t.interrupt();
 		}

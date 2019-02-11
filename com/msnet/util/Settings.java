@@ -1,9 +1,11 @@
 package com.msnet.util;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.MainApp;
+import com.msnet.model.WDB;
 
 public class Settings {
 
@@ -46,6 +48,21 @@ public class Settings {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		////////////////////////////////////////////////////////////////
+		// DB init.
+		DB db = new DB();
+		db.open();
+		try {
+			db.init();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		db.close();
+		//////////////////////////////////////
+		// In Memory Database Initialize.   //
+		new PDB();							//
+		new WDB();				            //
+		//////////////////////////////////////
 	}
 
 	private boolean isThereConfFile() {
@@ -137,8 +154,6 @@ public class Settings {
 			fw.newLine();
 			fw.write("printtoconsole=1");
 			fw.newLine();
-			//fw.write("addnode=166.104.126.42");
-			//fw.newLine();
 
 			fw.flush();
 			fw.close();
@@ -194,7 +209,7 @@ public class Settings {
 				/////////////////////////////////////////////////////
 			} catch (Exception e) {
 				e.printStackTrace();
-			}       
+			}
 		}
 	}
 

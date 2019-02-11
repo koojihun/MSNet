@@ -117,7 +117,7 @@ public class HTTP {
 					String id = query.get("id");
 					String password = query.get("password");
 					boolean result;					
-					DataReader dr = new DataReader("C:\\Users\\triz\\AppData\\Roaming\\msnetDB.db");
+					DB dr = new DB();
 					dr.open();					
 					try {
 						result = dr.signIn(id, password);
@@ -137,7 +137,7 @@ public class HTTP {
 					String name = query.get("name");
 					String phone = query.get("phone");
 					boolean result;					
-					DataReader dr = new DataReader("C:\\Users\\triz\\AppData\\Roaming\\msnetDB.db");
+					DB dr = new DB();
 					dr.open();					
 					try {
 						result = dr.signUp(id, password, name, phone);
