@@ -193,6 +193,7 @@ public class DataReader {
 				tmp.put("expiration date", row.getString("expirationDate"));
 				tmp.put("prodName", row.getString("productName"));
 				tmp.put("PID", row.getString("pid"));
+				tmp.put("wid", row.getString("wid"));
 				pList.add(tmp);
 			}
 			return pList;

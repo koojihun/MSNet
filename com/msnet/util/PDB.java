@@ -49,10 +49,6 @@ public class PDB {
 		nMap = new HashMap<String, NBox>();
 		ndMap = new HashMap<NDKey, NDBox>();
 
-		// read Reservation objects from disk into rList.
-		// fileReadReservation();
-		// fileReadCompletedReservation();
-
 		DataReader dr = new DataReader("C:\\Users\\triz\\AppData\\Roaming\\msnetDB.db");
 		dr.open();
 		try {
@@ -110,7 +106,6 @@ public class PDB {
 	public static void reserveProduct(String time, String address, String company, NDBox selectedNDBox, int count) {
 		Reservation r = new Reservation(time, address, company, selectedNDBox, count);
 		rList.add(r);
-		//fileWriteOneReservation(r);
 		DataReader dr = new DataReader("C:\\Users\\triz\\AppData\\Roaming\\msnetDB.db");
 		dr.open();
 		try {
@@ -126,158 +121,7 @@ public class PDB {
 
 		selectedNDBox.setAvailable(selectedNDBox.getAvailable() - count);
 	}
-/*
-	public static void reserveProduct(String time, String toAddress, String toCompany, String productName,
-			String prodDate, String expDate, int quantity, int success, ArrayList<JSONObject> productList) {
 
-		Reservation r = new Reservation(time, toAddress, toCompany, productName, prodDate, expDate, quantity, success,
-				productList);
-		rList.add(r);
-	}
-*/
-	/*
-	public static void addToCompletedRList(String time, String toAddress, String toCompany, String productName,
-			String prodDate, String expDate, int quantity, int success, ArrayList<JSONObject> productList) {
-
-		Reservation r = new Reservation(time, toAddress, toCompany, productName, prodDate, expDate, quantity, success,
-				productList);
-		completedRList.add(r);
-	}
-	*/
-
-	/*
-	 * public static void fileReadReservation() { try { File resDat = new File(
-	 * "C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\
-	 * reservation.dat"); if (resDat.exists()) { BufferedReader br = new
-	 * BufferedReader(new FileReader(resDat)); JSONParser parser = new JSONParser();
-	 * String input; while ((input = br.readLine()) != null) { JSONObject jsonObject
-	 * = (JSONObject) parser.parse(input); String time =
-	 * jsonObject.get("time").toString(); String toAddress =
-	 * jsonObject.get("toAddress").toString(); String toCompany =
-	 * jsonObject.get("toCompany").toString(); String productName =
-	 * jsonObject.get("productName").toString(); String productionDate =
-	 * jsonObject.get("productionDate").toString(); String expirationDate =
-	 * jsonObject.get("expirationDate").toString(); int quantity =
-	 * Integer.parseInt(jsonObject.get("quantity").toString()); int success =
-	 * Integer.parseInt(jsonObject.get("success").toString()); ArrayList<JSONObject>
-	 * productList = (ArrayList<JSONObject>) jsonObject.get("productList");
-	 * 
-	 * PDB.reserveProduct(time, toAddress, toCompany, productName, productionDate,
-	 * expirationDate, quantity, success, productList); } br.close(); } } catch
-	 * (IOException | ParseException e) { e.printStackTrace(); } }
-	 */
-	/*
-	public static void fileWriteAllReservation() {
-		try {
-			File file = new File(
-					"C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
-			FileWriter fw = new FileWriter(file, false);
-
-			Reservation r;
-			JSONObject jsonObj = new JSONObject();
-			for (int i = 0; i < rList.size(); i++) {
-				r = rList.get(i);
-				jsonObj.put("time", r.getTime());
-				jsonObj.put("toAddress", r.getToAddress());
-				jsonObj.put("toCompany", r.getToCompany());
-				jsonObj.put("productName", r.getProductName());
-				jsonObj.put("productionDate", r.getProductionDate());
-				jsonObj.put("expirationDate", r.getExpirationDate());
-				jsonObj.put("quantity", r.getQuantity());
-				jsonObj.put("success", r.getSuccess());
-				JSONArray jsonArray = arrayProductToJSONArray(r.getProductList());
-				jsonObj.put("productList", jsonArray);
-				fw.write(jsonObj.toJSONString() + "\n");
-			}
-			fw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void fileWriteOneReservation(Reservation r) {
-		try {
-			File file = new File(
-					"C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
-			FileWriter fw = new FileWriter(file, true);
-			JSONObject jsonObj = new JSONObject();
-
-			jsonObj.put("time", r.getTime());
-			jsonObj.put("toAddress", r.getToAddress());
-			jsonObj.put("toCompany", r.getToCompany());
-			jsonObj.put("productName", r.getProductName());
-			jsonObj.put("productionDate", r.getProductionDate());
-			jsonObj.put("expirationDate", r.getExpirationDate());
-			jsonObj.put("quantity", r.getQuantity());
-			jsonObj.put("success", r.getSuccess());
-			JSONArray jsonArray = arrayProductToJSONArray(r.getProductList());
-			jsonObj.put("productList", jsonArray);
-			fw.write(jsonObj.toJSONString() + "\n");
-			fw.close();
-		} catch (IOException e) {
-			System.err.println("File writer error");
-			e.printStackTrace();
-		}
-	}
-
-	private static void fileDeleteReservation(Reservation r) throws IOException {
-		File inputFile = new File(
-				"C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\reservation.dat");
-		File tempFile = new File("myTempFile.dat");
-
-		BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-		BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-		JSONObject jsonObj = new JSONObject();
-
-		jsonObj.put("time", r.getTime());
-		jsonObj.put("toAddress", r.getToAddress());
-		jsonObj.put("toCompany", r.getToCompany());
-		jsonObj.put("productName", r.getProductName());
-		jsonObj.put("productionDate", r.getProductionDate());
-		jsonObj.put("expirationDate", r.getExpirationDate());
-		jsonObj.put("quantity", r.getQuantity());
-		String lineToRemove = jsonObj.toJSONString();
-
-		String currentLine;
-
-		while ((currentLine = reader.readLine()) != null) {
-			// trim newline when comparing with lineToRemove
-			String trimmedLine = currentLine.trim();
-			if (trimmedLine.contains(lineToRemove))
-				continue;
-			writer.write(currentLine + System.getProperty("line.separator"));
-		}
-		writer.close();
-		reader.close();
-		inputFile.delete();
-		boolean successful = tempFile.renameTo(inputFile);
-	}
-*/
-	/*
-	 * 
-	 * // 완료된 Reservation 정보를 파일에 읽기 public static void
-	 * fileReadCompletedReservation() { try { File resDat = new File(
-	 * "C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\Bitcoin\\
-	 * salesData.dat"); if (resDat.exists()) { BufferedReader br = new
-	 * BufferedReader(new FileReader(resDat)); JSONParser parser = new JSONParser();
-	 * String input; while ((input = br.readLine()) != null) { JSONObject jsonObject
-	 * = (JSONObject) parser.parse(input); String time =
-	 * jsonObject.get("time").toString(); String toAddress =
-	 * jsonObject.get("toAddress").toString(); String toCompany =
-	 * jsonObject.get("toCompany").toString(); String productName =
-	 * jsonObject.get("productName").toString(); String productionDate =
-	 * jsonObject.get("productionDate").toString(); String expirationDate =
-	 * jsonObject.get("expirationDate").toString(); int quantity =
-	 * Integer.parseInt(jsonObject.get("quantity").toString()); int success =
-	 * Integer.parseInt(jsonObject.get("success").toString()); ArrayList<JSONObject>
-	 * productList = (ArrayList<JSONObject>) jsonObject.get("productList");
-	 * 
-	 * System.out.println(time + " " + toCompany + " " + productName + " " +
-	 * success); addToCompletedRList(time, toAddress, toCompany, productName,
-	 * productionDate, expirationDate, quantity, success, productList); }
-	 * br.close(); } } catch (IOException | ParseException e) { e.printStackTrace();
-	 * } }
-	 */
 	// 완료된 Reservation 정보를 파일에 쓰기
 	private static void fileWriteCompletedReservation(Reservation r) {
 		try {

@@ -153,6 +153,8 @@ public class SystemOverviewController implements Initializable {
 		new PDB(reservationStatusTableView);//
 		new WDB(workerTableView); //
 		//////////////////////////////////////
+		product_expirationDateTextField.setEditable(false);
+		
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
 		productNameTextField.setEditable(false);
@@ -427,8 +429,9 @@ public class SystemOverviewController implements Initializable {
 		String str_quantity = product_quantityTextField.getText();
 		String productionDate = product_productionDateTextField.getText();
 		String expirationDate = product_expirationDateTextField.getText();
-
-		if (prodName.equals("") || str_quantity.equals("") || productionDate.equals("") || expirationDate.equals("")) {
+		String productionDate2 = productionDate.replaceAll(":", "").replaceAll(" ", "T").replaceAll("-", "");
+		String expirationDate2 = expirationDate.replaceAll(":", "").replaceAll(" ", "T").replaceAll("-", "");
+		if (prodName.equals("") || str_quantity.equals("") || productionDate2.equals("") || expirationDate2.equals("")) {
 			String head = "Enter the information";
 			String body = "Please enter the required information(Name, Quantity, Production date, Expiration date)";
 			new Alert(systemOverview, head, body);
@@ -443,7 +446,7 @@ public class SystemOverviewController implements Initializable {
 				ProgressDialog.show(mainApp.getPrimaryStage(), false);
 				Thread t = new Thread() {
 					public void run() {
-						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate, quantity,
+						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate2, expirationDate2, quantity,
 								Settings.getBitcoinAddress());
 						Platform.runLater(() -> {
 							ProgressDialog.close();
@@ -462,11 +465,11 @@ public class SystemOverviewController implements Initializable {
 
 	@FXML
 	public void handleGetCurrentTime() {
-		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd:HHmmss");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date current = new Date(System.currentTimeMillis());
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(current);
-		String prodTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+		String prodTime = format.format(cal.getTimeInMillis()); //format.format(cal.getTimeInMillis()).replace(":", "T");
 		String str_term = termTextField.getText();
 		product_productionDateTextField.setText(prodTime);
 		if (!str_term.equals("")) {
@@ -475,16 +478,16 @@ public class SystemOverviewController implements Initializable {
 			String expTime = "";
 			if (unitOfTerm.equals("Hour")) {
 				cal.add(Calendar.HOUR, term);
-				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
 			} else if (unitOfTerm.equals("Day")) {
 				cal.add(Calendar.DATE, term);
-				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
 			} else if (unitOfTerm.equals("Month")) {
 				cal.add(Calendar.MONTH, term);
-				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
 			} else if (unitOfTerm.equals("Year")) {
 				cal.add(Calendar.YEAR, term);
-				expTime = format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
 			}
 			product_expirationDateTextField.setText(expTime);
 		}
@@ -584,6 +587,7 @@ public class SystemOverviewController implements Initializable {
 			dialogStage.setScene(scene);
 
 			ChartDialogController controller = loader.getController();
+			controller.setMain(mainApp);
 			controller.setNDList(PDB.getNDList());
 			controller.setNList(PDB.getNList());
 			controller.setLineChart();
