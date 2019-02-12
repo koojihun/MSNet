@@ -2,7 +2,6 @@ package com.msnet.view;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,15 +16,15 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.msnet.MainApp;
 import com.msnet.model.Reservation;
-import com.msnet.model.WDB;
 import com.msnet.model.Worker;
 import com.msnet.util.AES;
 import com.msnet.util.Alert;
-import com.msnet.util.DataReader;
+import com.msnet.util.DB;
 import com.msnet.util.PDB;
 import com.msnet.util.QRMaker;
 import com.msnet.util.Settings;
 import com.msnet.util.ThreadGroup;
+import com.msnet.util.WDB;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 
@@ -148,13 +147,8 @@ public class SystemOverviewController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		//////////////////////////////////////
-		// Product Database Initialize. //
-		new PDB(reservationStatusTableView);//
-		new WDB(workerTableView); //
-		//////////////////////////////////////
 		product_expirationDateTextField.setEditable(false);
-		
+
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
 		productNameTextField.setEditable(false);
@@ -288,20 +282,14 @@ public class SystemOverviewController implements Initializable {
 		MenuItem mi_reservation = new MenuItem("Delete");
 		mi_reservation.setOnAction((ActionEvent event) -> {
 			Reservation r = reservationStatusTableView.getSelectionModel().getSelectedItem();
-			DataReader dr = new DataReader("C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\msnetDB.db");
-			dr.open();
-			try {
-				if (r.getSuccess() > 0) {
-					System.out.println("Success: " + r.getSuccess());
-					r.setQuantity(r.getSuccess());
-					dr.writeCompletedReservation(r);					
-				}
-				dr.deleteReservation(r);
-				PDB.getRList().remove(r);
-			} catch (SQLException e) {
-				e.printStackTrace();
+			DB db = new DB();
+			if (r.getSuccess() > 0) {
+				System.out.println("Success: " + r.getSuccess());
+				r.setQuantity(r.getSuccess());
+				db.writeCompletedReservation(r);					
 			}
-			dr.close();
+			db.deleteReservation(r);
+			PDB.getRList().remove(r);
 		});
 		ContextMenu menu_reservation = new ContextMenu();
 		menu_reservation.getItems().add(mi_reservation);
@@ -311,15 +299,9 @@ public class SystemOverviewController implements Initializable {
 		MenuItem mi_worker = new MenuItem("Delete");
 		mi_worker.setOnAction((ActionEvent event) -> {
 			Worker w = workerTableView.getSelectionModel().getSelectedItem();
-			DataReader dr = new DataReader("C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\msnetDB.db");
-			dr.open();
-			try {
-				dr.deleteWorker(w);
-				WDB.delete(w);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			dr.close();
+			DB db = new DB();
+			db.deleteWorker(w);
+			WDB.delete(w);
 		});
 		ContextMenu menu_worker = new ContextMenu();
 		menu_worker.getItems().add(mi_worker);
@@ -495,8 +477,6 @@ public class SystemOverviewController implements Initializable {
 
 	public void handleQRGenerate(List<JSONObject> plist) {
 		QRMaker qrMaker = new QRMaker(300, 300);
-		NBox selectedNBox = total_inventoryStatusTableView.getSelectionModel().getSelectedItem();
-
 		String fileName;
 		String pid;
 		String prodName;

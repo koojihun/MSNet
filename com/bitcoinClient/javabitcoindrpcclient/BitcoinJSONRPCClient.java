@@ -2186,6 +2186,11 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 	}
 	
 	@Override
+	public JSONObject dump_default_key() {
+		return (JSONObject) query("dump_default_key");
+	}
+	
+	@Override
 	public List<Map> get_current_products() {
 		return (List<Map>) query("get_current_products");
 	}

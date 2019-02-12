@@ -8,12 +8,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.msnet.model.WDB;
 import com.sun.net.httpserver.*;
 
 import org.json.simple.JSONObject;
@@ -106,9 +104,7 @@ public class HTTP {
 					String bitcoinAddress = query.get("bitcoinAddress");
 					String wid = query.get("wid");
 					sendReturnValue(httpExchange, "result", PDB.sendProduct(bitcoinAddress, pid, prodName, productionDate, expirationDate, wid));
-					System.out.println(prodName+ "/" + productionDate + "/" + pid + "/" + wid);
-					if (!WDB.isLogin(wid))
-						WDB.setIsLogin(wid, true);
+					WDB.setIsLogin(wid, true);
 				} else if (method.equals("workerSignOut")) {
 					String id = query.get("id");
 					WDB.setIsLogin(id, false);
@@ -116,40 +112,15 @@ public class HTTP {
 				} else if (method.equals("workerSignIn")) {
 					String id = query.get("id");
 					String password = query.get("password");
-					boolean result;					
-					DataReader dr = new DataReader("C:\\Users\\triz\\AppData\\Roaming\\msnetDB.db");
-					dr.open();					
-					try {
-						result = dr.signIn(id, password);
-						sendReturnValue(httpExchange, "result", String.valueOf(result));
-						// id, password에 해당하는 workerinfo가 있을 때는 WDB.workerList의 isLogin을 true로 설정
-						if(result) {
-							WDB.setIsLogin(id, true);
-						}						
-					} catch (SQLException e) {
-						System.out.println("로그인 과정에서 문제 발생.");
-						e.printStackTrace();
-					}
-					dr.close();
+					boolean result = WDB.signIn(id, password);
+					sendReturnValue(httpExchange, "result", String.valueOf(result));
 				} else if (method.equals("workerSignUp")) {
 					String id = query.get("id");
 					String password = query.get("password");
 					String name = query.get("name");
 					String phone = query.get("phone");
-					boolean result;					
-					DataReader dr = new DataReader("C:\\Users\\triz\\AppData\\Roaming\\msnetDB.db");
-					dr.open();					
-					try {
-						result = dr.signUp(id, password, name, phone);
-						if (result) {
-							WDB.insert(id, password, name, phone);
-						}
-						sendReturnValue(httpExchange, "result", String.valueOf(result));
-					} catch (SQLException e) {
-						System.out.println("회원가입 과정에서 문제 발생.");
-						e.printStackTrace();
-					}
-					dr.close();				
+					boolean result = WDB.signUp(id, password, name, phone);
+					sendReturnValue(httpExchange, "result", String.valueOf(result));				
 				}
 			}
 		}

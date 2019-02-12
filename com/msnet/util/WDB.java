@@ -1,37 +1,37 @@
-package com.msnet.model;
-/**
- * Worker DB
- * @author triz
- *
- */
+package com.msnet.util;
 
-import java.sql.SQLException;
-
-import com.msnet.util.DataReader;
-
+import com.msnet.model.Worker;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableView;
 
 public class WDB {
 
 	private static ObservableList<Worker> workerList;
-	private static TableView<Worker> workerTableView;
 
-	public WDB(TableView<Worker> inputTableView) {
-		workerTableView = inputTableView;
+	public WDB() {
 		workerList = FXCollections.observableArrayList();
-
-		DataReader dr = new DataReader("C:\\Users\\triz\\AppData\\Roaming\\msnetDB.db");
-		dr.open();
-		try {
-			dr.readWorker();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		dr.close();
+		DB db = new DB();
+		db.readWorker();
 	}
-
+	
+	public static boolean signIn(String id, String password) {
+		DB db = new DB();
+		boolean result = db.signIn(id, password);
+		if (result)
+			setIsLogin(id, true);
+		return result;
+	}
+	
+	public static boolean signUp(String id, String password, String name, String phone) {
+		DB db = new DB();
+		boolean result = db.signUp(id, password, name, phone);
+		
+		if (result)
+			insert(id, password, name, phone);
+		
+		return result;
+	}
+	
 	public static void insert(String id, String password, String name, String phone) {
 		Worker w = new Worker(id, name, false);
 		workerList.add(w);
@@ -40,7 +40,7 @@ public class WDB {
 	public static void delete(Worker w) {
 		workerList.remove(w);
 	}
-
+	
 	public static ObservableList<Worker> getWorkerList() {
 		return workerList;
 	}
@@ -54,14 +54,5 @@ public class WDB {
 				break;
 			}
 		}
-	}
-
-	public static boolean isLogin(String id) {
-		for (Worker w : workerList) {
-			if (w.getID().equals(id)) {
-				return w.getIsLogin();
-			}
-		}
-		return false;
 	}
 }

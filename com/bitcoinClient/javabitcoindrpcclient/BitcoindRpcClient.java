@@ -1575,6 +1575,7 @@ public interface BitcoindRpcClient {
   List<JSONObject> get_current_products_by_name(String prodName);
   List<JSONObject> get_current_products_by_ndd(String prodName, String production_date, String expiration_date);
   List<JSONObject> get_ndd_boxes();
+  JSONObject dump_default_key();
   List<Map> get_current_products();
   List<Map> get_current_products(String account);
 
