@@ -311,8 +311,6 @@ public class PDB {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}	
-				// PDB.fileWriteCompletedReservation(sendReservation);
-				// PDB.fileDeleteReservation(sendReservation);		
 			} else {		
 				try {
 					dr.open();
@@ -326,7 +324,6 @@ public class PDB {
 					e.printStackTrace();
 				}		
 			}
-			//PDB.fileWriteAllReservation();
 			return "success";
 		} else {
 			System.out.println("===== 할당량 끝 =====");
