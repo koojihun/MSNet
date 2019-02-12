@@ -149,6 +149,11 @@ public class SystemOverviewController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		//////////////////////////////////////
+		// In Memory Database Initialize. //
+		new PDB(); //
+		new WDB(); //
+		//////////////////////////////////////
 		product_expirationDateTextField.setEditable(false);
 
 		companyTextField.setEditable(false);
@@ -180,8 +185,6 @@ public class SystemOverviewController implements Initializable {
 		r_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		r_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		r_successColumn.setCellValueFactory(cellData -> cellData.getValue().successProperty().asObject());
-
-		// 프로그램이 실행될 때 reservation.dat에 저장된 reservation 데이터를 읽어서 rList에 추가
 		reservationStatusTableView.setItems(PDB.getRList());
 
 		worker_idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty());
@@ -294,7 +297,7 @@ public class SystemOverviewController implements Initializable {
 			if (r.getSuccess() > 0) {
 				System.out.println("Success: " + r.getSuccess());
 				r.setQuantity(r.getSuccess());
-				db.writeCompletedReservation(r);					
+				db.writeCompletedReservation(r);
 			}
 			db.deleteReservation(r);
 			PDB.getRList().remove(r);
@@ -302,7 +305,7 @@ public class SystemOverviewController implements Initializable {
 		ContextMenu menu_reservation = new ContextMenu();
 		menu_reservation.getItems().add(mi_reservation);
 		reservationStatusTableView.setContextMenu(menu_reservation);
-		///////////////////////////////////////////////////////////////////		
+		///////////////////////////////////////////////////////////////////
 		// worker tab에서 오른쪽 마우스 눌러서 worker를 지울 수 있는 기능
 		MenuItem mi_worker = new MenuItem("Delete");
 		mi_worker.setOnAction((ActionEvent event) -> {
@@ -314,7 +317,7 @@ public class SystemOverviewController implements Initializable {
 		ContextMenu menu_worker = new ContextMenu();
 		menu_worker.getItems().add(mi_worker);
 		workerTableView.setContextMenu(menu_worker);
-		///////////////////////////////////////////////////////////////////	
+		///////////////////////////////////////////////////////////////////
 	}
 
 	@FXML
@@ -421,7 +424,8 @@ public class SystemOverviewController implements Initializable {
 		String expirationDate = product_expirationDateTextField.getText();
 		String productionDate2 = productionDate.replaceAll(":", "").replaceAll(" ", "T").replaceAll("-", "");
 		String expirationDate2 = expirationDate.replaceAll(":", "").replaceAll(" ", "T").replaceAll("-", "");
-		if (prodName.equals("") || str_quantity.equals("") || productionDate2.equals("") || expirationDate2.equals("")) {
+		if (prodName.equals("") || str_quantity.equals("") || productionDate2.equals("")
+				|| expirationDate2.equals("")) {
 			String head = "Enter the information";
 			String body = "Please enter the required information(Name, Quantity, Production date, Expiration date)";
 			new Alert(systemOverview, head, body);
@@ -436,8 +440,9 @@ public class SystemOverviewController implements Initializable {
 				ProgressDialog.show(mainApp.getPrimaryStage(), false);
 				Thread t = new Thread() {
 					public void run() {
-						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate2, expirationDate2, quantity);
-						
+						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate2, expirationDate2,
+								quantity);
+
 						Platform.runLater(() -> {
 							ProgressDialog.close();
 						});
@@ -459,7 +464,8 @@ public class SystemOverviewController implements Initializable {
 		Date current = new Date(System.currentTimeMillis());
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(current);
-		String prodTime = format.format(cal.getTimeInMillis()); //format.format(cal.getTimeInMillis()).replace(":", "T");
+		String prodTime = format.format(cal.getTimeInMillis()); // format.format(cal.getTimeInMillis()).replace(":",
+																// "T");
 		String str_term = termTextField.getText();
 		product_productionDateTextField.setText(prodTime);
 		if (!str_term.equals("")) {
@@ -468,16 +474,20 @@ public class SystemOverviewController implements Initializable {
 			String expTime = "";
 			if (unitOfTerm.equals("Hour")) {
 				cal.add(Calendar.HOUR, term);
-				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());// format.format(cal.getTimeInMillis()).replace(":",
+																// "T");
 			} else if (unitOfTerm.equals("Day")) {
 				cal.add(Calendar.DATE, term);
-				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());// format.format(cal.getTimeInMillis()).replace(":",
+																// "T");
 			} else if (unitOfTerm.equals("Month")) {
 				cal.add(Calendar.MONTH, term);
-				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());// format.format(cal.getTimeInMillis()).replace(":",
+																// "T");
 			} else if (unitOfTerm.equals("Year")) {
 				cal.add(Calendar.YEAR, term);
-				expTime = format.format(cal.getTimeInMillis());//format.format(cal.getTimeInMillis()).replace(":", "T");
+				expTime = format.format(cal.getTimeInMillis());// format.format(cal.getTimeInMillis()).replace(":",
+																// "T");
 			}
 			product_expirationDateTextField.setText(expTime);
 		}

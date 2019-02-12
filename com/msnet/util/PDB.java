@@ -84,7 +84,7 @@ public class PDB {
 	public static void reserveProduct(String time, String address, String company, NDBox selectedNDBox, int count) {
 		Reservation r = new Reservation(time, address, company, selectedNDBox, count);
 		rList.add(r);
-		
+		 
 		DB db = new DB();
 		db.writeReservation(r);
 		
@@ -170,7 +170,7 @@ public class PDB {
 			// Execute send_to_address when there is a reservation matching the condition in
 			// the reservation list
 					
-			Product p = new Product(productionDate, expirationDate, prodName, pid);
+			Product p = new Product(productionDate, expirationDate, prodName, pid, wid);
 			
 			DB db = new DB();
 

@@ -103,6 +103,7 @@ public class HTTP {
 					String pid = AES.decrypt(query.get("pid"));
 					String bitcoinAddress = query.get("bitcoinAddress");
 					String wid = query.get("wid");
+					
 					sendReturnValue(httpExchange, "result", PDB.sendProduct(bitcoinAddress, pid, prodName, productionDate, expirationDate, wid));
 					WDB.setIsLogin(wid, true);
 				} else if (method.equals("workerSignOut")) {
