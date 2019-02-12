@@ -2205,32 +2205,6 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 		return (List<Map>) query("get_current_products", account);
 	}
 
-	/*
-	 * @Override public void gen_new_product(String prodDate, String expDate, int
-	 * count) {
-	 * 
-	 * StringBuffer sb = new StringBuffer(); sb.append("{\"prodDate\":\"" + prodDate
-	 * + "\""); sb.append(",\"expDate\":\"" + expDate + "\"");
-	 * sb.append(",\"count\":" + count + "}"); String str = sb.toString();
-	 * //System.out.println(str); List<Map> ret = (List<Map>)
-	 * query("gen_new_product", CrippledJavaScriptParser.parseJSExpr(str));
-	 * //System.out.println(ret);s //return ret; }
-	 */
-/*
-	@Override
-	public List<String> gen_new_product(String prodDate, String expDate, int count) {
-
-		StringBuffer sb = new StringBuffer();
-		sb.append("{\"prodDate\":\"" + prodDate + "\"");
-		sb.append(",\"expDate\":\"" + expDate + "\"");
-		sb.append(",\"count\":" + count + "}");
-		String str = sb.toString();
-		// System.out.println(str);
-		List<String> ret = (List<String>) query("gen_new_product", CrippledJavaScriptParser.parseJSExpr(str));
-		// System.out.println(ret);
-		return ret;
-	}
-	*/
 	
 	@Override
 	public void gen_new_product(String prodName, String prodDate, String expDate, int count) {
