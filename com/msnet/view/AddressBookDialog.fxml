@@ -6,12 +6,12 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="524.0" prefWidth="666.0" style="-fx-background-color: #173845;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msnet.view.AddressBookDialogController">
+<AnchorPane prefHeight="524.0" prefWidth="720.0" style="-fx-background-color: #173845;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msnet.view.AddressBookDialogController">
    <children>
       <TableView fx:id="companyInfoTableView" layoutX="18.0" layoutY="64.0" prefHeight="400.0" prefWidth="634.0" stylesheets="@tableview.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
         <columns>
-          <TableColumn fx:id="nameColumn" maxWidth="300.0" prefWidth="148.0" text="Company" />
-          <TableColumn fx:id="addressColumn" maxWidth="600.0" prefWidth="273.0" text="Location" />
+          <TableColumn fx:id="nameColumn" maxWidth="350.0" prefWidth="117.0" text="Company" />
+          <TableColumn fx:id="addressColumn" maxWidth="1200.0" prefWidth="282.0" text="Location" />
             <TableColumn fx:id="bitcoinAddressColumn" maxWidth="600.0" prefWidth="108.0" text="Address" />
         </columns>
          <columnResizePolicy>
