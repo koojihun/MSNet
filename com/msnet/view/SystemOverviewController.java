@@ -436,6 +436,7 @@ public class SystemOverviewController implements Initializable {
 				ProgressDialog.show(mainApp.getPrimaryStage(), false);
 				Thread t = new Thread() {
 					public void run() {
+						System.out.println(productionDate2 + " " + expirationDate);
 						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate2, expirationDate2, quantity,
 								Settings.getBitcoinAddress());
 						Platform.runLater(() -> {
