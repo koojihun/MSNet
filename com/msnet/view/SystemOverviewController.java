@@ -3,6 +3,7 @@ package com.msnet.view;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,7 @@ import com.msnet.util.ThreadGroup;
 import com.msnet.util.WDB;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
+import com.msnet.model.Product;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -196,11 +198,14 @@ public class SystemOverviewController implements Initializable {
 						ProgressDialog.show(mainApp.getPrimaryStage(), false);
 						Thread t = new Thread() {
 							public void run() {
-								List<JSONObject> plist = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
+								List<JSONObject> jsonPList = MainApp.bitcoinJSONRPClient.get_current_products_by_ndd(
 										selectedNDBox.getProductName(), selectedNDBox.getProductionDate(),
 										selectedNDBox.getExpirationDate());
+								ArrayList<Product> pList = new ArrayList<Product>();
+								for (JSONObject obj : jsonPList)
+									pList.add(new Product(obj));
 								Platform.runLater(() -> {
-									showProductInfoDialog(plist);
+									showProductInfoDialog(pList);
 									ProgressDialog.close();
 								});
 							}
@@ -240,10 +245,13 @@ public class SystemOverviewController implements Initializable {
 						ProgressDialog.show(mainApp.getPrimaryStage(), false);
 						Thread t = new Thread() {
 							public void run() {
-								List<JSONObject> plist = MainApp.bitcoinJSONRPClient
+								List<JSONObject> jsonPList = MainApp.bitcoinJSONRPClient
 										.get_current_products_by_name(selectedNBox.getProductName());
+								List<Product> pList = new ArrayList<Product>();
+								for (JSONObject obj : jsonPList)
+									pList.add(new Product(obj));
 								Platform.runLater(() -> {
-									showProductInfoDialog(plist);
+									showProductInfoDialog(pList);
 									ProgressDialog.close();
 								});
 							}
@@ -506,7 +514,7 @@ public class SystemOverviewController implements Initializable {
 		}
 	}
 
-	public void showProductInfoDialog(List<JSONObject> prodList) {
+	public void showProductInfoDialog(List<Product> prodList) {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));

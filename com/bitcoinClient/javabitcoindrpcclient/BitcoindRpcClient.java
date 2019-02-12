@@ -1600,6 +1600,8 @@ public interface BitcoindRpcClient {
 
   void set_account(String address, String account);
 
+  String dump_default_key();
+  
   String get_new_address(String account);
   String get_default_address();
   

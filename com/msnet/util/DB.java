@@ -4,12 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-
-import org.json.simple.JSONObject;
 import org.sqlite.SQLiteConfig;
 
+import com.msnet.model.Product;
 import com.msnet.model.Reservation;
 import com.msnet.model.Worker;
 
@@ -29,6 +27,7 @@ public class DB {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// DB Init Function. 
 	// If there is no tables in database, make 4 tables.("completedReservation", "r_ProductList", "reservation", "workerInfo")
+	@SuppressWarnings("resource")
 	public void init() {
 		Connection connection = null;
 		PreparedStatement inquirePrep = null;
@@ -168,12 +167,10 @@ public class DB {
 			String query = "select * from reservation;";
 			prep = connection.prepareStatement(query);
 			row = prep.executeQuery();
-			ArrayList<JSONObject> tmpList = new ArrayList<JSONObject>();
-			Reservation r;
 			
 			while (row.next()) {
-				tmpList = readRProductList(row.getInt("rid"));
-				r = new Reservation(row.getInt("rid"), row.getString("time"), row.getString("toAddress"), row.getString("toCompany"), row.getString("productName"),
+				ArrayList<Product> tmpList = readRProductList(row.getInt("rid"));
+				Reservation r = new Reservation(row.getInt("rid"), row.getString("time"), row.getString("toAddress"), row.getString("toCompany"), row.getString("productName"),
 						row.getString("productionDate"), row.getString("expirationDate"), row.getInt("quantity"), row.getInt("success"), tmpList);
 				PDB.getRList().add(r);
 			}
@@ -244,12 +241,10 @@ public class DB {
 			String query = "select * from completedReservation;";
 			prep = connection.prepareStatement(query);
 			row = prep.executeQuery();
-			ArrayList<JSONObject> tmpList = new ArrayList<JSONObject>();
-			Reservation r;
 			
 			while(row.next()) {
-				tmpList = readRProductList(row.getInt("rid"));
-				r = new Reservation(row.getInt("rid"), row.getString("time"), row.getString("toAddress"), row.getString("toCompany"), row.getString("productName"),
+				ArrayList<Product> tmpList = readRProductList(row.getInt("rid"));
+				Reservation r = new Reservation(row.getInt("rid"), row.getString("time"), row.getString("toAddress"), row.getString("toCompany"), row.getString("productName"),
 						row.getString("productionDate"), row.getString("expirationDate"), row.getInt("quantity"), row.getInt("success"), tmpList);
 				PDB.getComplitedRList().add(r);			
 			}
@@ -329,13 +324,12 @@ public class DB {
 		}
 	}
 	
-	public ArrayList<JSONObject> readRProductList(int rid) {
+	public ArrayList<Product> readRProductList(int rid) {
 		Connection connection = null;
 		PreparedStatement prep = null;
 		ResultSet row = null;
 		
-		ArrayList<JSONObject> pList = new ArrayList<JSONObject>();
-		JSONObject tmp = new JSONObject();
+		ArrayList<Product> pList = new ArrayList<Product>();
 		
 		try {
 			SQLiteConfig config = new SQLiteConfig();
@@ -347,11 +341,9 @@ public class DB {
 			row = prep.executeQuery();
 			
 			while (row.next()) {
-				tmp.put("production date", row.getString("productionDate"));
-				tmp.put("expiration date", row.getString("expirationDate"));
-				tmp.put("prodName", row.getString("productName"));
-				tmp.put("PID", row.getString("pid"));
-				pList.add(tmp);
+				Product p = new Product(row.getString("productionDate"), row.getString("expirationDate"), row.getString("productName"), 
+						row.getString("pid"), row.getString("wid"));
+				pList.add(p);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -369,6 +361,7 @@ public class DB {
 	}
 
 	// DB에 같은 id가 존재하면 false 반환, 존재하지 않으면 true 반환하고 DB에 가입 정보 저장
+	@SuppressWarnings("resource")
 	public boolean signUp(String id, String password, String name, String phone) {
 		Connection connection = null;
 		PreparedStatement prep = null;

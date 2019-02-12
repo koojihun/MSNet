@@ -10,6 +10,7 @@ import com.msnet.MainApp;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
 import com.msnet.model.NDKey;
+import com.msnet.model.Product;
 import com.msnet.model.Reservation;
 
 import javafx.collections.FXCollections;
@@ -141,10 +142,10 @@ public class PDB {
 	}
 
 	public static boolean isExistPID_in_Reservation(Reservation r, String pid) {
-		ArrayList<JSONObject> tmpProductList = r.getProductList();
+		ArrayList<Product> tmpProductList = r.getProductList();
 		String tmpPID;
-		for (JSONObject p : tmpProductList) {
-			tmpPID = (String) p.get("PID");
+		for (Product p : tmpProductList) {
+			tmpPID = p.getPid();
 			if (pid.equals(tmpPID)) {
 				return true;
 			}
@@ -152,9 +153,7 @@ public class PDB {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	public static String sendProduct(String bitcoin_address, String pid, String prodName, String productionDate,
-			String expirationDate, String wid) {
+	public static String sendProduct(String bitcoin_address, String pid, String prodName, String productionDate, String expirationDate, String wid) {
 		// sendReservation: reservation that matches the information to be sent in the
 		// reservation list
 		Reservation sendReservation = PDB.findReservation(prodName, productionDate, expirationDate, bitcoin_address);
@@ -170,17 +169,9 @@ public class PDB {
 		} else if (sendReservation.getQuantity() > sendReservation.getSuccess()) {
 			// Execute send_to_address when there is a reservation matching the condition in
 			// the reservation list
-			System.out.println("=================================");
-			System.out.println(prodName);
-			System.out.println(pid);
-			System.out.println(productionDate);
-			System.out.println(expirationDate);
-			JSONObject p = new JSONObject();
-			p.put("production date", productionDate);
-			p.put("expiration date", expirationDate);
-			p.put("prodName", prodName);
-			p.put("PID", pid);
-
+					
+			Product p = new Product(productionDate, expirationDate, prodName, pid);
+			
 			DB db = new DB();
 
 			if (sendReservation.getQuantity() - 1 == sendReservation.getSuccess()) {
@@ -188,7 +179,9 @@ public class PDB {
 				db.writeProductList(pid, prodName, productionDate, expirationDate, sendReservation.getRid(), wid); // db에서도 p 추가
 				sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success + 1		
 				db.setSuccessPlusOne(sendReservation.getRid()); // db에서도 success + 1
+				
 				MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
+				
 				completedRList.add(sendReservation);
 				db.writeCompletedReservation(sendReservation);
 				rList.remove(sendReservation);	
@@ -197,9 +190,11 @@ public class PDB {
 				sendReservation.getProductList().add(p);
 				db.writeProductList(pid, prodName, productionDate, expirationDate, sendReservation.getRid(), wid);
 				sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success
-				db.setSuccessPlusOne(sendReservation.getRid());					
+				db.setSuccessPlusOne(sendReservation.getRid());		
+				
 				MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
 			}
+			
 			return "success";
 		} else {
 			System.out.println("===== 할당량 끝 =====");

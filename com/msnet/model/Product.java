@@ -1,75 +1,74 @@
 package com.msnet.model;
 
-import java.util.Map;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import org.json.simple.JSONObject;
 
 public class Product {
-	private StringProperty productionDate;
-	private StringProperty expirationDate;
-	private StringProperty productName;
-	private StringProperty pid;
+	private String productionDate;
+	private String expirationDate;
+	private String productName;
+	private String pid;
+	private String wid;
 	
-	public Product(Map<String, String> product) {
-		this.productionDate = new SimpleStringProperty(String.valueOf(product.get("production date")));
-		this.expirationDate = new SimpleStringProperty(String.valueOf(product.get("expiration date")));
-		this.productName = new SimpleStringProperty(String.valueOf(product.get("prodName")));
-		this.pid = new SimpleStringProperty(String.valueOf(product.get("PID")));
-	} 
+	public Product(JSONObject obj) {
+		this.productionDate = String.valueOf(obj.get("production date"));
+		this.expirationDate = String.valueOf(obj.get("expiration date"));
+		this.productName = String.valueOf(obj.get("prodName"));
+		this.pid = String.valueOf(obj.get("PID"));
+	}
 	
 	public Product(String productionDate, String expirationDate, String productName, String pid) {
-		this.productionDate = new SimpleStringProperty(productionDate);
-		this.expirationDate = new SimpleStringProperty(expirationDate);
-		this.productName = new SimpleStringProperty(productName);
-		this.pid = new SimpleStringProperty(pid);
+		this.productionDate = productionDate;
+		this.expirationDate = expirationDate;
+		this.productName = productName;
+		this.pid = pid;
 	}
 	
+	public Product(String productionDate, String expirationDate, String productName, String pid, String wid) {
+		this.productionDate = productionDate;
+		this.expirationDate = expirationDate;
+		this.productName = productName;
+		this.pid = pid;
+		this.wid = wid;
+	}
+
 	public String getProductionDate() {
-		return productionDate.get();
-	}
-	
-	public void setProductionDate(String productionDate) {
-		this.productionDate.set(productionDate); 
-	}
-	
-	public StringProperty productionDateProperty() {
 		return productionDate;
 	}
-		
-	
+
+	public void setProductionDate(String productionDate) {
+		this.productionDate = productionDate;
+	}
+
 	public String getExpirationDate() {
-		return expirationDate.get();
-	}
-	
-	public void setExpirationDate(String expirationDate) {
-		this.expirationDate.set(expirationDate);
-	}
-	
-	public StringProperty expirationDateProperty() {
 		return expirationDate;
 	}
-	
+
+	public void setExpirationDate(String expirationDate) {
+		this.expirationDate = expirationDate;
+	}
+
 	public String getProductName() {
-		return productName.get();
-	}
-	
-	public void setProductName(String productName) {
-		this.productName.set(productName);
-	}
-	
-	public StringProperty productNameProperty() {
 		return productName;
 	}
-	
-	public String getPID() {
-		return pid.get();
+
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
-	
-	public void setPID(String pid) {
-		this.pid.set(pid);
-	}
-	
-	public StringProperty pidProperty() {
+
+	public String getPid() {
 		return pid;
 	}
+
+	public void setPid(String pid) {
+		this.pid = pid;
+	}
+	
+	public void setWid(String wid) {
+		this.wid = wid;
+	}
+	
+	public String getWid() {
+		return wid;
+	}
+
 }

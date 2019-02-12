@@ -2264,6 +2264,11 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 	}
 
 	@Override
+	public String dump_default_key() {
+		return (String) query("dump_default_key");
+	}
+	
+	@Override
 	public String get_new_address(String account) {
 		return (String) query("get_new_address", account);
 	}

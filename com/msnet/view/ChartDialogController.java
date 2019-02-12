@@ -14,6 +14,7 @@ import org.json.simple.JSONObject;
 import com.msnet.MainApp;
 import com.msnet.model.NBox;
 import com.msnet.model.NDBox;
+import com.msnet.model.Product;
 import com.msnet.model.Reservation;
 import com.msnet.util.PDB;
 
@@ -105,7 +106,7 @@ public class ChartDialogController implements Initializable {
 		});
 	}
 	
-	public void showProductInfoDialog(List<JSONObject> prodList) {
+	public void showProductInfoDialog(List<Product> prodList) {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/ProductInfoDialog.fxml"));

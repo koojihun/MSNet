@@ -4,9 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
-import org.json.simple.JSONObject;
-
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,7 +20,7 @@ public class Reservation {
 	private StringProperty expirationDate;
 	private IntegerProperty quantity;
 	private IntegerProperty success;
-	private ArrayList<JSONObject> productList;
+	private ArrayList<Product> productList;
 
 	// Reservation을 아예 새로 생성하는 경우.
 	public Reservation(String time, String toAddress, String toCompany, NDBox selectedNDBox, int quantity) {
@@ -41,7 +38,7 @@ public class Reservation {
 
 	// Reservation을 파일에서 읽어와 ArrayList 형태로 추가하는 경우.
 	public Reservation(int rid, String time, String toAddress, String toCompany, String productName, String prodDate,
-			String expDate, int quantity, int success, ArrayList<JSONObject> productList) {
+			String expDate, int quantity, int success, ArrayList<Product> productList) {
 		this.rid = new SimpleIntegerProperty(rid);
 		this.time = new SimpleStringProperty(time);
 		this.toAddress = new SimpleStringProperty(toAddress);
@@ -177,11 +174,11 @@ public class Reservation {
 		return success;
 	}
 
-	public ArrayList<JSONObject> getProductList() {
+	public ArrayList<Product> getProductList() {
 		return this.productList;
 	}
 
-	public void setProductList(ArrayList<JSONObject> productList) {
+	public void setProductList(ArrayList<Product> productList) {
 		this.productList = productList;
 	}
 }

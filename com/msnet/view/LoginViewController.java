@@ -86,7 +86,7 @@ public class LoginViewController implements Initializable{
 		
 		try {
 			JSONObject jsonResult = HTTP.send(serverURL + "signin.do", "post", key, val);
-			result = (boolean)jsonResult.get("result");
+			result = (boolean) jsonResult.get("result");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

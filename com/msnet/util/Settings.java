@@ -1,7 +1,6 @@
 package com.msnet.util;
 
 import java.io.*;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.MainApp;
@@ -179,7 +178,7 @@ public class Settings {
 		if (bitcoinAddress == null) {
 			while (bitcoinAddress == null) {
 				try {
-					bitcoinAddress = MainApp.bitcoinJSONRPClient.get_new_address(Settings.getId());
+					bitcoinAddress = MainApp.bitcoinJSONRPClient.dump_default_key();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
