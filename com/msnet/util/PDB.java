@@ -141,7 +141,7 @@ public class PDB {
 		}
 		return null;
 	}
-
+/*
 	public static boolean isExistPID_in_Reservation(Reservation r, String pid) {
 		ArrayList<Product> tmpProductList = r.getProductList();
 		String tmpPID;
@@ -153,18 +153,18 @@ public class PDB {
 		}
 		return false;
 	}
-
+*/
 	public static String sendProduct(String bitcoin_address, String pid, String prodName, String productionDate, String expirationDate, String wid) {
 		// sendReservation: reservation that matches the information to be sent in the
 		// reservation list
 		Reservation sendReservation = PDB.findReservation(prodName, productionDate, expirationDate, bitcoin_address);
-
+		DB db = new DB();
 		if (sendReservation == null) {
 			// When there is no reservation matching the condition in the reservation list,
 			// an alert window
 			System.out.println("======== 존재하지 않는 reservation =========");
 			return "notExist";
-		} else if (isExistPID_in_Reservation(sendReservation, pid)) {
+		} else if (db.isExist_pid(pid)) {
 			System.out.println("========== 이미 보낸 제품 ===========");
 			return "sentProduct";
 		} else if (sendReservation.getQuantity() > sendReservation.getSuccess()) {
@@ -172,8 +172,6 @@ public class PDB {
 			// the reservation list
 					
 			Product p = new Product(productionDate, expirationDate, prodName, pid, wid);
-			
-			DB db = new DB();
 
 			if (sendReservation.getQuantity() - 1 == sendReservation.getSuccess()) {
 				sendReservation.getProductList().add(p); // productList에 p 추가

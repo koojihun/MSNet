@@ -34,7 +34,7 @@
                                           <Label layoutX="20.0" layoutY="20.0" text="Name:" />
                                           <JFXTextField fx:id="product_prodNameTextField" layoutX="155.0" layoutY="15.0" prefHeight="23.0" prefWidth="133.0" />
                                           <JFXTextField fx:id="product_quantityTextField" layoutX="155.0" layoutY="45.0" prefHeight="23.0" prefWidth="133.0" />
-                                          <JFXTextField fx:id="product_productionDateTextField" layoutX="155.0" layoutY="75.0" prefHeight="23.0" prefWidth="133.0" promptText="2020-12-24 00:00:00" />
+                                          <JFXTextField fx:id="product_productionDateTextField" layoutX="155.0" layoutY="75.0" prefHeight="23.0" prefWidth="133.0" promptText="2020-12-24 00:00:00" style="-fx-prompt-text-fill: gray;" />
                                           <JFXTextField fx:id="termTextField" layoutX="65.0" layoutY="105.0" prefHeight="23.0" prefWidth="75.0" />
                                           <JFXComboBox fx:id="dateBox" layoutX="155.0" layoutY="105.0" prefHeight="23.0" prefWidth="133.0" />
                                           <JFXTextField fx:id="product_expirationDateTextField" layoutX="155.0" layoutY="135.0" prefHeight="23.0" prefWidth="133.0" />

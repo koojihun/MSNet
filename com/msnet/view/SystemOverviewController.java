@@ -288,13 +288,13 @@ public class SystemOverviewController implements Initializable {
 			}
 		});
 		///////////////////////////////////////////////////////////////////
-		// Reservation tab에서 오른쪽 마우스 눌러서 reservation을 지울 수 있는 기능
+		// Reservation tab에서 오른쪽 마우스 눌러서 reservation을 지울 수 있는 기능. 
+		// (reservation의 success가 0보다 클 때 -> completedReservation에 추가)
 		MenuItem mi_reservation = new MenuItem("Delete");
 		mi_reservation.setOnAction((ActionEvent event) -> {
 			Reservation r = reservationStatusTableView.getSelectionModel().getSelectedItem();
 			DB db = new DB();
 			if (r.getSuccess() > 0) {
-				System.out.println("Success: " + r.getSuccess());
 				r.setQuantity(r.getSuccess());
 				db.writeCompletedReservation(r);
 			}
