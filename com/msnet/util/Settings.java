@@ -54,11 +54,6 @@ public class Settings {
 		// DB init.
 		DB db = new DB();
 		db.init();
-		//////////////////////////////////////
-		// In Memory Database Initialize.   //
-		new PDB();							//
-		new WDB();				            //
-		//////////////////////////////////////
 	}
 
 	private boolean isThereConfFile() {

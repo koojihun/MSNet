@@ -144,13 +144,17 @@ public class SystemOverviewController implements Initializable {
 	private static AnchorPane systemOverview;
 
 	//////////////////////////////////////////////////
-	public SystemOverviewController() {
-	}
+	public SystemOverviewController() { }
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		//////////////////////////////////////
+		// In Memory Database Initialize.   //
+		new PDB();							//
+		new WDB();				            //
+		//////////////////////////////////////
 		product_expirationDateTextField.setEditable(false);
-
+		
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
 		productNameTextField.setEditable(false);
@@ -180,8 +184,6 @@ public class SystemOverviewController implements Initializable {
 		r_productNameColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
 		r_quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
 		r_successColumn.setCellValueFactory(cellData -> cellData.getValue().successProperty().asObject());
-
-		// 프로그램이 실행될 때 reservation.dat에 저장된 reservation 데이터를 읽어서 rList에 추가
 		reservationStatusTableView.setItems(PDB.getRList());
 
 		worker_idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty());
@@ -386,7 +388,6 @@ public class SystemOverviewController implements Initializable {
 						String head = "Wrong Quantity";
 						String body = "There is nothing to send";
 						new Alert(systemOverview, head, body);
-
 					} else {
 						String head = "Wrong Quantity";
 						String body = "Please enter the 'Quantity' less than " + available;
