@@ -169,6 +169,9 @@ public class Settings {
 				if (s.contains("bitcoinAddress")) {
 					int equalIndex = s.indexOf('=');
 					Settings.bitcoinAddress = s.substring(equalIndex + 1);
+				} else if (s.contains("defaultKey")) {
+					int equalIndex = s.indexOf('=');
+					Settings.defaultKey = s.substring(equalIndex + 1);
 				}
 			}
 			in.close();

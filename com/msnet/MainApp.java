@@ -1,11 +1,9 @@
 package com.msnet;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import com.bitcoinClient.javabitcoindrpcclient.BitcoinJSONRPCClient;
 import com.msnet.util.Bitcoind;
-import com.msnet.util.DB;
 import com.msnet.util.HTTP;
 import com.msnet.util.ThreadGroup;
 import com.msnet.view.LoginViewController;
