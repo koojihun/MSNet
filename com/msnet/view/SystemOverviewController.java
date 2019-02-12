@@ -144,8 +144,7 @@ public class SystemOverviewController implements Initializable {
 	private static AnchorPane systemOverview;
 
 	//////////////////////////////////////////////////
-	public SystemOverviewController() {
-	}
+	public SystemOverviewController() { }
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -155,7 +154,7 @@ public class SystemOverviewController implements Initializable {
 		new WDB(); //
 		//////////////////////////////////////
 		product_expirationDateTextField.setEditable(false);
-
+		
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
 		productNameTextField.setEditable(false);
@@ -389,7 +388,6 @@ public class SystemOverviewController implements Initializable {
 						String head = "Wrong Quantity";
 						String body = "There is nothing to send";
 						new Alert(systemOverview, head, body);
-
 					} else {
 						String head = "Wrong Quantity";
 						String body = "Please enter the 'Quantity' less than " + available;
