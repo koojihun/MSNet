@@ -152,7 +152,7 @@ public class Settings {
 			fw.newLine();
 			fw.write("addnode=166.104.126.42");
 			fw.newLine();
-
+			
 			fw.flush();
 			fw.close();
 		} catch (Exception e) {
