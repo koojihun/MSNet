@@ -2231,11 +2231,11 @@ public class BitcoinJSONRPCClient implements BitcoindRpcClient {
 		return ret;
 	}
 	*/
+	
 	@Override
-	public void gen_new_product(String prodName, String prodDate, String expDate, int count, String bitcoinAddress) {
-		query("gen_new_product", prodName, prodDate, expDate, count, bitcoinAddress);
+	public void gen_new_product(String prodName, String prodDate, String expDate, int count) {
+		query("gen_new_product", prodName, prodDate, expDate, count);
 	}
-
 	@Override
 	public boolean find_product(String id, long countryCode, long zipCode) {
 		return (boolean) query("find_product", id, countryCode, zipCode);

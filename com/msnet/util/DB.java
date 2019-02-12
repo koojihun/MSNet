@@ -26,7 +26,7 @@ public class DB {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// DB Init Function. 
-	// If there is no tables in database, make 4 tables.("completedReservation", "r_ProductList", "reservation", "workerInfo")
+	// If there is no tables in database, make 4 tables.("completedReservation", "r_productList", "reservation", "workerInfo")
 	@SuppressWarnings("resource")
 	public void init() {
 		Connection connection = null;
@@ -62,10 +62,10 @@ public class DB {
 			}
 			
 			// 2. r_productList table creation.
-			inquirePrep.setString(1, "r_ProductList");
+			inquirePrep.setString(1, "r_productList");
 			row = inquirePrep.executeQuery();
 			if (!row.getBoolean("isExist")) {
-				String creationQeury = "CREATE TABLE `r_productLIst` (" + 
+				String creationQeury = "CREATE TABLE `r_productList` (" + 
 						"`pid` TEXT," + 
 						"`productName` TEXT," + 
 						"`productionDate` TEXT," + 

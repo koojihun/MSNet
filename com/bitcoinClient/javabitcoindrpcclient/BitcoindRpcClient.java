@@ -1586,8 +1586,7 @@ public interface BitcoindRpcClient {
    * Must be called before set_generate
    */
   
-  void gen_new_product(String prodName, String prodDate, String expDate, int count, String bitcoinAddress);
-
+  void gen_new_product(String prodName, String prodDate, String expDate, int count);
   boolean find_product(String id, long countryCode, long zipCode);
   /**
    * For MSNet - Added by Juhan
