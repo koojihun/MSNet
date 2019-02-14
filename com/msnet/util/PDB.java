@@ -174,7 +174,7 @@ public class PDB {
 				sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success + 1
 				db.setSuccessPlusOne(sendReservation.getRid()); // db에서도 success + 1
 				
-				if (sendReservation.getQuantity() - 1 == sendReservation.getSuccess()) {
+				if (sendReservation.getQuantity() == sendReservation.getSuccess()) {
 					// reservation에서 마지막 tx 상황일 때
 					completedRList.add(sendReservation);
 					db.writeCompletedReservation(sendReservation);

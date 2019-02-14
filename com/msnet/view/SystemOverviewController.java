@@ -2,6 +2,7 @@ package com.msnet.view;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,6 +22,7 @@ import com.msnet.model.Worker;
 import com.msnet.util.AES;
 import com.msnet.util.Alert;
 import com.msnet.util.DB;
+import com.msnet.util.HTTP;
 import com.msnet.util.PDB;
 import com.msnet.util.QRMaker;
 import com.msnet.util.Settings;
@@ -51,7 +53,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class SystemOverviewController implements Initializable {
-
+	private final String serverURL = "http://166.104.126.42:8090/NewSystem/";
 	//////////////////////////////////////////////////
 	// Accordion
 	@FXML
@@ -61,9 +63,29 @@ public class SystemOverviewController implements Initializable {
 	@FXML
 	private JFXTextField product_quantityTextField;
 	@FXML
-	private JFXTextField product_productionDateTextField;
+	private JFXTextField product_p_year_TextField; // production date
 	@FXML
-	private JFXTextField product_expirationDateTextField;
+	private JFXTextField product_p_month_TextField;
+	@FXML
+	private JFXTextField product_p_day_TextField;
+	@FXML
+	private JFXTextField product_p_hour_TextField;
+	@FXML
+	private JFXTextField product_p_minute_TextField;
+	@FXML
+	private JFXTextField product_p_second_TextField;
+	@FXML
+	private JFXTextField product_e_year_TextField; // expiration date
+	@FXML
+	private JFXTextField product_e_month_TextField;
+	@FXML
+	private JFXTextField product_e_day_TextField;
+	@FXML
+	private JFXTextField product_e_hour_TextField;
+	@FXML
+	private JFXTextField product_e_minute_TextField;
+	@FXML
+	private JFXTextField product_e_second_TextField;
 	@FXML
 	private JFXTextField termTextField;
 	@FXML
@@ -147,8 +169,10 @@ public class SystemOverviewController implements Initializable {
 	private TabPane right_tab;
 	public double xOffset = 0;
 	public double yOffset = 0;
+
 	//////////////////////////////////////////////////
-	public SystemOverviewController() { }
+	public SystemOverviewController() {
+	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -162,36 +186,41 @@ public class SystemOverviewController implements Initializable {
 			@Override
 			public void handle(MouseEvent event) {
 				xOffset = event.getSceneX();
-	            yOffset = event.getSceneY();		
+				yOffset = event.getSceneY();
 			}
 		});
-		
+
 		left_anchor.setOnMouseDragged(new EventHandler<MouseEvent>() {
-	        @Override
-	        public void handle(MouseEvent event) {
-	        	mainApp.getPrimaryStage().setX(event.getScreenX() - xOffset);
-	        	mainApp.getPrimaryStage().setY(event.getScreenY() - yOffset);
-	        }
-	    });
-		
+			@Override
+			public void handle(MouseEvent event) {
+				mainApp.getPrimaryStage().setX(event.getScreenX() - xOffset);
+				mainApp.getPrimaryStage().setY(event.getScreenY() - yOffset);
+			}
+		});
+
 		right_tab.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
 				xOffset = event.getSceneX();
-	            yOffset = event.getSceneY();		
+				yOffset = event.getSceneY();
 			}
 		});
-		
+
 		right_tab.setOnMouseDragged(new EventHandler<MouseEvent>() {
-	        @Override
-	        public void handle(MouseEvent event) {
-	        	mainApp.getPrimaryStage().setX(event.getScreenX() - xOffset);
-	        	mainApp.getPrimaryStage().setY(event.getScreenY() - yOffset);
-	        }
-	    });
+			@Override
+			public void handle(MouseEvent event) {
+				mainApp.getPrimaryStage().setX(event.getScreenX() - xOffset);
+				mainApp.getPrimaryStage().setY(event.getScreenY() - yOffset);
+			}
+		});
 		////////////////////////////////////////////////////////////////////
-		product_expirationDateTextField.setEditable(false);
-		
+		product_e_year_TextField.setEditable(false);
+		product_e_month_TextField.setEditable(false);
+		product_e_day_TextField.setEditable(false);
+		product_e_hour_TextField.setEditable(false);
+		product_e_minute_TextField.setEditable(false);
+		product_e_second_TextField.setEditable(false);
+
 		companyTextField.setEditable(false);
 		addressTextField.setEditable(false);
 		productNameTextField.setEditable(false);
@@ -325,7 +354,7 @@ public class SystemOverviewController implements Initializable {
 			}
 		});
 		///////////////////////////////////////////////////////////////////
-		// Reservation tab에서 오른쪽 마우스 눌러서 reservation을 지울 수 있는 기능. 
+		// Reservation tab에서 오른쪽 마우스 눌러서 reservation을 지울 수 있는 기능.
 		// (reservation의 success가 0보다 클 때 -> completedReservation에 추가)
 		MenuItem mi_reservation = new MenuItem("Delete");
 		mi_reservation.setOnAction((ActionEvent event) -> {
@@ -355,12 +384,12 @@ public class SystemOverviewController implements Initializable {
 		workerTableView.setContextMenu(menu_worker);
 		///////////////////////////////////////////////////////////////////
 	}
-	
+
 	@FXML
 	public void handleMinimize() {
 		mainApp.getPrimaryStage().setIconified(true);
 	}
-	
+
 	@FXML
 	public void handleClose() {
 		try {
@@ -369,9 +398,9 @@ public class SystemOverviewController implements Initializable {
 			e.printStackTrace();
 		}
 		Platform.exit();
-        System.exit(0);
+		System.exit(0);
 	}
-	
+
 	@FXML
 	public void handleAddressBook() {
 		showAddressBookDialog();
@@ -471,12 +500,24 @@ public class SystemOverviewController implements Initializable {
 	public void handleMakeProducts() {
 		String prodName = product_prodNameTextField.getText();
 		String str_quantity = product_quantityTextField.getText();
-		String productionDate = product_productionDateTextField.getText();
-		String expirationDate = product_expirationDateTextField.getText();
-		String productionDate2 = productionDate.replaceAll(":", "").replaceAll(" ", "T").replaceAll("-", "");
-		String expirationDate2 = expirationDate.replaceAll(":", "").replaceAll(" ", "T").replaceAll("-", "");
-		if (prodName.equals("") || str_quantity.equals("") || productionDate2.equals("")
-				|| expirationDate2.equals("")) {
+
+		String p_year = product_p_year_TextField.getText();
+		String p_month = product_p_month_TextField.getText();
+		String p_day = product_p_day_TextField.getText();
+		String p_hour = product_p_hour_TextField.getText();
+		String p_minute = product_p_minute_TextField.getText();
+		String p_second = product_p_second_TextField.getText();
+		String productionDate = p_year + p_month + p_day + "T" + p_hour + p_minute + p_second;
+
+		String e_year = product_e_year_TextField.getText();
+		String e_month = product_e_month_TextField.getText();
+		String e_day = product_e_day_TextField.getText();
+		String e_hour = product_e_hour_TextField.getText();
+		String e_minute = product_e_minute_TextField.getText();
+		String e_second = product_e_second_TextField.getText();
+		String expirationDate = e_year + e_month + e_day + "T" + e_hour + e_minute + e_second;
+
+		if (prodName.equals("") || str_quantity.equals("") || productionDate.equals("") || expirationDate.equals("")) {
 			String head = "Enter the information";
 			String body = "Please enter the required information(Name, Quantity, Production date, Expiration date)";
 			new Alert(systemOverview, head, body);
@@ -488,59 +529,133 @@ public class SystemOverviewController implements Initializable {
 				String body = "Please enter the 'Quantity' less than 10000";
 				new Alert(systemOverview, head, body);
 			} else {
-				ProgressDialog.show(mainApp.getPrimaryStage(), false);
-				Thread t = new Thread() {
-					public void run() {
-						MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate2, expirationDate2,
-								quantity);
+				boolean result = false;
 
-						Platform.runLater(() -> {
-							ProgressDialog.close();
-						});
-					}
-				};
-				ThreadGroup.addThread(t);
+				// 서버에 나의 할당량을 물어봐서 할당량에 여유가 있으면 true를 return. 
+				// true일 경우에만 gen_new_product() 진행
+				ArrayList<String> key = new ArrayList<String>();
+				ArrayList<String> val = new ArrayList<String>();
+
+				key.add("id");
+				key.add("password");
+				key.add("quantity");
+				val.add(Settings.getId());
+				val.add(Settings.getPassword());
+				val.add(str_quantity);
+
+				try {
+					JSONObject jsonResult = HTTP.send(serverURL + "reportGen.do", "post", key, val);
+					result = (boolean) jsonResult.get("result");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (result) {
+					// 할당량에 여유가 있는 경우, gen_new_product() 실행.
+					ProgressDialog.show(mainApp.getPrimaryStage(), false);
+					Thread t = new Thread() {
+						public void run() {
+							MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate,
+									quantity);
+
+							Platform.runLater(() -> {
+								ProgressDialog.close();
+							});
+						}
+					};
+					ThreadGroup.addThread(t);
+				} else {
+					// 할당량에 여유가 없는 경우, 경고창 뜸.
+					String head = "할당량 부족...";
+					String body = "쫌  사라!!!!!!!!!!";
+					new Alert(systemOverview, head, body);
+				}
+
 				product_prodNameTextField.setText("");
 				product_quantityTextField.setText("");
-				product_productionDateTextField.setText("");
-				product_expirationDateTextField.setText("");
+				product_p_year_TextField.setText("");
+				product_p_month_TextField.setText("");
+				product_p_day_TextField.setText("");
+				product_p_hour_TextField.setText("");
+				product_p_minute_TextField.setText("");
+				product_p_second_TextField.setText("");
+				product_e_year_TextField.setText("");
+				product_e_month_TextField.setText("");
+				product_e_day_TextField.setText("");
+				product_e_hour_TextField.setText("");
+				product_e_minute_TextField.setText("");
+				product_e_second_TextField.setText("");
 				termTextField.setText("");
 			}
 		}
 	}
 
 	@FXML
+	public void handleAdd() {
+
+		// 아직 안됨!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+		String p_year = product_p_year_TextField.getText();
+		String p_month = product_p_month_TextField.getText();
+		String p_day = product_p_day_TextField.getText();
+		String p_hour = product_p_hour_TextField.getText();
+		String p_minute = product_p_minute_TextField.getText();
+		String p_second = product_p_second_TextField.getText();
+
+		if (p_year.equals("") | p_month.equals("") | p_day.equals("") | p_hour.equals("") | p_minute.equals("")
+				| p_second.equals("")) {
+			String head = "Enter the date.";
+			String body = "Please enter the required date information.";
+			new Alert(systemOverview, head, body);
+		} else {
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		}
+	}
+
+	@FXML
 	public void handleGetCurrentTime() {
+
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date current = new Date(System.currentTimeMillis());
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(current);
-		String prodTime = format.format(cal.getTimeInMillis()); // format.format(cal.getTimeInMillis()).replace(":",
-																// "T");
+		String prodTime = format.format(cal.getTimeInMillis());
+		product_p_year_TextField.setText(prodTime.substring(0, 4));
+		product_p_month_TextField.setText(prodTime.substring(5, 7));
+		product_p_day_TextField.setText(prodTime.substring(8, 10));
+		product_p_hour_TextField.setText(prodTime.substring(11, 13));
+		product_p_minute_TextField.setText(prodTime.substring(14, 16));
+		product_p_second_TextField.setText(prodTime.substring(17, 19));
+
 		String str_term = termTextField.getText();
-		product_productionDateTextField.setText(prodTime);
+
 		if (!str_term.equals("")) {
-			int term = Integer.parseInt(termTextField.getText());
+			int term = Integer.parseInt(str_term);
 			String unitOfTerm = dateBox.getSelectionModel().getSelectedItem();
 			String expTime = "";
 			if (unitOfTerm.equals("Hour")) {
 				cal.add(Calendar.HOUR, term);
-				expTime = format.format(cal.getTimeInMillis());// format.format(cal.getTimeInMillis()).replace(":",
-																// "T");
+				expTime = format.format(cal.getTimeInMillis());
+
 			} else if (unitOfTerm.equals("Day")) {
 				cal.add(Calendar.DATE, term);
-				expTime = format.format(cal.getTimeInMillis());// format.format(cal.getTimeInMillis()).replace(":",
-																// "T");
+				expTime = format.format(cal.getTimeInMillis());
+
 			} else if (unitOfTerm.equals("Month")) {
 				cal.add(Calendar.MONTH, term);
-				expTime = format.format(cal.getTimeInMillis());// format.format(cal.getTimeInMillis()).replace(":",
-																// "T");
+				expTime = format.format(cal.getTimeInMillis());
+
 			} else if (unitOfTerm.equals("Year")) {
 				cal.add(Calendar.YEAR, term);
-				expTime = format.format(cal.getTimeInMillis());// format.format(cal.getTimeInMillis()).replace(":",
-																// "T");
+				expTime = format.format(cal.getTimeInMillis());
+
 			}
-			product_expirationDateTextField.setText(expTime);
+			product_e_year_TextField.setText(expTime.substring(0, 4));
+			product_e_month_TextField.setText(expTime.substring(5, 7));
+			product_e_day_TextField.setText(expTime.substring(8, 10));
+			product_e_hour_TextField.setText(expTime.substring(11, 13));
+			product_e_minute_TextField.setText(expTime.substring(14, 16));
+			product_e_second_TextField.setText(expTime.substring(17, 19));
 		}
 	}
 
@@ -595,7 +710,7 @@ public class SystemOverviewController implements Initializable {
 			controller.setProduct(prodList);
 			controller.setMain(mainApp);
 			dialogStage.showAndWait();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -613,7 +728,7 @@ public class SystemOverviewController implements Initializable {
 			dialogStage.initOwner(mainApp.getPrimaryStage());
 			Scene scene = new Scene(addressBookPane);
 			dialogStage.setScene(scene);
-			
+
 			AddressBookDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
 			controller.setCompanyTextField(companyTextField);
