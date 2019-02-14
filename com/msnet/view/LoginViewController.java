@@ -109,4 +109,10 @@ public class LoginViewController implements Initializable{
 			new Alert(loginPane, head, body);
 		}
 	}
+	
+	@FXML
+	public void handleClose() {
+		Platform.exit();
+        System.exit(0);
+	}
 }

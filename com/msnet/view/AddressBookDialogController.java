@@ -12,21 +12,26 @@ import com.msnet.model.Company;
 import com.msnet.util.HTTP;
 import com.msnet.util.Settings;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.DialogEvent;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class AddressBookDialogController implements Initializable {
-
+	@FXML
+	private AnchorPane pane;
 	@FXML
 	private JFXTextField searchTextField;
 	@FXML
@@ -41,10 +46,12 @@ public class AddressBookDialogController implements Initializable {
 	private TextField addressTextField;
 	private Stage dialogStage;
 	private ObservableList<Company> companyList;
-
+	public double xOffset = 0;
+	public double yOffset = 0;
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-
+		
 		ArrayList<String> key = new ArrayList<String>();
 		ArrayList<String> val = new ArrayList<String>();
 
@@ -95,12 +102,24 @@ public class AddressBookDialogController implements Initializable {
 				} 
 			}
 		});
+		
 
-	}
+		pane.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				xOffset = event.getSceneX();
+	            yOffset = event.getSceneY();					
+			}
+		});
+		
+		pane.setOnMouseDragged(new EventHandler<MouseEvent>() {
+	        @Override
+	        public void handle(MouseEvent event) {
+	        	dialogStage.setX(event.getScreenX() - xOffset);
+	        	dialogStage.setY(event.getScreenY() - yOffset);
+	        }
+	    });
 
-	public void setDialogStage(Stage dialogStage) {
-		this.dialogStage = dialogStage;
-		dialogStage.setResizable(false);
 	}
 
 	@FXML
@@ -114,12 +133,23 @@ public class AddressBookDialogController implements Initializable {
 					companyInfoTableView.scrollTo(item);
 				});
 	}
-
+	
+	@FXML
+	public void handleClose() {
+		dialogStage.close();
+	}
+	
 	public void setCompanyTextField(TextField companyTextField) {
 		this.companyTextField = companyTextField;
 	}
 
 	public void setAddressTextField(TextField addressTextField) {
 		this.addressTextField = addressTextField;
+	}
+	
+	public void setDialogStage(Stage dialogStage) {
+		this.dialogStage = dialogStage;
+		dialogStage.setResizable(false);
+		this.dialogStage.initStyle(StageStyle.UNDECORATED); // 제목표시줄 안보이게 하기 위한 작업
 	}
 }

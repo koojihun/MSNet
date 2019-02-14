@@ -18,6 +18,7 @@ import com.msnet.model.Product;
 import com.msnet.model.Reservation;
 import com.msnet.util.PDB;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -33,15 +34,20 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class ChartDialogController implements Initializable {
 	private MainApp mainApp;
+	private Stage dialogStage;
+	@FXML
+	private TabPane pane;
 	@FXML
 	private BarChart<String, Integer> barChart;
 	@FXML
@@ -79,6 +85,9 @@ public class ChartDialogController implements Initializable {
 	private ObservableList<String> nameList = FXCollections.observableArrayList();
 	private ObservableList<Reservation> completedRList = FXCollections.observableArrayList();
 
+	public double xOffset = 0;
+	public double yOffset = 0;
+	
 	public ChartDialogController() {
 	}
 	
@@ -104,6 +113,22 @@ public class ChartDialogController implements Initializable {
 				}
 			}
 		});
+		
+		pane.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				xOffset = event.getSceneX();
+	            yOffset = event.getSceneY();					
+			}
+		});
+		
+		pane.setOnMouseDragged(new EventHandler<MouseEvent>() {
+	        @Override
+	        public void handle(MouseEvent event) {
+	        	dialogStage.setX(event.getScreenX() - xOffset);
+	        	dialogStage.setY(event.getScreenY() - yOffset);
+	        }
+	    });
 	}
 	
 	public void showProductInfoDialog(List<Product> prodList) {
@@ -186,4 +211,16 @@ public class ChartDialogController implements Initializable {
 	public void setMain(MainApp mainApp) {
 		this.mainApp = mainApp;
 	}
+	
+	@FXML
+	public void handleClose() {
+		dialogStage.close();
+	}
+
+	public void setDialogStage(Stage dialogStage) {
+		this.dialogStage= dialogStage;
+		dialogStage.setResizable(false);
+		this.dialogStage.initStyle(StageStyle.UNDECORATED); // 제목표시줄 안보이게 하기 위한 작업
+	}
+	
 }

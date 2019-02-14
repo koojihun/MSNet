@@ -6,8 +6,10 @@ import java.util.ResourceBundle;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
+import com.msnet.MainApp;
 import com.msnet.model.Product;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,8 +20,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class ProductInfoDialogController implements Initializable {
+	@FXML
+	private AnchorPane pane;
 	@FXML
 	private TableView<Product> productInfoTableView;
 	@FXML
@@ -36,9 +44,13 @@ public class ProductInfoDialogController implements Initializable {
 	private JFXTextField searchTextField;
 	@FXML
 	private JFXButton searchButton;
-
+	
+	private Stage dialogStage;
 	private ObservableList<Product> pList;
-
+	private MainApp mainApp;
+	public double xOffset = 0;
+	public double yOffset = 0;
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		productInfoTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -59,6 +71,22 @@ public class ProductInfoDialogController implements Initializable {
 				}
 			}
 		});
+		
+		pane.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				xOffset = event.getSceneX();
+	            yOffset = event.getSceneY();					
+			}
+		});
+		
+		pane.setOnMouseDragged(new EventHandler<MouseEvent>() {
+	        @Override
+	        public void handle(MouseEvent event) {
+	        	dialogStage.setX(event.getScreenX() - xOffset);
+	        	dialogStage.setY(event.getScreenY() - yOffset);
+	        }
+	    });
 	}
 
 	@FXML
@@ -78,5 +106,21 @@ public class ProductInfoDialogController implements Initializable {
 	
 	public ObservableList<Product> getPList(){
 		return pList;
+	}
+	
+	@FXML
+	public void handleClose() {
+		dialogStage.close();
+	}
+
+	public void setMain(MainApp mainApp) {
+		this.mainApp = mainApp;
+		
+	}
+	
+	public void setDialogStage(Stage dialogStage) {
+		this.dialogStage = dialogStage;
+		dialogStage.setResizable(false);
+		this.dialogStage.initStyle(StageStyle.UNDECORATED); // 제목표시줄 안보이게 하기 위한 작업
 	}
 }

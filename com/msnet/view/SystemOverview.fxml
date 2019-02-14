@@ -27,7 +27,7 @@
                     <items>
                       <AnchorPane minHeight="0.0" minWidth="-Infinity" prefHeight="100.0" prefWidth="160.0" style="-fx-background-color: white;" styleClass="background">
                            <children>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="566.0" prefWidth="317.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <AnchorPane fx:id="left_anchor" minHeight="0.0" minWidth="0.0" prefHeight="566.0" prefWidth="317.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
                                     <Pane layoutX="16.0" layoutY="10.0" prefHeight="211.0" prefWidth="307.0" style="-fx-background-color: #EEEECD; -fx-border-color: black;" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="35.0">
                                        <children>
@@ -95,7 +95,7 @@
                <children>
                   <SplitPane dividerPositions="0.6364942528735632" orientation="VERTICAL" prefHeight="698.0" prefWidth="663.0" stylesheets="@splitPane.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
-                        <TabPane prefHeight="549.0" prefWidth="920.0" style="-fx-background-color: #34869D;" stylesheets="@tabPane.css" tabClosingPolicy="UNAVAILABLE">
+                        <TabPane fx:id="right_tab" prefHeight="549.0" prefWidth="920.0" style="-fx-background-color: #34869D;" stylesheets="@tabPane.css" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
                             <Tab text="Inventory">
                               <content>
@@ -249,6 +249,14 @@
                         </AnchorPane>
                     </items>
                   </SplitPane>
+                  <JFXButton onAction="#handleClose" style="-fx-background-color: #C85B7D; -fx-text-fill: white;" text="X" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font></JFXButton>
+                  <JFXButton layoutX="10.0" layoutY="10.0" onAction="#handleMinimize" style="-fx-background-color: #7DC2D4; -fx-text-fill: white;" text="_" AnchorPane.rightAnchor="33.0" AnchorPane.topAnchor="2.0">
+                     <font>
+                        <Font name="Wide Latin" size="14.0" />
+                     </font></JFXButton>
                </children>
             </AnchorPane>
         </items>

@@ -5,8 +5,9 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="524.0" prefWidth="950.0" style="-fx-background-color: #173845;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msnet.view.AddressBookDialogController">
+<AnchorPane fx:id="pane" prefHeight="524.0" prefWidth="950.0" style="-fx-background-color: #173845;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msnet.view.AddressBookDialogController">
    <children>
       <TableView fx:id="companyInfoTableView" layoutX="18.0" layoutY="64.0" prefHeight="400.0" prefWidth="634.0" stylesheets="@tableview.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
         <columns>
@@ -20,5 +21,10 @@
       </TableView>
       <JFXTextField fx:id="searchTextField" focusColor="WHITE" layoutX="24.0" layoutY="21.0" prefHeight="23.0" prefWidth="287.0" style="-fx-text-fill: white;" unFocusColor="#3cb0b4" AnchorPane.leftAnchor="17.0" AnchorPane.topAnchor="20.0" />
       <JFXButton layoutX="325.0" layoutY="20.0" onAction="#handleSearch" style="-fx-background-color: #3CB0B4; -fx-text-fill: white;" text="Search" AnchorPane.leftAnchor="320.0" AnchorPane.topAnchor="20.0" />
+      <JFXButton layoutX="890.0" layoutY="18.0" onAction="#handleClose" style="-fx-background-color: #C85B7D; -fx-text-fill: white;" text="X" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </JFXButton>
    </children>
 </AnchorPane>

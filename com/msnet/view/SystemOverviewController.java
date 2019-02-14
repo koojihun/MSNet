@@ -41,6 +41,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -71,8 +72,6 @@ public class SystemOverviewController implements Initializable {
 	private JFXButton miningButton;
 	//////////////////////////////////////////////////
 	// Tab
-	@FXML
-	private TextArea bitcoindTextArea;
 	@FXML
 	private TableView<NDBox> inventoryStatusTableView;
 	@FXML
@@ -142,7 +141,12 @@ public class SystemOverviewController implements Initializable {
 	private MainApp mainApp;
 	private ObservableList<String> dateList;
 	private static AnchorPane systemOverview;
-
+	@FXML
+	private AnchorPane left_anchor;
+	@FXML
+	private TabPane right_tab;
+	public double xOffset = 0;
+	public double yOffset = 0;
 	//////////////////////////////////////////////////
 	public SystemOverviewController() { }
 
@@ -152,7 +156,40 @@ public class SystemOverviewController implements Initializable {
 		// In Memory Database Initialize. //
 		new PDB(); //
 		new WDB(); //
-		//////////////////////////////////////
+		/////////////////////////////////////////////////////////////
+		// To move an undecorated stage. //
+		left_anchor.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				xOffset = event.getSceneX();
+	            yOffset = event.getSceneY();		
+			}
+		});
+		
+		left_anchor.setOnMouseDragged(new EventHandler<MouseEvent>() {
+	        @Override
+	        public void handle(MouseEvent event) {
+	        	mainApp.getPrimaryStage().setX(event.getScreenX() - xOffset);
+	        	mainApp.getPrimaryStage().setY(event.getScreenY() - yOffset);
+	        }
+	    });
+		
+		right_tab.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				xOffset = event.getSceneX();
+	            yOffset = event.getSceneY();		
+			}
+		});
+		
+		right_tab.setOnMouseDragged(new EventHandler<MouseEvent>() {
+	        @Override
+	        public void handle(MouseEvent event) {
+	        	mainApp.getPrimaryStage().setX(event.getScreenX() - xOffset);
+	        	mainApp.getPrimaryStage().setY(event.getScreenY() - yOffset);
+	        }
+	    });
+		////////////////////////////////////////////////////////////////////
 		product_expirationDateTextField.setEditable(false);
 		
 		companyTextField.setEditable(false);
@@ -318,7 +355,23 @@ public class SystemOverviewController implements Initializable {
 		workerTableView.setContextMenu(menu_worker);
 		///////////////////////////////////////////////////////////////////
 	}
-
+	
+	@FXML
+	public void handleMinimize() {
+		mainApp.getPrimaryStage().setIconified(true);
+	}
+	
+	@FXML
+	public void handleClose() {
+		try {
+			mainApp.stop();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Platform.exit();
+        System.exit(0);
+	}
+	
 	@FXML
 	public void handleAddressBook() {
 		showAddressBookDialog();
@@ -538,8 +591,11 @@ public class SystemOverviewController implements Initializable {
 			dialogStage.setScene(scene);
 
 			ProductInfoDialogController controller = loader.getController();
+			controller.setDialogStage(dialogStage);
 			controller.setProduct(prodList);
+			controller.setMain(mainApp);
 			dialogStage.showAndWait();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -557,7 +613,7 @@ public class SystemOverviewController implements Initializable {
 			dialogStage.initOwner(mainApp.getPrimaryStage());
 			Scene scene = new Scene(addressBookPane);
 			dialogStage.setScene(scene);
-
+			
 			AddressBookDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
 			controller.setCompanyTextField(companyTextField);
@@ -584,11 +640,12 @@ public class SystemOverviewController implements Initializable {
 
 			ChartDialogController controller = loader.getController();
 			controller.setMain(mainApp);
+			controller.setDialogStage(dialogStage);
 			controller.setNDList(PDB.getNDList());
 			controller.setNList(PDB.getNList());
 			controller.setLineChart();
 			controller.setStackChart();
-			dialogStage.show();
+			dialogStage.showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

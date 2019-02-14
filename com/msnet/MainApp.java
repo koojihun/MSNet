@@ -9,12 +9,15 @@ import com.msnet.util.ThreadGroup;
 import com.msnet.view.LoginViewController;
 import com.msnet.view.SystemOverviewController;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class MainApp extends Application {
 
@@ -22,7 +25,10 @@ public class MainApp extends Application {
 	public static final double HEIGHT = 900;
 	private Stage primaryStage;
 	public static BitcoinJSONRPCClient bitcoinJSONRPClient;
-
+	
+	public double xOffset = 0;
+	public double yOffset = 0;
+	
 	public static void main(String[] args) throws Exception {
 		launch(args);
 	}
@@ -31,6 +37,7 @@ public class MainApp extends Application {
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("MSNet");
+		this.primaryStage.initStyle(StageStyle.UNDECORATED);
 		showLoginView();
 	}
 
@@ -46,8 +53,25 @@ public class MainApp extends Application {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/LoginView.fxml"));
 			AnchorPane loginPane = (AnchorPane) loader.load();
-
+ 
 			Scene loginScene = new Scene(loginPane);
+			
+			loginScene.setOnMousePressed(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					xOffset = event.getSceneX();
+		            yOffset = event.getSceneY();					
+				}
+			});
+			
+			loginScene.setOnMouseDragged(new EventHandler<MouseEvent>() {
+		        @Override
+		        public void handle(MouseEvent event) {
+		            primaryStage.setX(event.getScreenX() - xOffset);
+		            primaryStage.setY(event.getScreenY() - yOffset);
+		        }
+		    });
+			
 			LoginViewController controller = loader.getController();
 			controller.setPane(loginPane);
 			controller.setMain(this);
@@ -65,11 +89,9 @@ public class MainApp extends Application {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/SystemOverview.fxml"));
 			AnchorPane systemOverview = (AnchorPane) loader.load();
-
-			Scene scene = new Scene(systemOverview);
+			Scene scene = new Scene(systemOverview);		
 			centerStage(primaryStage, WIDTH, HEIGHT);
 			primaryStage.setScene(scene);
-
 			SystemOverviewController controller = loader.getController();
 			controller.setPane(systemOverview);
 			controller.setMainApp(this);

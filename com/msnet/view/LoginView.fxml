@@ -41,5 +41,10 @@
             </JFXButton>
          </children>
       </AnchorPane>
+      <JFXButton fx:id="enterButton1" layoutX="469.0" layoutY="14.0" onAction="#handleClose" style="-fx-background-color: #C95E97; -fx-text-fill: white;" text="X" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0">
+         <font>
+            <Font name="Arial" size="13.0" />
+         </font>
+      </JFXButton>
    </children>
 </AnchorPane>

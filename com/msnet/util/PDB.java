@@ -85,10 +85,10 @@ public class PDB {
 	public static void reserveProduct(String time, String address, String company, NDBox selectedNDBox, int count) {
 		Reservation r = new Reservation(time, address, company, selectedNDBox, count);
 		rList.add(r);
-		 
+
 		DB db = new DB();
 		db.writeReservation(r);
-		
+
 		NBox nBox = nMap.get(selectedNDBox.getProductName());
 		nBox.setAvailable(nBox.getAvailable() - count);
 
@@ -127,7 +127,8 @@ public class PDB {
 		return completedRList;
 	}
 
-	public static Reservation findReservation(String prodName, String productionDate, String expirationDate, String bitcoin_address) {
+	public static Reservation findReservation(String prodName, String productionDate, String expirationDate,
+			String bitcoin_address) {
 		Reservation tmpR;
 
 		for (int i = 0; i < rList.size(); i++) {
@@ -141,60 +142,52 @@ public class PDB {
 		}
 		return null;
 	}
-/*
-	public static boolean isExistPID_in_Reservation(Reservation r, String pid) {
-		ArrayList<Product> tmpProductList = r.getProductList();
-		String tmpPID;
-		for (Product p : tmpProductList) {
-			tmpPID = p.getPid();
-			if (pid.equals(tmpPID)) {
-				return true;
-			}
-		}
-		return false;
-	}
-*/
-	public static String sendProduct(String bitcoin_address, String pid, String prodName, String productionDate, String expirationDate, String wid) {
+
+	/*
+	 * public static boolean isExistPID_in_Reservation(Reservation r, String pid) {
+	 * ArrayList<Product> tmpProductList = r.getProductList(); String tmpPID; for
+	 * (Product p : tmpProductList) { tmpPID = p.getPid(); if (pid.equals(tmpPID)) {
+	 * return true; } } return false; }
+	 */
+	public static String sendProduct(String bitcoin_address, String pid, String prodName, String productionDate,
+			String expirationDate, String wid) {
 		// sendReservation: reservation that matches the information to be sent in the
 		// reservation list
 		Reservation sendReservation = PDB.findReservation(prodName, productionDate, expirationDate, bitcoin_address);
 		DB db = new DB();
+		String result = null;
 		if (sendReservation == null) {
 			// When there is no reservation matching the condition in the reservation list,
 			// an alert window
 			System.out.println("======== 존재하지 않는 reservation =========");
 			return "notExist";
-		} else if (db.isExist_pid(pid)) {
-			System.out.println("========== 이미 보낸 제품 ===========");
-			return "sentProduct";
 		} else if (sendReservation.getQuantity() > sendReservation.getSuccess()) {
 			// Execute send_to_address when there is a reservation matching the condition in
 			// the reservation list
-					
 			Product p = new Product(productionDate, expirationDate, prodName, pid, wid);
-
-			if (sendReservation.getQuantity() - 1 == sendReservation.getSuccess()) {
+			result = MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
+			
+			if ( !result.equals("No Product.")) {
+				// result가 "No Product."가 아니므로 정상적인 Transaction 발생.
 				sendReservation.getProductList().add(p); // productList에 p 추가
-				db.writeProductList(pid, prodName, productionDate, expirationDate, sendReservation.getRid(), wid); // db에서도 p 추가
-				sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success + 1		
+				db.writeProductList(pid, prodName, productionDate, expirationDate, sendReservation.getRid(), wid); // db에서도  p 추가
+				sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success + 1
 				db.setSuccessPlusOne(sendReservation.getRid()); // db에서도 success + 1
 				
-				MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
+				if (sendReservation.getQuantity() - 1 == sendReservation.getSuccess()) {
+					// reservation에서 마지막 tx 상황일 때
+					completedRList.add(sendReservation);
+					db.writeCompletedReservation(sendReservation);
+					rList.remove(sendReservation);
+					db.deleteReservation(sendReservation);
+				} 
 				
-				completedRList.add(sendReservation);
-				db.writeCompletedReservation(sendReservation);
-				rList.remove(sendReservation);	
-				db.deleteReservation(sendReservation);
+				return "success";
 			} else {
-				sendReservation.getProductList().add(p);
-				db.writeProductList(pid, prodName, productionDate, expirationDate, sendReservation.getRid(), wid);
-				sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success
-				db.setSuccessPlusOne(sendReservation.getRid());		
-				
-				MainApp.bitcoinJSONRPClient.send_to_address(bitcoin_address, pid);
+				// result가 "No Product."이므로 이미 보낸 제품
+				System.out.println("========== 이미 보낸 제품 ===========");
+				return "sentProduct";
 			}
-			
-			return "success";
 		} else {
 			System.out.println("===== 할당량 끝 =====");
 			return "overflow";
