@@ -22,7 +22,7 @@ public class QRMaker {
 	public QRMaker(int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.filePath = "C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\QRcodes";
+		this.filePath = "C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\bitcoin\\QRcodes";
 	}
 
 	public void makeQR(String fileName, String content, String filePath) {

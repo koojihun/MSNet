@@ -1,8 +1,9 @@
 package com.msnet.view;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,7 +47,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
@@ -410,6 +410,15 @@ public class SystemOverviewController implements Initializable {
 	public void handleFileWrite() {
 		DB db = new DB();
 		db.writeToFile();
+	}
+	
+	@FXML
+	public void handleOpenFolder() {
+		try {
+			Desktop.getDesktop().open(new File("C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\bitcoin"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@FXML
