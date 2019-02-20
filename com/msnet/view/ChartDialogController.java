@@ -225,6 +225,7 @@ public class ChartDialogController implements Initializable {
 	}
 	
 	public void setStackChart(String unit) {
+		stackChart.getData().clear();
 		this.completedRList = PDB.getComplitedRList();
 		Map<String, Map<String, Integer>> by_DateProdName = completedRList.stream()
 				.collect(Collectors.groupingBy(r -> r.getProductName(),
@@ -237,7 +238,6 @@ public class ChartDialogController implements Initializable {
 				seriesSuccess.getData()
 						.add(new XYChart.Data<String, Integer>(innerKey, by_DateProdName.get(key).get(innerKey)));
 			}
-			stackChart.getData().clear();
 			stackChart.getData().add(seriesSuccess);
 		}
 	}
