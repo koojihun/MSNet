@@ -18,10 +18,6 @@
 
 package com.bitcoinClient.krotjson;
 
-/**
- *
- * @author Mikhail Yevchenko m.ṥῥẚ�?.?�ѐḿởύḙ@azazar.com
- */
 public class StringParser {
 
     private String string;

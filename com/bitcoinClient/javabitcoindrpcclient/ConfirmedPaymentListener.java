@@ -8,10 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 import com.bitcoinClient.javabitcoindrpcclient.BitcoindRpcClient.Transaction;
 
-/**
- *
- * @author Mikhail Yevchenko m.ṥῥẚ�?.?�ѐḿởύḙ@azazar.com
- */
 public abstract class ConfirmedPaymentListener extends SimpleBitcoinPaymentListener {
 
     public int minConf;

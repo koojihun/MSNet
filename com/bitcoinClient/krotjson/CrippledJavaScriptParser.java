@@ -27,10 +27,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-/**
- *
- * @author Mikhail Yevchenko m.ṥῥẚ�?.?�ѐḿởύḙ@azazar.com
- */
 public class CrippledJavaScriptParser {
     
     private static boolean isDigit(char ch) {

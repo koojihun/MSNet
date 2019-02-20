@@ -18,10 +18,6 @@
 
 package com.bitcoinClient.javabitcoindrpcclient;
 
-/**
- *
- * @author Mikhail Yevchenko m.ṥῥẚ�?.?�ѐḿởύḙ@azazar.com
- */
 public class BitcoinUtil {
     
     public static double normalizeAmount(double amount) {

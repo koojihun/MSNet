@@ -1,5 +1,8 @@
 package com.msnet.util;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -11,6 +14,7 @@ import org.sqlite.SQLiteConfig;
 import com.msnet.model.Product;
 import com.msnet.model.Reservation;
 import com.msnet.model.Worker;
+import com.opencsv.CSVWriter;
 
 public class DB {
 	private final String dbFileName = "C:\\Users\\" + Settings.getSysUsrName()
@@ -585,5 +589,46 @@ public class DB {
 		
 		return result;
 	}
+	public void writeToFile() {
+		Connection connection = null;
+		PreparedStatement prep = null;
+		ResultSet row = null;
 
+		try {
+			SQLiteConfig config = new SQLiteConfig();
+			connection = DriverManager.getConnection("jdbc:sqlite:" + this.dbFileName, config.toProperties());
+
+			String query = "select * from completedReservation;";
+			prep = connection.prepareStatement(query);
+			row = prep.executeQuery();
+			String filename = "C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\bitcoin\\transactionDB.csv";
+			CSVWriter writer = new CSVWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename), "euc-kr")), ',');
+			Boolean includeHeaders = true;
+			writer.writeAll(row, includeHeaders);
+			writer.close();
+			
+			query = "select id, name, phone from workerInfo;";
+			prep = connection.prepareStatement(query);
+			row = prep.executeQuery();
+			filename = "C:\\Users\\" + Settings.getSysUsrName() + "\\AppData\\Roaming\\bitcoin\\workerDB.csv";
+			writer = new CSVWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename), "euc-kr")), ',');
+			includeHeaders = true;
+			writer.writeAll(row, includeHeaders);
+			writer.close();			
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (prep != null)
+					prep.close();
+				if (row != null)
+					row.close();
+				if (connection != null)
+					connection.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }

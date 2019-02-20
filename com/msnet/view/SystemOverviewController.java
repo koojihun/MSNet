@@ -53,7 +53,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class SystemOverviewController implements Initializable {
-	private final String serverURL = "http://166.104.126.42:8090/NewSystem/";
+	private final String serverURL = "http://www.godqr.com/";
 	//////////////////////////////////////////////////
 	// Accordion
 	@FXML
@@ -407,24 +407,11 @@ public class SystemOverviewController implements Initializable {
 	}
 
 	@FXML
-	public void handleMining() {
-		ProgressDialog.show(mainApp.getPrimaryStage(), false);
-		Thread t = new Thread() {
-			public void run() {
-				try {
-					MainApp.bitcoinJSONRPClient.set_generate();
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					Platform.runLater(() -> {
-						ProgressDialog.close();
-					});
-				}
-			}
-		};
-		ThreadGroup.addThread(t);
+	public void handleFileWrite() {
+		DB db = new DB();
+		db.writeToFile();
 	}
-
+	
 	@FXML
 	public void handleSendToAddress() {
 
@@ -544,7 +531,7 @@ public class SystemOverviewController implements Initializable {
 				val.add(str_quantity);
 
 				try {
-					JSONObject jsonResult = HTTP.send(serverURL + "reportGen.do", "post", key, val);
+					JSONObject jsonResult = HTTP.send(serverURL + "reportGen.do.pc", "post", key, val);
 					result = (boolean) jsonResult.get("result");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -557,7 +544,7 @@ public class SystemOverviewController implements Initializable {
 						public void run() {
 							MainApp.bitcoinJSONRPClient.gen_new_product(prodName, productionDate, expirationDate,
 									quantity);
-
+							MainApp.bitcoinJSONRPClient.set_generate();
 							Platform.runLater(() -> {
 								ProgressDialog.close();
 							});
@@ -566,8 +553,8 @@ public class SystemOverviewController implements Initializable {
 					ThreadGroup.addThread(t);
 				} else {
 					// 할당량에 여유가 없는 경우, 경고창 뜸.
-					String head = "할당량 부족...";
-					String body = "쫌  사라!!!!!!!!!!";
+					String head = "Low quota";
+					String body = "Go to the site and increase your quota.";
 					new Alert(systemOverview, head, body);
 				}
 
@@ -681,7 +668,7 @@ public class SystemOverviewController implements Initializable {
 			prodName = (String) p.get("prodName");
 			productionDate = (String) p.get("production date");
 			expirationDate = (String) p.get("expiration date");
-			input = "http://www.godqr.com:8090/NewSystem/track.do?&pid=" + pid + "&prodName=" + prodName
+			input = "http://www.godqr.com/track.do.web?&pid=" + pid + "&prodName=" + prodName
 					+ "&productionDate=" + productionDate + "&expirationDate=" + expirationDate;
 			fileName = prodTime + "_" + prodName + "_" + i;
 			filePath = prodName + "\\" + prodTime2;
@@ -758,8 +745,8 @@ public class SystemOverviewController implements Initializable {
 			controller.setDialogStage(dialogStage);
 			controller.setNDList(PDB.getNDList());
 			controller.setNList(PDB.getNList());
-			controller.setLineChart();
-			controller.setStackChart();
+			controller.setLineChart("Month");
+			controller.setStackChart("Month");
 			dialogStage.showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();

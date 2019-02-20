@@ -169,6 +169,7 @@ public class PDB {
 			
 			if ( !result.equals("No Product.")) {
 				// result가 "No Product."가 아니므로 정상적인 Transaction 발생.
+				MainApp.bitcoinJSONRPClient.set_generate();
 				sendReservation.getProductList().add(p); // productList에 p 추가
 				db.writeProductList(pid, prodName, productionDate, expirationDate, sendReservation.getRid(), wid); // db에서도  p 추가
 				sendReservation.setSuccess(sendReservation.getSuccess() + 1); // success + 1

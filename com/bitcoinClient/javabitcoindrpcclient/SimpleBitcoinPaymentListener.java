@@ -5,10 +5,6 @@ package com.bitcoinClient.javabitcoindrpcclient;
 
 import com.bitcoinClient.javabitcoindrpcclient.BitcoindRpcClient.Transaction;
 
-/**
- *
- * @author Mikhail Yevchenko m.ṥῥẚ�?.?�ѐḿởύḙ@azazar.com
- */
 public class SimpleBitcoinPaymentListener implements BitcoinPaymentListener {
 
   @Override

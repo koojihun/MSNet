@@ -67,19 +67,30 @@ public class Reservation {
 		return time.get();
 	}
 
-	public String getYEARMONTH() {
+	public String getDateByUnit(String unit) {
 		try {
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date from;
 			from = df.parse(time.get());
-			//SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM");
-			SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH");
+			SimpleDateFormat transFormat = null;
+			if (unit.equals("Year")) {
+				transFormat = new SimpleDateFormat("yyyy");
+			} else if (unit.equals("Month")) {
+				transFormat = new SimpleDateFormat("yyyy-MM");
+			} else if (unit.equals("Day")) {
+				transFormat = new SimpleDateFormat("yyyy-MM-dd");
+			} else if (unit.equals("Hour")) {
+				transFormat = new SimpleDateFormat("yyyy-MM-dd HH");
+			} else {
+				transFormat = new SimpleDateFormat("yyyy-MM");
+			}
+
 			String to = transFormat.format(from);
 			return to;
 		} catch (ParseException e) {
 			e.printStackTrace();
 			return null;
-		}	
+		}
 	}
 
 	public void setTime(String time) {

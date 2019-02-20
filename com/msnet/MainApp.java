@@ -39,6 +39,7 @@ public class MainApp extends Application {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("MSNet");
 		this.primaryStage.initStyle(StageStyle.UNDECORATED);
+		this.primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
 		showLoginView();
 	}
 

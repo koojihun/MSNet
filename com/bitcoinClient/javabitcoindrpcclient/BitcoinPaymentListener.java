@@ -18,10 +18,6 @@
 
 package com.bitcoinClient.javabitcoindrpcclient;
 
-/**
- *
- * @author Mikhail Yevchenko: m.ṥῥẚ�?.?�ѐḿởύḙ@azazar.com
- */
 public interface BitcoinPaymentListener {
 
     public void block(String blockHash);

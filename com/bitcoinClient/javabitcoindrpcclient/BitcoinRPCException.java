@@ -17,11 +17,7 @@
  */
 package com.bitcoinClient.javabitcoindrpcclient;
 
-/**
- *
- * @author Mikhail Yevchenko m.ṥῥẚ�?.?�ѐḿởύḙ@azazar.com, Alessandro Polverini
- * <alex@polverini.org>
- */
+
 public class BitcoinRPCException extends GenericRpcException {
 
   private String rpcMethod;

@@ -23,10 +23,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Mikhail Yevchenko m.ṥῥẚ�?.?�ѐḿởύḙ@azazar.com
- */
 public class MapWrapper {
 
     public final Map m;

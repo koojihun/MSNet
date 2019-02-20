@@ -28,7 +28,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
 public class LoginViewController implements Initializable{
-	private final String serverURL = "http://166.104.126.42:8090/NewSystem/";
+	private final String serverURL = "http://www.godqr.com/";
 	@FXML
 	private JFXTextField idField;
 	@FXML
@@ -64,7 +64,7 @@ public class LoginViewController implements Initializable{
 	@FXML
 	public void handleSignUp() {
 		try {
-			Desktop.getDesktop().browse(new URI("http://166.104.126.42:8090/NewSystem/register.html"));
+			Desktop.getDesktop().browse(new URI("http://www.godqr.com/register.html"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
@@ -85,7 +85,7 @@ public class LoginViewController implements Initializable{
 		val.add(id);   val.add(password);   val.add("p");
 		
 		try {
-			JSONObject jsonResult = HTTP.send(serverURL + "signin.do", "post", key, val);
+			JSONObject jsonResult = HTTP.send(serverURL + "signin.do.pc", "post", key, val);
 			result = (boolean) jsonResult.get("result");
 		} catch (Exception e) {
 			e.printStackTrace();
