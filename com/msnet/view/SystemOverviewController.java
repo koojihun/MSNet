@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -588,23 +589,55 @@ public class SystemOverviewController implements Initializable {
 
 	@FXML
 	public void handleAdd() {
-
-		// 아직 안됨!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+		
 		String p_year = product_p_year_TextField.getText();
 		String p_month = product_p_month_TextField.getText();
 		String p_day = product_p_day_TextField.getText();
 		String p_hour = product_p_hour_TextField.getText();
 		String p_minute = product_p_minute_TextField.getText();
 		String p_second = product_p_second_TextField.getText();
-
+		String time = p_year + "-" + p_month + "-" + p_day + " " + p_hour + ":" + p_minute + ":" + p_second;
+		String str_term = termTextField.getText();
+		
 		if (p_year.equals("") | p_month.equals("") | p_day.equals("") | p_hour.equals("") | p_minute.equals("")
 				| p_second.equals("")) {
-			String head = "Enter the date.";
-			String body = "Please enter the required date information.";
+			String head = "날짜를 입력하세요.";
+			String body = "모든 날짜 정보를 올바르게 기입하세요.";
 			new Alert(systemOverview, head, body);
 		} else {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			int term = Integer.parseInt(str_term);
+			String unitOfTerm = dateBox.getSelectionModel().getSelectedItem();
+			
+			try {
+				Date d = format.parse(time);
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(d);
+				String expTime = "";
+				if (unitOfTerm.equals("시간")) {
+					cal.add(Calendar.HOUR, term);
+					expTime = format.format(cal.getTimeInMillis());
+				} else if (unitOfTerm.equals("일")) {
+					cal.add(Calendar.DATE, term);
+					expTime = format.format(cal.getTimeInMillis());
+				} else if (unitOfTerm.equals("월")) {
+					cal.add(Calendar.MONTH, term);
+					expTime = format.format(cal.getTimeInMillis());
+
+				} else if (unitOfTerm.equals("년")) {
+					cal.add(Calendar.YEAR, term);
+					expTime = format.format(cal.getTimeInMillis());
+				}
+				product_e_year_TextField.setText(expTime.substring(0, 4));
+				product_e_month_TextField.setText(expTime.substring(5, 7));
+				product_e_day_TextField.setText(expTime.substring(8, 10));
+				product_e_hour_TextField.setText(expTime.substring(11, 13));
+				product_e_minute_TextField.setText(expTime.substring(14, 16));
+				product_e_second_TextField.setText(expTime.substring(17, 19));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			
 		}
 	}
 
@@ -754,6 +787,7 @@ public class SystemOverviewController implements Initializable {
 			controller.setDialogStage(dialogStage);
 			controller.setNDList(PDB.getNDList());
 			controller.setNList(PDB.getNList());
+			controller.setBarChart();
 			controller.setLineChart("Month");
 			controller.setStackChart("Month");
 			dialogStage.showAndWait();

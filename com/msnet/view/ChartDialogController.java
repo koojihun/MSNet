@@ -110,7 +110,7 @@ public class ChartDialogController implements Initializable {
 		r_successColumn.setCellValueFactory(cellData -> cellData.getValue().successProperty().asObject());
 
 		// 프로그램이 실행될 때 reservation.dat에 저장된 reservation 데이터를 읽어서 rList에 추가
-		reservationStatusTableView.setItems(PDB.getComplitedRList());
+		reservationStatusTableView.setItems(PDB.getCompletedRList());
 
 		reservationStatusTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
@@ -189,7 +189,10 @@ public class ChartDialogController implements Initializable {
 
 	public void setNList(ObservableList<NBox> nList) {
 		this.nList = nList;
-		for (NBox nBox : nList) {
+	}
+
+	public void setBarChart() {
+		for (NBox nBox : this.nList) {
 			nameList.add(nBox.getProductName());
 		}
 		bar_xAxis.setCategories(nameList);
@@ -200,17 +203,17 @@ public class ChartDialogController implements Initializable {
 		seriesAvailable.setName("Available");
 
 		for (int i = 0; i < nameList.size(); i++) {
-			seriesQuantity.getData().add(new XYChart.Data<>(nameList.get(i), nList.get(i).getQuantity()));
-			seriesAvailable.getData().add(new XYChart.Data<>(nameList.get(i), nList.get(i).getAvailable()));
+			seriesQuantity.getData().add(new XYChart.Data<>(nameList.get(i), this.nList.get(i).getQuantity()));
+			seriesAvailable.getData().add(new XYChart.Data<>(nameList.get(i), this.nList.get(i).getAvailable()));
 		}
 
 		barChart.getData().add(seriesQuantity);
 		barChart.getData().add(seriesAvailable);
 	}
-
+	
 	public void setLineChart(String unit) {
 
-		this.completedRList = PDB.getComplitedRList();
+		this.completedRList = PDB.getCompletedRList();
 		Map<String, Integer> by_Date = completedRList.stream()
 				.collect(Collectors.groupingBy(r -> r.getDateByUnit(unit), Collectors.summingInt(r -> r.getSuccess())));
 
@@ -226,7 +229,7 @@ public class ChartDialogController implements Initializable {
 	
 	public void setStackChart(String unit) {
 		stackChart.getData().clear();
-		this.completedRList = PDB.getComplitedRList();
+		this.completedRList = PDB.getCompletedRList();
 		Map<String, Map<String, Integer>> by_DateProdName = completedRList.stream()
 				.collect(Collectors.groupingBy(r -> r.getProductName(),
 						Collectors.groupingBy(r -> r.getDateByUnit(unit), Collectors.summingInt(r -> r.getSuccess()))));

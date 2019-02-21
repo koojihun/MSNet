@@ -123,7 +123,7 @@ public class PDB {
 		return rList;
 	}
 
-	public static ObservableList<Reservation> getComplitedRList() {
+	public static ObservableList<Reservation> getCompletedRList() {
 		return completedRList;
 	}
 

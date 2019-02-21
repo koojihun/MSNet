@@ -247,7 +247,7 @@ public class DB {
 				Reservation r = new Reservation(row.getInt("rid"), row.getString("time"), row.getString("toAddress"),
 						row.getString("toCompany"), row.getString("productName"), row.getString("productionDate"),
 						row.getString("expirationDate"), row.getInt("quantity"), row.getInt("success"), tmpList);
-				PDB.getComplitedRList().add(r);
+				PDB.getCompletedRList().add(r);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
